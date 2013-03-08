@@ -1,0 +1,60 @@
+<body>
+<p>
+This library constitutes the Norconex Java Execution Framework.
+</p>
+<p>
+Simple steps to get started:
+<ul>
+  <li>Create one or more jobs ({@link com.norconex.jef.IJob}) to accomplish
+      the required tasks.
+  <li>If you have more than one job, assemble/group them together using one or
+      a combination of
+      {@link com.norconex.jef.AsyncJobGroup} and
+      {@link com.norconex.jef.SyncJobGroup}.
+  <li>Create and configure a job suite ({@link com.norconex.jef.suite.JobSuite})
+      with your created jobs (it is recommended you use 
+      {@link com.norconex.jef.suite.IJobSuiteFactory} for the suite creation
+       process).
+  <li>Run your job suite by passing it to 
+      {@link com.norconex.jef.JobRunner#runSuite(com.norconex.jef.suite.JobSuite)}.
+</ul>
+</p>
+
+<p>
+The creation of a job suite may look like this:
+<pre>
+    public class MyJobSuiteFactory implements IJobSuiteFactory {
+    
+        public JobSuite createJobSuite() {
+            IJob rootJob = new AsyncJobGroup("asyncGroupSample", new IJob[] {
+                    new MyJobA(),
+                    new SyncJobGroup("syncGroupSample", new IJob[] {
+                            new MyJobB(),
+                            new MyJobC()
+                    }),    
+                    new MyJobD(),
+                    new MyJobE()),
+            });
+            JobSuite suite = new JobSuite(rootJob);
+            
+            // add any listners/handlers to the suite
+
+            return suite;
+        }
+    }
+</pre>
+</p>
+
+<p>
+In the end, launching a job suite may look like this:
+
+<pre>
+    IJobSuiteFactory factory = new MyJobSuiteFactory();
+    JobSuite suite = factory.createJobSuite();
+    JobRunner jobRunner = new JobRunner();
+    jobRunner.runSuite(suite);
+</pre>
+
+</p>
+
+</body>

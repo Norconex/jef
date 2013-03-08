@@ -1,0 +1,64 @@
+Changes for each release.
+
+2.0.0 (2012-11-20):
+-------------------
+• Minimum Java Runtime Environment requirement now 1.6.
+• SystemCommand can now run processes in background (new method argument).
+• New method ExecUtils#watchProcessOutput(...) to listen for a process output
+  without waiting for it to finish before returning. 
+• IJob.getMinimum(), getMaximum(), and getDescription() now replaced with a 
+  createJobContext() method.
+• Added new framework feature to cleanly stop running suites.
+• Added more progress events to IJobProgressListener class.
+• New CharsetUtils class.  
+• New IJobStatus which provides a read-only account of a job progress.
+  IJobStatus is now used in most places where JobProgress was found before.
+• New IJobSuiteProgressRenderer with one implementation:
+  XMLJobSuiteProgressRenderer to print the job suite progress as XML.
+• JobProgress status has been remodelled and can be obtain via #getStatus.
+
+1.1.1 (2011-04-05):
+-----------------------
+• New AsyncLimitedJobGroup to handle groups of jobs asynchronously, but only
+  up to a maximum at a time.
+• Added capability to get last failed job progress information from any
+  applicable JobProgress instance.
+• Added constructor JobSuite(IJob job, ILogManager logManager).
+• Added #createDateDirs(...) method to FileSystemUtils.
+• Improved: FileProgressSerializer and FileLogManager now creates y/m/d 
+  directories when backing up files, to limit the number of files in a single 
+  backup directory.
+• Fixed AbstractResumableJob not recognising properly when a job truly resumes.
+
+1.1.0 (2008-07-11):
+-----------------------
+• Fixed NPE in FileLogManager#getLog(String, String) when log did not exist.
+
+1.1.0_RC2 (2008-01-07):
+-----------------------
+• Added input stream filtering capabilities to FileUtils #head and #tail. 
+• New input stream filtering classes: FilteredInputStream, IInputStreamFilter,
+  RegexInputStream.
+• Fixed NPE in FileLogManager#getLog(String, String) when log did not exist.
+• Improved: FileLogManager log viewing now much faster.
+
+1.1.0_RC1 (2007-09-19):
+-----------------------
+• New SystemCommand and SystemCommandJob classes to help with command-line
+  program execution.
+• New ReverseFileInputStream for reading a file backwards.
+• New JobProgressUtils class adding progress related convenience methods.
+• New IJobSuiteVisitor for navigating through a JobSuite.
+• New AbstractJob providing a base implementation for id and description.
+• Added convenience methods for getting specific job and job progress
+  instances from a JobSuite.
+• Added #getFile(...) and #getClass(...) methods to ConfigProperties.
+• Added #getJobProgress(IJob) to JobSuite.
+• Fixed AsyncJobGroup defining the current job to be the Thread id as opposed
+  to its own id (also affects logging).
+• ConfigProperties.setString(...) now allows for null value
+  (will store a blank string).
+
+1.0.0 (2007-02-24):
+-------------------
+• Initial release.

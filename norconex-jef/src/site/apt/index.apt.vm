@@ -1,0 +1,54 @@
+            ------
+            Home
+            ------
+            Norconex Inc.
+            ------
+
+Welcome to Norconex JEF
+
+  JEF stands for <<Job Execution Framework>> and is first and foremost a 
+  Java API library.  It is typically meant for developers and integrators who
+  have to build any kind of maintenance tasks on a server.  JEF let's you 
+  build those jobs as you normally would using Java. Then, JEF strives to 
+  make it easier while offering a set of "out-of-the-box" functionalities that 
+  would otherwise be tedious and sometimes costly to do from scratch.   
+  These functionalities includes:
+
+  * Better error handing and reporting
+
+  * Crash recovery (resuming jobs where they failed)
+
+  * Self-diagnostics of process issues
+
+  * Email notification (upon success, failure, etc.)
+
+  * Chaining of individual jobs (Both synchronous and asynchronous 
+    jobs are supported)
+
+  * Centralized process logging
+
+  * More robust execution of system commands
+
+  []  
+  
+  Norconex also provides <<JEF Web Monitor>> which offers a glance view
+  of all running jobs, with possibilities to perform actions on them.
+  
+  TODO: put JEF Mon picture here.
+  
+  The current version of {{{http://jef.norconex.com}Norconex JEF}} is
+  ${project.version}
+  
+  
+  <<SITE IN HEAVY DEVELOPMENT.  PLEASE IGNORE.  DO NOT RELY>>
+  
+  Commercial Support
+  
+  License
+  
+  Talk about flexibility of configuration by pointing to Configuration Javadoc?
+  
+  Add Google adds?
+  
+  
+
