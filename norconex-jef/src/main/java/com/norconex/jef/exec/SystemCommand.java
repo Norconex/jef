@@ -9,8 +9,8 @@ import java.util.List;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import com.norconex.commons.lang.io.IStreamListener;
 import com.norconex.jef.AsyncJobGroup;
-import com.norconex.jef.io.IStreamListener;
 
 /**
  * Represents a program to be executed by the underlying system

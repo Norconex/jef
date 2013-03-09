@@ -1,5 +1,6 @@
 package com.norconex.jef.suite;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.norconex.commons.lang.Sleeper;
 import com.norconex.jef.IJob;
 import com.norconex.jef.IJobContext;
 import com.norconex.jef.IJobGroup;
@@ -20,7 +22,6 @@ import com.norconex.jef.progress.IJobProgressSerializer;
 import com.norconex.jef.progress.IJobStatus;
 import com.norconex.jef.progress.JobProgressPropertiesFileSerializer;
 import com.norconex.jef.progress.JobProgressStateChangeAdapter;
-import com.norconex.jef.util.Sleeper;
 
 /**
  * A job suite is an amalgamation of jobs, represented as a single executable
@@ -86,7 +87,7 @@ public final class JobSuite {
      * @param job root job for the suite
      */
     public JobSuite(final IJob job) {
-        this(job, new JobProgressPropertiesFileSerializer());
+        this(job, new JobProgressPropertiesFileSerializer(getDefaultWorkDir()));
     }
     /**
      * Creates a new job suite using a {@link FileLogManager}.
@@ -95,7 +96,7 @@ public final class JobSuite {
      */
     public JobSuite(
             final IJob job, final IJobProgressSerializer progressSerializer) {
-        this(job, progressSerializer, new FileLogManager());
+        this(job, progressSerializer, new FileLogManager(getDefaultWorkDir()));
     }
     /**
      * Creates a new job suite using a {@link JobProgressPropertiesFileSerializer}.
@@ -106,7 +107,8 @@ public final class JobSuite {
     public JobSuite(
             final IJob job,
             final ILogManager logManager) {
-        this(job, new JobProgressPropertiesFileSerializer(), logManager);
+        this(job, new JobProgressPropertiesFileSerializer(
+                getDefaultWorkDir()), logManager);
     }
     /**
      * Creates a new job suite.
@@ -119,7 +121,8 @@ public final class JobSuite {
             final IJobProgressSerializer progressSerializer,
             final ILogManager logManager) {
         this(job, progressSerializer, logManager, 
-                new FileStopRequestHandler(job.getId()));
+                new FileStopRequestHandler(
+                        job.getId(), getDefaultWorkDir()));
         
     }
     /**
@@ -484,4 +487,29 @@ public final class JobSuite {
             }
         }
     }
+    
+    /**
+     * Gets the default path to the JEF working directory for file-system
+     * related operations.  The path is determined in one of the following
+     * way (in order):
+     * <ul>
+     *   <li>The system property "jef.job.dir".
+     *   <li>The system property "user.home", appended with
+     *       "/norconex/jef/jobs"
+     * </ul>
+     * @return path to default working directory
+     */
+    public static String getDefaultWorkDir() {
+        String jobDir = System.getProperty("jef.job.dir");
+        if (jobDir == null) {
+            jobDir = System.getProperty("user.home")
+                    + "/norconex/jef/jobs";
+        }
+        File dir = new File(jobDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return jobDir;
+    }    
+    
 }

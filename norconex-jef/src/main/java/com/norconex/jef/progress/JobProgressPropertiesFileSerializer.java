@@ -13,9 +13,9 @@ import java.util.Date;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import com.norconex.commons.lang.io.FileUtil;
+import com.norconex.commons.lang.map.TypedProperties;
 import com.norconex.jef.IJobContext;
-import com.norconex.jef.io.FileSystemUtils;
-import com.norconex.jef.util.ConfigProperties;
 
 /**
  * Serializer using a file to store job process information. The created
@@ -37,14 +37,6 @@ public class JobProgressPropertiesFileSerializer
     /** Directory where to backup the file. */
     private String jobdirBackup;
 
-    /**
-     * Creates a file-based job progress serializer.  The mechanism used
-     * to find the base directory where to store the file is described in the
-     * {@link FileSystemUtils#getDefaultWorkDir()} method.
-     */
-    public JobProgressPropertiesFileSerializer() {
-        this(FileSystemUtils.getDefaultWorkDir());
-    }
     /**
      * Creates a file-based job progress serializer storing files in the given
      * job directory.
@@ -79,7 +71,7 @@ public class JobProgressPropertiesFileSerializer
         if (LOG.isDebugEnabled()) {
             LOG.debug("Serializing file: " + file);
         }
-        ConfigProperties config = new ConfigProperties();
+        TypedProperties config = new TypedProperties();
         OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
         config.setString("jobId", jobProgress.getJobId());
         config.setLong("minimum", jobContext.getProgressMinimum());
@@ -116,7 +108,7 @@ public class JobProgressPropertiesFileSerializer
             JobProgress progress = null;
             JobElapsedTime elapsedTime = new JobElapsedTime();
             progress = new JobProgress(jobId, jobContext, elapsedTime);
-            ConfigProperties config = new ConfigProperties();
+            TypedProperties config = new TypedProperties();
             InputStream is = new FileInputStream(file);
             config.load(is);
             if (LOG.isDebugEnabled()) {
@@ -186,7 +178,8 @@ public class JobProgressPropertiesFileSerializer
         String date = new SimpleDateFormat(
                 "yyyyMMddHHmmssSSSS").format(backupDate);
         try {
-            return new File(FileSystemUtils.createDateDirs(jobdirBackup, backupDate)
+            return new File(FileUtil.createDateDirs(
+                    new File(jobdirBackup), backupDate)
                     + "/" + date + "__" + namespace + "__" + jobId + ".job");
         } catch (IOException e) {
             return new File(jobdirBackup + "/" + date + "__"

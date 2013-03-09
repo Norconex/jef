@@ -2,7 +2,7 @@ package com.norconex.jef.mail;
 
 import java.io.IOException;
 
-import com.norconex.jef.io.IOUtils;
+import com.norconex.commons.lang.io.IOUtil;
 import com.norconex.jef.suite.JobSuite;
 
 /**
@@ -68,7 +68,7 @@ public abstract class AbstractMailNotifier {
     protected final String getLogTail(final JobSuite suite, final int lineQty)
             throws IOException {
         StringBuffer logTail = new StringBuffer();
-        String[] lines = IOUtils.tail(
+        String[] lines = IOUtil.tail(
                 suite.getLogManager().getLog(suite.getNamespace()), lineQty);
         if (lines.length == 0) {
             logTail.append("*** No log found. ***\n");

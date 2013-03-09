@@ -1,7 +1,8 @@
 package com.norconex.jef.exec;
 
-import com.norconex.jef.io.IStreamListener;
-import com.norconex.jef.io.StreamGobbler;
+import com.norconex.commons.lang.io.IStreamListener;
+import com.norconex.commons.lang.io.StreamGobbler;
+import com.norconex.jef.JobRunner;
 
 /**
  * Utility methods related to process execution.
@@ -154,15 +155,26 @@ public final class ExecUtils {
             Process process,
             IStreamListener[] outputListeners,
             IStreamListener[] errorListeners) {
+        final String jobId = JobRunner.getCurrentJobId();
         // listen for output
         StreamGobbler output = 
-                new StreamGobbler(process.getInputStream(), STDOUT);
+                new StreamGobbler(process.getInputStream(), STDOUT) {
+            @Override
+            protected void beforeStreaming() {
+                JobRunner.setCurrentJobId(jobId);
+            }
+        };
         output.addStreamListeners(outputListeners);
         output.start();
 
         // listen for error
         StreamGobbler error = 
-            new StreamGobbler(process.getErrorStream(), STDERR);
+            new StreamGobbler(process.getErrorStream(), STDERR) {
+            @Override
+            protected void beforeStreaming() {
+                JobRunner.setCurrentJobId(jobId);
+            }
+        };
         error.addStreamListeners(errorListeners);
         error.start();
     }

@@ -7,6 +7,7 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import com.norconex.commons.lang.Sleeper;
 import com.norconex.jef.error.IErrorEvent;
 import com.norconex.jef.error.IErrorHandler;
 import com.norconex.jef.progress.IJobProgressListener;
@@ -17,7 +18,6 @@ import com.norconex.jef.suite.IJobSuiteStopRequestHandler;
 import com.norconex.jef.suite.ISuiteLifeCycleListener;
 import com.norconex.jef.suite.ISuiteStopRequestListener;
 import com.norconex.jef.suite.JobSuite;
-import com.norconex.jef.util.Sleeper;
 
 /**
  * Responsible for managing the execution of a suite and its related jobs.

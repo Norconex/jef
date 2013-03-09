@@ -7,7 +7,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.norconex.jef.JobException;
-import com.norconex.jef.io.FileSystemUtils;
 
 /**
  * Listens for STOP requests using a stop file.  The stop file
@@ -33,17 +32,6 @@ public class FileStopRequestHandler
     private boolean listening = false;
     
 
-    /**
-     * Creates a file-based job stop request advisor.  If a file bearing
-     * the job suite name (i.e. namespace) is found, with the extension
-     * ".stop", a stop request event will be send to the listener and the stop
-     * file will be deleted.  The mechanism used
-     * to find the base directory where to store the stop file is described 
-     * in the {@link FileSystemUtils#getDefaultWorkDir()} method.
-     */
-    public FileStopRequestHandler(String namespace) {
-        this(namespace, FileSystemUtils.getDefaultWorkDir());
-    }
     /**
      * Creates a file-based job stop request advisor storing files in the given
      * job directory.

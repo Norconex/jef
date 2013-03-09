@@ -15,7 +15,7 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.PatternLayout;
 
-import com.norconex.jef.io.FileSystemUtils;
+import com.norconex.commons.lang.io.FileUtil;
 
 /**
  * Log manager using the file system to store its logs.
@@ -27,16 +27,16 @@ public class FileLogManager implements ILogManager {
     /** Directory where to store the file. */
     private final String logdirLatest;
     /** Directory where to backup the file. */
-    private final String logdirBackup;
+    private final File logdirBackup;
     /** Log4J layout to use for the generated log. */
     private final ThreadSafeLayout layout;
     
-    /**
-     * Constructor.
-     */
-    public FileLogManager() {
-        this(FileSystemUtils.getDefaultWorkDir());
-    }
+//    /**
+//     * Constructor.
+//     */
+//    public FileLogManager() {
+//        this(JefUtils.getDefaultWorkDir());
+//    }
 
     /**
      * Constructor.
@@ -57,15 +57,14 @@ public class FileLogManager implements ILogManager {
     public FileLogManager(final String logdir, final Layout layout) {
         super();
         logdirLatest = logdir + "/latest";
-        logdirBackup = logdir + "/backup";
+        logdirBackup = new File(logdir + "/backup");
         this.layout = new ThreadSafeLayout(layout);
-        File dir = new File(logdirLatest);
-        if (!dir.exists()) {
-            dir.mkdirs();
+        File latestDir = new File(logdirLatest);
+        if (!latestDir.exists()) {
+            latestDir.mkdirs();
         }
-        dir = new File(logdirBackup);
-        if (!dir.exists()) {
-            dir.mkdirs();
+        if (!logdirBackup.exists()) {
+            logdirBackup.mkdirs();
         }
     }
 
@@ -75,8 +74,7 @@ public class FileLogManager implements ILogManager {
     public final Appender createAppender(final String namespace)
             throws IOException {
         return new FileAppender(
-                layout,
-                logdirLatest + "/" + namespace + ".log");
+                layout, logdirLatest + "/" + namespace + ".log");
     }
     
     /**
@@ -88,9 +86,8 @@ public class FileLogManager implements ILogManager {
                 "yyyyMMddHHmmssSSSS").format(backupDate);
         File progressFile = new File(logdirLatest + "/" + namespace + ".log");
         File backupFile =
-            new File(FileSystemUtils.createDateDirs(logdirBackup, backupDate)
+            new File(FileUtil.createDateDirs(logdirBackup, backupDate)
                     + "/" + date + "__" + namespace + ".log");
-//                new File(logdirBackup + "/" + date + "__" + namespace + ".log");
         if (!progressFile.renameTo(backupFile)) {
             throw new RuntimeException("Could not move file from \""
                     + progressFile + "\" to \"" + backupFile + "\"");
