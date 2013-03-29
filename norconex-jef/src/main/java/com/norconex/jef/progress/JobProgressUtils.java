@@ -1,9 +1,8 @@
 package com.norconex.jef.progress;
 
 import java.io.IOException;
-import java.util.Properties;
 
-import com.norconex.commons.lang.map.TypedProperties;
+import com.norconex.commons.lang.map.Properties;
 import com.norconex.jef.JobException;
 
 /**
@@ -19,17 +18,17 @@ public final class JobProgressUtils {
     }
 
     /**
-     * Gets meta data as a {@link TypedProperties} instance.  This is a 
+     * Gets meta data as a {@link Properties} instance.  This is a 
      * convenience method for treating the meta data string as properties.
      * It calls {@link JobProgress#getMetadata()} and parses it assuming it
      * follows {@link Properties} syntax.
      * @return configuration properties
      */
-    public static TypedProperties getMetaDataProperties(JobProgress progress) {
+    public static Properties getMetaDataProperties(JobProgress progress) {
         if (progress == null || progress.getMetadata() == null) {
             return null;
         }
-        TypedProperties props = new TypedProperties();
+        Properties props = new Properties();
         try {
             props.loadFromString(progress.getMetadata());
         } catch (IOException e) {
@@ -49,7 +48,7 @@ public final class JobProgressUtils {
      * @param props properties to store in job progress
      */
     public static void setMetaDataProperties(
-            JobProgress progress, TypedProperties props) {
+            JobProgress progress, Properties props) {
         if (progress == null || props == null) {
             return;
         }

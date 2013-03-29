@@ -14,7 +14,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.norconex.commons.lang.io.FileUtil;
-import com.norconex.commons.lang.map.TypedProperties;
+import com.norconex.commons.lang.map.Properties;
 import com.norconex.jef.IJobContext;
 
 /**
@@ -71,7 +71,7 @@ public class JobProgressPropertiesFileSerializer
         if (LOG.isDebugEnabled()) {
             LOG.debug("Serializing file: " + file);
         }
-        TypedProperties config = new TypedProperties();
+        Properties config = new Properties();
         OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
         config.setString("jobId", jobProgress.getJobId());
         config.setLong("minimum", jobContext.getProgressMinimum());
@@ -108,7 +108,7 @@ public class JobProgressPropertiesFileSerializer
             JobProgress progress = null;
             JobElapsedTime elapsedTime = new JobElapsedTime();
             progress = new JobProgress(jobId, jobContext, elapsedTime);
-            TypedProperties config = new TypedProperties();
+            Properties config = new Properties();
             InputStream is = new FileInputStream(file);
             config.load(is);
             if (LOG.isDebugEnabled()) {
