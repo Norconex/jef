@@ -6,7 +6,7 @@ import com.norconex.jef.suite.JobSuite;
 /**
  * Event thrown by the framework to all registered <code>ErrorHandler</code>
  * instances.
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 public interface IErrorEvent {
 

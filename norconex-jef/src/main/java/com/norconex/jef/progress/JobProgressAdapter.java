@@ -4,7 +4,7 @@ package com.norconex.jef.progress;
 /**
  * Adapter for a job life-cycle.  Default implementation for all
  * methods do nothing.
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 public class JobProgressAdapter implements IJobProgressListener {
 

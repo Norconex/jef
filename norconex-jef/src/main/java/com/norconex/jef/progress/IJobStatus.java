@@ -7,7 +7,7 @@ import com.norconex.jef.IJobContext;
 
 /**
  * Representation of a job execution status at any given time.
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  * @since 2.0
  */
 public interface IJobStatus extends Serializable {

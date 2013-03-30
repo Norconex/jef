@@ -22,7 +22,7 @@ import com.norconex.jef.IJobContext;
  * file name matches the job id, plus the ".job" extension.  The path
  * where to locate the file depends on the constructor invoked.
  *
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 @SuppressWarnings("nls")
 public class JobProgressPropertiesFileSerializer

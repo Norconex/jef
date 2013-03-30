@@ -13,7 +13,7 @@ import com.norconex.jef.suite.ISuiteStopRequestListener;
 
 /**
  * Responsible for keeping track reporting job execution progress.
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 public final class JobProgress 
         implements IJobStatus, ISuiteStopRequestListener  {

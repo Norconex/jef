@@ -7,7 +7,7 @@ import com.norconex.jef.progress.IJobStatus;
  * Convenience base implementation of {@link IJobSuiteVisitor}.
  * All methods are empty (do nothing) and are meant for developers to pick
  * and chose the method to overwrite.
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  * @since 1.1
  */
 public abstract class AbstractJobSuiteVisitor implements IJobSuiteVisitor {

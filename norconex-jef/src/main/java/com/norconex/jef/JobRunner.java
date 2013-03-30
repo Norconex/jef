@@ -21,7 +21,7 @@ import com.norconex.jef.suite.JobSuite;
 
 /**
  * Responsible for managing the execution of a suite and its related jobs.
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 @SuppressWarnings("nls")
 public class JobRunner {

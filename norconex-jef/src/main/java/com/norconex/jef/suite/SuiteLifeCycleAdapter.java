@@ -3,7 +3,7 @@ package com.norconex.jef.suite;
 /**
  * Adapter for a suite life-cycle listener.  Default implementation for all
  * methods do nothing.
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 public class SuiteLifeCycleAdapter implements ISuiteLifeCycleListener {
 

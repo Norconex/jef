@@ -26,7 +26,7 @@ import com.norconex.jef.suite.JobSuite;
  *   <li>use lazy-loading where possible
  * </ul>
  *
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 public interface IJob {
 

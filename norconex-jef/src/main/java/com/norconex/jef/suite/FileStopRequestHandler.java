@@ -13,7 +13,7 @@ import com.norconex.jef.JobException;
  * file name matches the suite namespace, plus the ".stop" extension.  
  * The directory where to locate the file depends on the constructor invoked.
  *
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  * @since 2.0
  */
 @SuppressWarnings("nls")

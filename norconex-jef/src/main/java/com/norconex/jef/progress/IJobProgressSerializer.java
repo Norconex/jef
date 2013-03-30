@@ -8,7 +8,7 @@ import com.norconex.jef.IJobContext;
 
 /**
  * Responsible for serializing a job progress.
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 public interface IJobProgressSerializer {
 

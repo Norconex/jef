@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Implementations of this interface will listen for stop signals sent 
  * to a running suite.   It is up to implementors to define the mechanism
  * by which to stop a running suite.  
- * @author Pascal Essiembre
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  * @since 2.0
  */
 public interface IJobSuiteStopRequestHandler extends Serializable {

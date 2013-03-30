@@ -14,7 +14,7 @@ import com.norconex.jef.suite.JobSuite;
 /**
  * Simple suite life-cycle listener notifying email recipients when a job suite
  * completes.
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 public class SuiteCompletedMailNotifier
         extends AbstractMailNotifier implements ISuiteLifeCycleListener {

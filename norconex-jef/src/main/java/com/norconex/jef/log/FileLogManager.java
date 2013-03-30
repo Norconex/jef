@@ -19,7 +19,7 @@ import com.norconex.commons.lang.io.FileUtil;
 
 /**
  * Log manager using the file system to store its logs.
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 @SuppressWarnings("nls")
 public class FileLogManager implements ILogManager {

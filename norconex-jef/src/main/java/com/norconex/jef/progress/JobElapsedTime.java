@@ -4,7 +4,7 @@ import java.util.Date;
 
 /**
  * Holds time-related information about a job execution.
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 public class JobElapsedTime {
 

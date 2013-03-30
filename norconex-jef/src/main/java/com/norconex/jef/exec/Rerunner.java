@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
  * will return the last exception encountered if there was one, or throw
  * a {@link RuntimeException} if {@link IRerunnable} simply returned
  * <code>false</code>. 
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 public class Rerunner {
 

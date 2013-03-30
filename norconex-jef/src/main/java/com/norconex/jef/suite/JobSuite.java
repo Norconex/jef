@@ -29,7 +29,7 @@ import com.norconex.jef.progress.JobProgressStateChangeAdapter;
  * Configurations applied to a suite affects all jobs associated
  * with the suite.
  * All jobs making up a suite must have unique identifiers.
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 @SuppressWarnings("nls")
 public final class JobSuite {

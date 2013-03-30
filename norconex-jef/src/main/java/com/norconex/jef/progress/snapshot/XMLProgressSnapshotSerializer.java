@@ -22,7 +22,7 @@ import com.norconex.jef.progress.IJobStatus;
 
 /**
  * Renders the a job suite progress snapshot in XML format.
- * @author Pascal Essiembre
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  * @since 2.0
  */
 @SuppressWarnings("nls")

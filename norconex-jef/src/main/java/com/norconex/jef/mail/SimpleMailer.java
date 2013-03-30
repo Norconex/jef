@@ -12,7 +12,7 @@ import javax.mail.internet.MimeMessage;
 /**
  * Convinience class for sending simple emails.  It does not cover most
  * advanced needs (HTML images, attachments, etc).
- * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
 @SuppressWarnings("nls")
 public class SimpleMailer {

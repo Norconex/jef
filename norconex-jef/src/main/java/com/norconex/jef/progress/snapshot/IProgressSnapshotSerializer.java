@@ -7,7 +7,7 @@ import java.io.Writer;
 /**
  * Interface meant to favour integration with other systems, such as monitoring
  * systems.
- * @author Pascal Essiembre
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  * @since 2.0
  */
 public interface IProgressSnapshotSerializer extends Serializable {

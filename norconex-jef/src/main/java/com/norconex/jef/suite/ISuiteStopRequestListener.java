@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Implementations are waiting to be notified when a 
  * {@link IJobSuiteStopRequestHandler} received a stop signal.
- * @author Pascal Essiembre
+ * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  * @since 2.0
  */
 public interface ISuiteStopRequestListener extends Serializable {
