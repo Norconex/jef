@@ -1,3 +1,20 @@
+/* Copyright 2010-2013 Norconex Inc.
+ * 
+ * This file is part of Norconex JEF.
+ * 
+ * Norconex JEF is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Norconex JEF is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.norconex.jef.exec;
 
 import java.io.IOException;
@@ -68,7 +85,7 @@ public class SystemCommandJob implements IJob {
      * internally.
      * @param id job id
      * @param desc job description
-     * @param commands commands to be executed
+     * @param command commands to be executed
      */
     public SystemCommandJob(String id, String desc, String command) {
     	this(id, desc, new String[] {command});
@@ -90,7 +107,7 @@ public class SystemCommandJob implements IJob {
      * Creates a JEF job for executing a system command.
      * @param id job id
      * @param desc job description
-     * @param commands commands to be executed
+     * @param command commands to be executed
      */
     public SystemCommandJob(String id, String desc, SystemCommand command) {
         super();
@@ -99,9 +116,7 @@ public class SystemCommandJob implements IJob {
         this.systemCommands = new SystemCommand[] { command };
     }
     
-    /**
-     * @see com.autonomy.jef.IJob#getId()
-     */
+    @Override
     public String getId() {
         return id;
     }

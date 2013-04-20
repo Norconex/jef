@@ -1,9 +1,25 @@
+/* Copyright 2010-2013 Norconex Inc.
+ * 
+ * This file is part of Norconex JEF.
+ * 
+ * Norconex JEF is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Norconex JEF is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.norconex.jef.progress;
 
 import java.io.IOException;
 import java.util.Date;
 
-import com.norconex.jef.IJob;
 import com.norconex.jef.IJobContext;
 
 /**
@@ -34,7 +50,8 @@ public interface IJobProgressSerializer {
             throws IOException;
     /**
      * Removes job progress.  A removed job progress can no longer be
-     * obtained using the {@link #deserialize(String, IJob)} method.
+     * obtained using the {@link #deserialize(String, String, IJobContext)} 
+     * method.
      * @param namespace name space given to the job progress
      * @param jobId unique identifier of job we want to remove status
      * @throws IOException problem removing job progress
@@ -42,7 +59,8 @@ public interface IJobProgressSerializer {
     void remove(String namespace, String jobId) throws IOException;
     /**
      * Backups job progress.  A backed-up job progress can no longer be
-     * obtained using the {@link #deserialize(IJobContext)} method.
+     * obtained using the {@link #deserialize(String, String, IJobContext)}
+     * method.
      * @param namespace name space given to the job progress
      * @param jobId unique identifier of job progress we want to backup
      * @param backupDate date used to timestamp to backup

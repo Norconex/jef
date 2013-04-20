@@ -1,3 +1,20 @@
+/* Copyright 2010-2013 Norconex Inc.
+ * 
+ * This file is part of Norconex JEF.
+ * 
+ * Norconex JEF is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Norconex JEF is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.norconex.jef.progress;
 
 import java.io.IOException;
@@ -39,10 +56,10 @@ public final class JobProgressUtils {
     }
 
     /**
-     * Sets meta data as a string from a {@link ConfigProperties} instance.
+     * Sets meta data as a string from a {@link Properties} instance.
      * This is a convenience method for treating the meta data string as 
      * properties.
-     * It calls {@link JobProgress#setMetadata()} after converting the
+     * It calls {@link JobProgress#setMetadata(String)} after converting the
      * properties to a string as per {@link Properties} syntax.
      * @param progress job progress on which to store meta data
      * @param props properties to store in job progress

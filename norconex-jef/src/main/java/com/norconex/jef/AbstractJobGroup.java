@@ -1,3 +1,20 @@
+/* Copyright 2010-2013 Norconex Inc.
+ * 
+ * This file is part of Norconex JEF.
+ * 
+ * Norconex JEF is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Norconex JEF is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.norconex.jef;
 
 import java.util.ArrayList;
@@ -32,7 +49,7 @@ public abstract class AbstractJobGroup implements IJobGroup {
 
     /** Listener for updating this group progress. */
     private IJobProgressListener progressListener;
-
+    
     /**
      * Constructor.
      * @param id job unique identifier
@@ -50,7 +67,7 @@ public abstract class AbstractJobGroup implements IJobGroup {
      * @param description job description
      */
     public AbstractJobGroup(
-            final String id, final IJob[] jobs, String description) {
+            final String id, final IJob[] jobs, final String description) {
         super();
         this.description = description;
         if (id == null) {
@@ -95,25 +112,6 @@ public abstract class AbstractJobGroup implements IJobGroup {
         }; 
     }
     
-    /**
-     * @see com.norconex.jef.IJob#getDescription()
-     */
-    public final String getDescription() {
-        return description;
-    }
-    /**
-     * @see com.norconex.jef.IJob#getProgressMinimum()
-     */
-    public final long getProgressMinimum() {
-        return 0;
-    }
-    /**
-     * @see com.norconex.jef.IJob#getProgressMaximum()
-     */
-    public final long getProgressMaximum() {
-        return MAX_PROGRESS;
-    }
-
     /**
      * Registers a monitoring process so that individual job progress part
      * of this group gets reflected on the group overall progress.

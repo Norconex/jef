@@ -1,6 +1,0 @@
-To support, maintain or otherwise work with the last stable release of JEF code,
-please use the latest 1.x SVN branch.
-
-As of this writing, the code from the trunk is geared towards JEF 2.0.
-
-2.0 contains several incompatibilities with 1.x. 

@@ -1,3 +1,19 @@
+~~ Copyright 2010-2013 Norconex Inc.
+~~ 
+~~ This file is part of Norconex JEF.
+~~ 
+~~ Norconex JEF is free software: you can redistribute it and/or modify
+~~ it under the terms of the GNU General Public License as published by
+~~ the Free Software Foundation, either version 3 of the License, or
+~~ (at your option) any later version.
+~~ 
+~~ Norconex JEF is distributed in the hope that it will be useful, 
+~~ but WITHOUT ANY WARRANTY; without even the implied warranty of 
+~~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+~~ GNU General Public License for more details.
+~~ 
+~~ You should have received a copy of the GNU General Public License
+~~ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
             ------
             Home
             ------
@@ -7,12 +23,12 @@
 Welcome to Norconex JEF
 
   JEF stands for <<Job Execution Framework>> and is first and foremost a 
-  Java API library.  It is typically meant for developers and integrators who
-  have to build any kind of maintenance tasks on a server.  JEF let's you 
-  build those jobs as you normally would using Java. Then, JEF strives to 
-  make it easier while offering a set of "out-of-the-box" functionalities that 
-  would otherwise be tedious and sometimes costly to do from scratch.   
-  These functionalities includes:
+  Java API library.  It is meant to facilitate the lives of developers and 
+  integrators who have to build any kind of maintenance tasks on a server. 
+  JEF let's you build those jobs as you normally would using Java. Then, 
+  JEF strives to make it easier by offering a set of "out-of-the-box" 
+  functionalities that would otherwise be tedious and sometimes costly to do 
+  from scratch.   These functionalities includes:
 
   * Better error handing and reporting
 
@@ -31,24 +47,15 @@ Welcome to Norconex JEF
 
   []  
   
-  Norconex also provides <<JEF Web Monitor>> which offers a glance view
-  of all running jobs, with possibilities to perform actions on them.
+  Norconex also provides <<JEF Monitor>>, a browser-based application offering
+  a glance view of all running jobs, with possibilities to perform actions on 
+  them. {{{mailto:info@norconex.com}Contact Norconex}} for more info on JEF 
+  Monitor.
   
-  TODO: put JEF Mon picture here.
+[images/jefmon.png] Screenshot of JEF Monitor
   
-  The current version of {{{http://jef.norconex.com}Norconex JEF}} is
-  ${project.version}
-  
-  
-  <<SITE IN HEAVY DEVELOPMENT.  PLEASE IGNORE.  DO NOT RELY>>
-  
-  Commercial Support
-  
-  License
-  
-  Talk about flexibility of configuration by pointing to Configuration Javadoc?
-  
-  Add Google adds?
-  
-  
+  The current stable version of 
+  {{{http://www.norconex.com/product/jef}Norconex JEF}} is
+  ${currentStableVersion} ({{{./download.html}download}}). 
 
+  Latest {{{./apidocs/index.html}API documentation}}.

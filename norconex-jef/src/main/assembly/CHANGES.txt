@@ -1,5 +1,13 @@
 Changes for each release.
 
+3.0.0 (2013-04-18):
+-------------------
+• Starting with this release, JEF is open-source under GPL.
+• Now depends on Norconex Commons Lang:
+    • Refactored to rely on Norconex Commons Lang whenever possible.
+    • Some classes were moved to Norconex Commons Lang to avoid feature
+      duplication.
+
 2.0.0 (2012-11-20):
 -------------------
 • Minimum Java Runtime Environment requirement now 1.6.
