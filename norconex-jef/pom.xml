@@ -160,6 +160,7 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
           <stylesheetfile>${basedir}/src/main/resources/javadoc.css</stylesheetfile>
           <show>protected</show>
           <overview>src/main/java/overview.html</overview>
+          <detectLinks>true</detectLinks>
         </configuration>
         <executions>
           <execution>
@@ -220,6 +221,7 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
           <stylesheetfile>${basedir}/src/main/resources/javadoc.css</stylesheetfile>
           <show>protected</show>
           <overview>src/main/java/overview.html</overview>
+          <detectLinks>true</detectLinks>
         </configuration>
         <reportSets>
           <reportSet>
