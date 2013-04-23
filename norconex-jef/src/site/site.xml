@@ -78,8 +78,6 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
   </body>
 
   <googleAnalyticsAccountId>UA-23162620-1</googleAnalyticsAccountId>
-  <googleAdSenseClient></googleAdSenseClient>
-  <googleAdSenseSlot></googleAdSenseSlot>
 
   <poweredBy>
     <logo name="Maven" href="http://maven.apache.org/" position="right"
