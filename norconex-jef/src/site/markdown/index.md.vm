@@ -1,0 +1,60 @@
+<!---
+ Copyright 2010-2013 Norconex Inc.
+ 
+ This file is part of Norconex JEF.
+ 
+ Norconex JEF is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ Norconex JEF is distributed in the hope that it will be useful, 
+ but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
+-->
+<head><title>Home</title><meta name="Author" content="Norconex Inc." /></head> 
+
+#parse("adsense.html")
+
+Welcome to Norconex JEF
+=======================
+
+JEF stands for *Job Execution Framework* and is first and foremost a 
+Java API library.  It is meant to facilitate the lives of developers and 
+integrators who have to build any kind of maintenance tasks on a server. 
+JEF let's you build those jobs as you normally would using Java. Then, 
+JEF strives to make it easier by offering a set of "out-of-the-box" 
+functionalities that would otherwise be tedious and sometimes costly to do 
+from scratch.   These functionalities includes:
+
+ * Better error handing and reporting
+
+ * Crash recovery (resuming jobs where they failed)
+
+ * Self-diagnostics of process issues
+
+ * Email notification (upon success, failure, etc.)
+
+ * Chaining of individual jobs (Both synchronous and asynchronous 
+   jobs are supported)
+
+ * Centralized process logging
+
+ * More robust execution of system commands
+
+Norconex also provides *JEF Monitor*, a browser-based application offering
+a glance view of all running jobs, with possibilities to perform actions on 
+them. [Contact Norconex](mailto:info@norconex.com) for more info on JEF 
+Monitor.
+
+![Screenshot of JEF Monitor](images/jefmon.png "Screenshot of JEF Monitor")  
+  
+The current stable version of 
+[Norconex JEF](http://www.norconex.com/product/jef) is
+${currentStableVersion} ([download](./download.html)). 
+
+  Latest [API documentation](./apidocs/index.html).
