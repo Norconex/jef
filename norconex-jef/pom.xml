@@ -214,6 +214,7 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
               <report>issue-tracking</report>
               <report>license</report>
               <report>scm</report>
+              <report>project-team</report>
             </reports>
           </reportSet>
         </reportSets>
@@ -239,6 +240,19 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
           </reportSet>
         </reportSets>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-changes-plugin</artifactId>
+        <version>2.9</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>changes-report</report>
+              <!-- report>github-report</report -->
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
     </plugins>
   </reporting>  
 
@@ -255,4 +269,32 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
   <scm>
     <url>https://github.com/Norconex/jef/tree/master/norconex-jef</url>
   </scm>
+  
+  <developers>
+    <developer>
+        <id>essiembp</id>
+        <name>Pascal Essiembre</name>
+        <email>pascal.essiembre@norconex.com</email>
+        <organization>Norconex Inc.</organization>
+        <organizationUrl>http://www.norconex.com</organizationUrl>
+        <roles>
+          <role>project leader</role>
+          <role>developer</role>
+        </roles>
+        <timezone>-4</timezone>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+        <name>David Gaulin</name>
+        <email>david.gaulin@norconex.com</email>
+        <organization>Norconex Inc.</organization>
+        <organizationUrl>http://www.norconex.com</organizationUrl>
+        <roles>
+          <role>developer</role>
+        </roles>
+        <timezone>-4</timezone>
+    </contributor>
+  </contributors>
+  
 </project>
