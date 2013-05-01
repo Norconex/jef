@@ -35,7 +35,7 @@ Older releases:
 
 Snapshot releases:
 
-  * [3.0.0-20130424.014945-2](http://norconex.s3.amazonaws.com/repo/snapshot/com/norconex/jef/norconex-jef/3.0.0-SNAPSHOT/norconex-jef-3.0.0-20130424.014945-2.zip)
+  * [3.0.0-20130501.015238-3](http://norconex.s3.amazonaws.com/repo/snapshot/com/norconex/jef/norconex-jef/3.0.0-SNAPSHOT/norconex-jef-3.0.0-20130501.015238-3.zip)
 
 **Note:** Snapshot releases are only listed until first stable release.
 After that, they will be available through the Norconex Snapshot maven
