@@ -20,6 +20,8 @@ package com.norconex.jef.exec;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import com.norconex.commons.lang.Sleeper;
+
 /**
  * <code>Rerunner</code> is responsible for executing <code>IRerunnable</code>
  * instances.  Upon reaching the maximum number of retries allowed, it 
@@ -115,23 +117,24 @@ public class Rerunner {
     /**
      * Runs the {@link IRerunnable} instance.
      * @param rerunnable the code to run
-     * @throws Exception last {@link IRerunnable} exception or 
-     *         {@link RuntimeException} if otherwise no exception
+     * @throws RerunnableException wrapper around last exception encountered
+     * or exeption thrown when max rerun attempts is reached.
      */
     @SuppressWarnings("nls")
-    public void run(IRerunnable rerunnable) throws Exception {
+    public void run(IRerunnable rerunnable) throws RerunnableException {
         int attemptCount = 0;
         Exception exception = null;
         while (attemptCount < maxRerunAttempts) {
             try {
                 rerunnable.run();
-                return; // no exception, simply return
+                // no exception, simply return
+                return;
             } catch (Exception e) {
                 if (exceptionFilter == null || exceptionFilter.accept(e)) {
                     exception = e;
                 } else {
-                    LOG.error("Unrecoverable exception encountered.", e);
-                    throw e;
+                    throw new RerunnableException(
+                            "Unrecoverable exception encountered.", e);
                 }
             }
             attemptCount++;
@@ -139,15 +142,11 @@ public class Rerunner {
                 LOG.warn("Execution failed, attempting to run again ("
                         + attemptCount + " of " + maxRerunAttempts
                         + ").", exception);
-                Thread.sleep(sleepTime);
+                Sleeper.sleepMillis(sleepTime);
             }
         }
-        String err = "Execution failed, maximum number of recovery "
-                + "attempts reached. Aborting.";
-        if (exception == null) {
-            exception = new RuntimeException(err);
-        }
-        LOG.error(err, exception);
-        throw exception;
+        throw new RerunnableException(
+                "Execution failed, maximum number of recovery "
+              + "attempts reached. Aborting.", exception);
     }
 }

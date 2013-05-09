@@ -34,9 +34,9 @@ public interface IJobSuiteStopRequestHandler extends Serializable {
      * when a stop request was received.
      * @param listener framework listener for stop signals
      */
-    public void startListening(ISuiteStopRequestListener listener);
+    void startListening(ISuiteStopRequestListener listener);
     /**
      * Stops listening for stop requests.
      */
-    public void stopListening();
+    void stopListening();
 }

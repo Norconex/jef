@@ -27,7 +27,7 @@ package com.norconex.jef.exec;
 public interface IRerunnable {
     /**
      * Code to be executed until successful (no exception thrown).
-     * @throws Exception any exception
+     * @throws RerunnableException any exception
      */
-    void run() throws Exception;
+    void run() throws RerunnableException;
 }

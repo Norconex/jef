@@ -23,6 +23,7 @@ import java.io.IOException;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import com.norconex.commons.lang.Sleeper;
 import com.norconex.jef.JobException;
 
 /**
@@ -43,8 +44,6 @@ public class FileStopRequestHandler
     private static final Logger LOG =
             LogManager.getLogger(FileStopRequestHandler.class);
 
-    /** Directory where to store the file. */
-    private final String jobdirProgress;
     private final File stopFile;
     private boolean listening = false;
     
@@ -56,7 +55,7 @@ public class FileStopRequestHandler
      */
     public FileStopRequestHandler(
             String namespace, final String jobDir) {
-        this.jobdirProgress = jobDir + "/latest";
+        String jobdirProgress = jobDir + "/latest";
         File dir = new File(jobdirProgress);
         if (!dir.exists()) {
             dir.mkdirs();
@@ -71,23 +70,19 @@ public class FileStopRequestHandler
         listening = true;
         new Thread() {
             public void run() {
-                try {
-                    while(listening) {
-                        boolean exists = stopFile.exists();
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Stop file exists:" + exists + " ("
-                                    + stopFile.getAbsolutePath() + ")");
-                        }
-                        if (exists) {
-                            listening = false;
-                            LOG.info("STOP request received.");
-                            listener.stopRequestReceived();
-                            stopFile.delete();
-                        }
-                        Thread.sleep(1 * 1000);
+                while(listening) {
+                    boolean exists = stopFile.exists();
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Stop file exists:" + exists + " ("
+                                + stopFile.getAbsolutePath() + ")");
                     }
-                } catch (InterruptedException e) {
-                    throw new JobException("Cannot sleep.", e);
+                    if (exists) {
+                        listening = false;
+                        LOG.info("STOP request received.");
+                        listener.stopRequestReceived();
+                        stopFile.delete();
+                    }
+                    Sleeper.sleepSeconds(1);
                 }
             };
         }.start();

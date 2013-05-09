@@ -26,6 +26,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
  * Convinience class for sending simple emails.  It does not cover most
  * advanced needs (HTML images, attachments, etc).
@@ -83,7 +85,7 @@ public class SimpleMailer {
             final String[] recipients, final String contentType) {
         super();
         this.sender = sender;
-        this.recipients = recipients;
+        this.recipients = ArrayUtils.clone(recipients);
 
         Properties sysProps = System.getProperties();
         if (sysProps == null) {

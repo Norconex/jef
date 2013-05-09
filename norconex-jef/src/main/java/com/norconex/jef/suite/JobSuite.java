@@ -64,6 +64,8 @@ public final class JobSuite {
     private static final ISuiteStopRequestListener[] EMPTY_STOP_LISTENERS =
         new ISuiteStopRequestListener[] {};
 
+    private static final int STOP_WAIT_DELAY = 5;
+    
     /** Job progress serializer. */
     private final IJobProgressSerializer progressSerializer;
     /** Job log manager. */
@@ -116,7 +118,8 @@ public final class JobSuite {
         this(job, progressSerializer, new FileLogManager(getDefaultWorkDir()));
     }
     /**
-     * Creates a new job suite using a {@link JobProgressPropertiesFileSerializer}.
+     * Creates a new job suite using a
+     *  {@link JobProgressPropertiesFileSerializer}.
      * @param job root job for the suite
      * @param logManager Log4J log manager
      * @since 1.1.1
@@ -452,31 +455,15 @@ public final class JobSuite {
                 final IJobStatus progress = getJobProgress(job);
                 new Thread(){
                     public void run() {
-                        job.stop(progress, JobSuite.this);
-                        while (/*progress.getStatus() == IJobStatus.Status.STARTED
-                                ||*/ progress.getStatus() 
-                                        == IJobStatus.Status.RUNNING) {
-                            Sleeper.sleepSeconds(5);
-                        }
-                        if (progress.getStatus() 
-                                == IJobStatus.Status.STOPPED) {
-                            for (IJobProgressListener listener 
-                                    : progressListeners) {
-                                listener.jobStopped(progress);
-                            }
-                            if (job.getId().equals(getNamespace())) {
-                                for (ISuiteLifeCycleListener listener 
-                                        : suiteListeners) {
-                                    listener.suiteStopped(JobSuite.this);
-                                }
-                            }
-                        }
-                    };
+                        stopJob(job, progress);
+                    }
                 }.start();
             }
         });
     }
 
+    
+    
     /**
      * Accepts a job suite visitor.
      * @param visitor job suite visitor
@@ -497,8 +484,8 @@ public final class JobSuite {
         String[] ids = getJobIds();
         for (int i = 0; i < ids.length; i++) {
             String jobId = ids[i];
-            IJob job = getJob(jobId);
-            if (jobFilterClass == null || jobFilterClass.isInstance(job)) {
+            IJob ajob = getJob(jobId);
+            if (jobFilterClass == null || jobFilterClass.isInstance(ajob)) {
                 visitor.visitJob(getJob(jobId));
                 visitor.visitJobProgress(getJobProgress(jobId));
             }
@@ -528,5 +515,22 @@ public final class JobSuite {
         }
         return jobDir;
     }    
+    
+    private void stopJob(final IJob job, final IJobStatus progress) {
+        job.stop(progress, JobSuite.this);
+        while (progress.getStatus()  == IJobStatus.Status.RUNNING) {
+            Sleeper.sleepSeconds(STOP_WAIT_DELAY);
+        }
+        if (progress.getStatus() == IJobStatus.Status.STOPPED) {
+            for (IJobProgressListener listener : progressListeners) {
+                listener.jobStopped(progress);
+            }
+            if (job.getId().equals(getNamespace())) {
+                for (ISuiteLifeCycleListener listener : suiteListeners) {
+                    listener.suiteStopped(JobSuite.this);
+                }
+            }
+        }
+    };
     
 }

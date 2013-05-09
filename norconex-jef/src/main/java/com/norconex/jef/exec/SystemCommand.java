@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -57,7 +59,7 @@ public class SystemCommand {
     /** The command to run. */
     private final String[] command;
     /** The command description. */
-    private final String desc;
+    private String desc;
     /** Whether to inherit the working directory. */
     private final File workdir;
 
@@ -72,67 +74,25 @@ public class SystemCommand {
     
     /**
      * Creates a command for which the execution will be in the working
-     * directory of the current process.
+     * directory of the current process.  If more than one command values
+     * are passed, the first element of the array
+     * is the command and subsequent elements are arguments.
      * @param command the command to run
      */
-    public SystemCommand(String command) {
-    	this(command, null);
+    public SystemCommand(String... command) {
+    	this(null, command);
     }
     
     /**
-     * Creates a command for which the execution will be in the working
-     * directory of the current process.
+     * Creates a command. If more than one command values
+     * are passed, the first element of the array
+     * is the command and subsequent elements are arguments.
      * @param command the command to run
-     * @param desc the command description
-     */
-    public SystemCommand(String command, String desc) {
-    	this(command, desc, null);
-    }
-    
-    /**
-     * Creates a command.
-     * @param command the command to run
-     * @param desc the command description
      * @param workdir specifies a working directory (default inherits
      *        the working directory of the current process.
      */
-    public SystemCommand(
-    		String command, String desc, File workdir) {
-    	this(new String[] {command}, desc, workdir);
-    }
-    /**
-     * Creates a command for which the execution will be in the working
-     * directory of the current process.  The first element of the array
-     * is the command and subsequent elements are arguments.
-     * @param command the command to run
-     */
-    public SystemCommand(String[] command) {
-    	this(command, null);
-    }
-    
-    /**
-     * Creates a command for which the execution will be in the working
-     * directory of the current process.  The first element of the array
-     * is the command and subsequent elements are arguments.
-     * @param command the command to run
-     * @param desc the command description
-     */
-    public SystemCommand(String[] command, String desc) {
-    	this(command, desc, null);
-    }
-    
-    /**
-     * Creates a command. The first element of the array
-     * is the command and subsequent elements are arguments.
-     * @param command the command to run
-     * @param desc the command description
-     * @param workdir specifies a working directory (default inherits
-     *        the working directory of the current process.
-     */
-    public SystemCommand(
-    		String[] command, String desc, File workdir) {
+    public SystemCommand(File workdir, String... command) {
         super();
-        this.desc = desc;
         this.command = command;
         this.workdir = workdir;
     }
@@ -153,6 +113,14 @@ public class SystemCommand {
     public String getDescription() {
         return desc;
     }
+    /**
+     * Sets the description for this command.
+     * @param description command description
+     */
+    public void setDescription(String description) {
+        this.desc = description;
+    }
+    
 
     /**
      * Gets the command working directory.
@@ -265,7 +233,7 @@ public class SystemCommand {
         			+ toString());
         }
         String[] prefixes = getOSCommandPrefixes();
-        String[] fullCommand = mergeArrays(prefixes, command);
+        String[] fullCommand = ArrayUtils.addAll(prefixes, command);
         process = Runtime.getRuntime().exec(fullCommand, null, workdir);
         int exitValue = 0;
         if (runInBackground) {
@@ -289,12 +257,9 @@ public class SystemCommand {
             LOG.debug("Command returned with exit value " + exitValue
             		+ ": " + toString());
         }
-        //        Thread.sleep(5000);
         if (exitValue != 0) {
             LOG.warn("Command returned exit value " + process.exitValue()
                     + ": " + toString());
-//            throw new JobException("Command failed, returning exit value "
-//            		+ process.exitValue() + ": " + toString());
         }
         process = null;
         return exitValue;
@@ -313,29 +278,15 @@ public class SystemCommand {
         return cmd.trim();
     }
 
-    private String[] mergeArrays(String[] arr1, String[] arr2) {
-    	String[] arr = new String[arr1.length + arr2.length];
-    	for (int i = 0; i < arr1.length; i++) {
-			arr[i] = arr1[i];
-		}
-    	for (int i = 0; i < arr2.length; i++) {
-			arr[i + arr1.length] = arr2[i];
-		}
-    	return arr;
-    }
-    
     private String[] getOSCommandPrefixes() {
-    	//TODO consider using Jakarta Commons Lang SystemUtils
     	//TODO consider using "nice" on *nix systems.
-    	String osName = System.getProperty("os.name");
-    	String osVersion = System.getProperty("os.version");
-    	if (osName == null) {
+    	if (SystemUtils.OS_NAME == null) {
     		return EMPTY_STRINGS;
     	}
-    	if (osName.startsWith("Windows")) {
-    		if (osVersion.startsWith("4.0")            // Win 95
-    				|| osVersion.startsWith("4.1")     // Win 98
-    				|| osVersion.startsWith("4.9")) {  // Win ME
+    	if (SystemUtils.IS_OS_WINDOWS) {
+    		if (SystemUtils.IS_OS_WINDOWS_95
+    				|| SystemUtils.IS_OS_WINDOWS_98
+    				|| SystemUtils.IS_OS_WINDOWS_ME) {
     			return CMD_PREFIXES_WIN_LEGACY;
     		} else {
                 // NT, 2000, XP and up

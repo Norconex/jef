@@ -36,24 +36,25 @@ public final class ProgressSnapshotTaker {
     private static IProgressSnapshot takeSnapshot(JobSuite jobSuite, IJob job) {
         IJobStatus progress = jobSuite.getJobProgress(job);
         ProgressSnapshot snapshot = new ProgressSnapshot();
-        snapshot.completionRatio = progress.getCompletionRatio();
-        snapshot.elapsedTime = progress.getElapsedTime();
-        snapshot.endTime = progress.getEndTime();
-        snapshot.jobContext = progress.getJobContext();
-        snapshot.jobId = progress.getJobId();
-        snapshot.lastActivity = progress.getLastActivity();
-        snapshot.metadata = progress.getMetadata();
-        snapshot.note = progress.getNote();
-        snapshot.progress = progress.getProgress();
-        snapshot.recovery = progress.isRecovery();
-        snapshot.startTime = progress.getStartTime();
-        snapshot.status = progress.getStatus();
-        snapshot.stopRequested = progress.isStopRequested();
+        snapshot.setCompletionRatio(progress.getCompletionRatio());
+        snapshot.setElapsedTime(progress.getElapsedTime());
+        snapshot.setEndTime(progress.getEndTime());
+        snapshot.setJobContext(progress.getJobContext());
+        snapshot.setJobId(progress.getJobId());
+        snapshot.setLastActivity(progress.getLastActivity());
+        snapshot.setMetadata(progress.getMetadata());
+        snapshot.setNote(progress.getNote());
+        snapshot.setProgress(progress.getProgress());
+        snapshot.setRecovery(progress.isRecovery());
+        snapshot.setStartTime(progress.getStartTime());
+        snapshot.setStatus(progress.getStatus());
+        snapshot.setStopRequested(progress.isStopRequested());
         if (job instanceof IJobGroup) {
             IJob[] jobs = ((IJobGroup) job).getJobs();
             if (jobs != null && jobs.length > 0) {
                 for (IJob childJob : jobs) {
-                    snapshot.children.add(takeSnapshot(jobSuite, childJob));
+                    snapshot.getChildren().add(
+                            takeSnapshot(jobSuite, childJob));
                 }
             }
         }

@@ -19,6 +19,8 @@ package com.norconex.jef.mail;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.norconex.commons.lang.io.IOUtil;
 import com.norconex.jef.suite.JobSuite;
 
@@ -55,7 +57,7 @@ public abstract class AbstractMailNotifier {
             final String host, final String sender, final String[] recipients) {
         super();
         this.mailer = new SimpleMailer(host, sender);
-        this.recipients = recipients;
+        this.recipients = ArrayUtils.clone(recipients);
     }
 
     /**

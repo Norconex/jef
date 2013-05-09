@@ -103,8 +103,7 @@ public class JobRunner {
             // Remove appender
             Logger.getRootLogger().removeAppender(appender);
         } catch (Throwable e) {
-            LOG.fatal("Could not execute job suite "  //$NON-NLS-1$
-                    + suite.getNamespace(), e);
+            LOG.fatal("Job suite execution failed: " + suite.getNamespace(), e);
             handleError(e, null, suite);
             success = false;
         } finally {
@@ -152,9 +151,77 @@ public class JobRunner {
         setCurrentJobId(job.getId());
         final JobElapsedTime elapsedTime = new JobElapsedTime();
 
-        JobProgress progress = null;
+        final JobProgress progress = createProgress(job, suite, elapsedTime);
+        suite.addSuiteStopRequestListener(progress);
+        
+        // If progress is completed, do not proceed.
+        if (IJobStatus.Status.COMPLETED == progress.getStatus()) {
+            LOG.info("Job skipped: " + job.getId() + " (already completed)");
+            fireJobSkipped(progress, suite.getJobProgressListeners());
+            return true;
+        }
 
-        // Potentially recover progress
+        // Proceed
+        IJobProgressListener[] progressListeners =
+                suite.getJobProgressListeners();
+        // Register our first activity so status can be RUNNING:
+        elapsedTime.setLastActivity(new Date());
+        
+        
+        // Add progress tracking for job.
+        for (int i = 0; i < progressListeners.length; i++) {
+            progress.addJobProgressListener(progressListeners[i]);
+        }
+
+        boolean errorHandled = false;
+        try {
+            if (!progress.isRecovery()) {
+                elapsedTime.setStartTime(new Date());
+                LOG.info("Running " + job.getId()  
+                        + ": BEGIN (" + elapsedTime.getStartTime() + ")");  
+                fireJobStarted(progress, suite.getJobProgressListeners());
+            } else {
+                LOG.info("Running " + job.getId()  
+                        + ": RESUME (" + new Date() + ")");  
+                fireJobResumed(progress, suite.getJobProgressListeners());
+                elapsedTime.setEndTime(null);
+                progress.setNote("");  
+            }
+            Thread activityNotifier = createActivityNotifier(
+                    job, suite, elapsedTime, progress);
+            activityNotifier.start();
+            job.execute(progress, suite);
+            success = true;
+        } catch (Exception e) {
+            success = false;
+            LOG.error("Execution failed for job: " + job.getId(), e);
+            handleError(e, progress, suite);
+            errorHandled = true;
+            //System.exit(-1)
+        } finally {
+            elapsedTime.setEndTime(new Date());
+            if (!errorHandled) {
+                LOG.fatal("Fatal error occured in job: " + job.getId());
+            }
+            LOG.info("Running " + job.getId()  
+                    + ": END (" + elapsedTime.getStartTime() + ")");  
+            if (success) {
+                fireJobCompleted(progress, suite.getJobProgressListeners());
+            } else {
+                fireJobTerminatedPrematuraly(
+                        progress, suite.getJobProgressListeners());
+            }
+            // Remove progress tracking for job.
+            for (int i = 0; i < progressListeners.length; i++) {
+                progress.removeJobProgressListener(progressListeners[i]);
+            }
+        }
+        return success;
+    }
+
+    private JobProgress createProgress(final IJob job, final JobSuite suite,
+            final JobElapsedTime elapsedTime) {
+        JobProgress progress;
         JobProgress recoveredProgress = recoverProgress(suite, job);
         if (recoveredProgress != null
                 && recoveredProgress.getStartTime() != null) {
@@ -164,27 +231,13 @@ public class JobRunner {
             progress = new JobProgress(
                     job.getId(), suite.getJobContext(job), elapsedTime);
         }
-        suite.addSuiteStopRequestListener(progress);
-        
-        // If progress is completed, do not proceed.
-        if (IJobStatus.Status.COMPLETED == progress.getStatus()) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Job skipped: " + job.getId()
-                        + " (already completed)");
-            }
-            fireJobSkipped(progress, suite.getJobProgressListeners());
-            return true;
-        }
-
-        // Proceed
-        IJobProgressListener[] progressListeners =
-                suite.getJobProgressListeners();
-        final JobProgress finalProgress = progress;
-        // Register our first activity so status can be RUNNING:
-        elapsedTime.setLastActivity(new Date());
-        
-        
-        Thread activityNotifier = new Thread(
+        return progress;
+    }
+    
+    private Thread createActivityNotifier(
+            final IJob job, final JobSuite suite,
+            final JobElapsedTime elapsedTime, final JobProgress finalProgress) {
+        return new Thread(
                 "activityTracker_" + job.getId()) {
             public void run() {
                 while (finalProgress.isStatus(
@@ -202,66 +255,6 @@ public class JobRunner {
                 }
             };
         };
-
-        // Add progress tracking for job.
-        for (int i = 0; i < progressListeners.length; i++) {
-            progress.addJobProgressListener(progressListeners[i]);
-        }
-
-        try {
-            if (!progress.isRecovery()) {
-                elapsedTime.setStartTime(new Date());
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Running " + job.getId()  //$NON-NLS-1$
-                            + ": BEGIN ("   //$NON-NLS-1$
-                            + elapsedTime.getStartTime() + ")");  //$NON-NLS-1$
-                }
-                fireJobStarted(progress, suite.getJobProgressListeners());
-            } else {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Running " + job.getId()  //$NON-NLS-1$
-                            + ": RESUME ("   //$NON-NLS-1$
-                            + new Date() + ")");  //$NON-NLS-1$
-                }
-                fireJobResumed(progress, suite.getJobProgressListeners());
-                elapsedTime.setEndTime(null);
-                progress.setNote("");  //$NON-NLS-1$
-            }
-            activityNotifier.start();
-            job.execute(progress, suite);
-            success = true;
-        } catch (Exception e) {
-            success = false;
-            LOG.error("Execution failed for job: "   //$NON-NLS-1$
-                    + job.getId(), e);
-            handleError(e, progress, suite);
-            //System.exit(-1)
-        } catch (Throwable t) {
-            success = false;
-            LOG.fatal("Fatal error occured in job: "  //$NON-NLS-1$
-                        + job.getId(), t);
-            handleError(t, progress, suite);
-            //System.exit(-1)
-        } finally {
-            elapsedTime.setEndTime(new Date());
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Running " + job.getId()  //$NON-NLS-1$
-                        + ": END ("   //$NON-NLS-1$
-                        + elapsedTime.getStartTime() + ")");  //$NON-NLS-1$
-            }
-            if (success) {
-                fireJobCompleted(
-                        progress, suite.getJobProgressListeners());
-            } else {
-                fireJobTerminatedPrematuraly(
-                        progress, suite.getJobProgressListeners());
-            }
-        }
-        // Remove progress tracking for job.
-        for (int i = 0; i < progressListeners.length; i++) {
-            progress.removeJobProgressListener(progressListeners[i]);
-        }
-        return success;
     }
 
     /**
@@ -285,7 +278,7 @@ public class JobRunner {
         // Abort if running already
         if (existingProgress.isStatus(IJobStatus.Status.RUNNING)) {
             throw new JobException(
-                    "Suite already running.");  //$NON-NLS-1$
+                    "Suite already running.");  
         }
 
 
@@ -309,31 +302,6 @@ public class JobRunner {
             // Backcup log
             suite.getLogManager().backup(suite.getNamespace(), backupDate);
         }
-        
-//        // If not running but incomplete, abort if not resuming
-//        if ((!existingProgress.isStatus(IJobStatus.Status.COMPLETED)
-//                || !existingProgress.isStatus(
-//                        IJobStatus.Status.PREMATURE_TERMINATION))
-//                && !resumeIfIncomplete
-//                && existingProgress.isRecovery()) { //Status(IJobStatus.Status.STARTED)) {
-//            throw new JobException(
-//                    "An incomplete suite was found.  "  //$NON-NLS-1$
-//                  + "Clear or resume to execute.");  //$NON-NLS-1$
-//        }
-//        if (existingProgress.isStatus(IJobStatus.Status.COMPLETED, 
-//                IJobStatus.Status.PREMATURE_TERMINATION)) {
-//            String[] ids = suite.getJobIds();
-//            for (int i = 0; i < ids.length; i++) {
-//                String jobId = ids[i];
-//                suite.getJobProgressSerializer().backup(
-//                        suite.getNamespace(),
-//                        jobId, existingProgress.getEndTime());
-//            }
-//            // Complete log
-//            suite.getLogManager().backup(
-//                    suite.getNamespace(),
-//                    existingProgress.getEndTime());
-//        }
     }
 
     private void fireSuiteStarted(final JobSuite suite) {
@@ -424,7 +392,7 @@ public class JobRunner {
             handlers[i].handleError(event);
         }
         if (progress != null) {
-            progress.setNote("Error occured: "  //$NON-NLS-1$
+            progress.setNote("Error occured: "  
                     + t.getLocalizedMessage());
         }
     }
@@ -444,7 +412,7 @@ public class JobRunner {
                     suite.getJobContext(job));
         } catch (IOException e) {
             throw new JobException(
-                    "Cannot deserialize progress for job: "  //$NON-NLS-1$
+                    "Cannot deserialize progress for job: "  
                             + job.getId(), e);
         }
         return recoveredProgress;

@@ -24,19 +24,20 @@ This library constitutes the Norconex Java Execution Framework.
 Simple steps to get started:
 <ul>
   <li>Create one or more jobs ({@link com.norconex.jef.IJob}) to accomplish
-      the required tasks.
+      the required tasks.</li>
   <li>If you have more than one job, assemble/group them together using one or
       a combination of
       {@link com.norconex.jef.AsyncJobGroup} and
-      {@link com.norconex.jef.SyncJobGroup}.
+      {@link com.norconex.jef.SyncJobGroup}.</li>
   <li>Create and configure a job suite ({@link com.norconex.jef.suite.JobSuite})
       with your created jobs (it is recommended you use 
       {@link com.norconex.jef.suite.IJobSuiteFactory} for the suite creation
-       process).
+       process).</li>
   <li>Run your job suite by passing it to 
-      {@link com.norconex.jef.JobRunner#runSuite(com.norconex.jef.suite.JobSuite)}.
+      {@link com.norconex.jef.JobRunner#runSuite(com.norconex.jef.suite.JobSuite)}.</li>
 </ul>
 </p>
+
 
 <p>
 The creation of a job suite may look like this:

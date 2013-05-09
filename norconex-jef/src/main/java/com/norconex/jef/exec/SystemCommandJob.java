@@ -19,6 +19,7 @@ package com.norconex.jef.exec;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -101,7 +102,7 @@ public class SystemCommandJob implements IJob {
         super();
         this.id = id;
         this.desc = desc;
-        this.systemCommands = commands;
+        this.systemCommands = ArrayUtils.clone(commands);
     }
     /**
      * Creates a JEF job for executing a system command.
@@ -150,11 +151,9 @@ public class SystemCommandJob implements IJob {
                 systemCommand.execute();
                 progress.incrementProgress(1);
             } catch (IOException e) {
-                LOG.error("Cannot execute command: " + systemCommand, e);
                 throw new JobException("Cannot execute command: "
                 		+ systemCommand, e);
             } catch (InterruptedException e) {
-                LOG.error("Cannot execute command: " + systemCommand, e);
                 throw new JobException("Cannot execute command: "
                 		+ systemCommand, e);
             }

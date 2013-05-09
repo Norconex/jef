@@ -155,7 +155,7 @@ public interface IJobStatus extends Serializable {
      * failed job.
      * @return <code>true</code> if the current progress is a recovery
      */
-    public boolean isRecovery();
+    boolean isRecovery();
 
     
 }

@@ -50,9 +50,8 @@ public class AsyncJobGroup extends AbstractJobGroup {
      * @param id unique identifier for this job group
      * @param jobs jobs making up this group
      */
-    public AsyncJobGroup(final String id, final IJob[] jobs) {
-        this(id, jobs,
-                "Asynchronous job group with " + jobs.length + " jobs.");
+    public AsyncJobGroup(final String id, final IJob... jobs) {
+        this(id, "Asynchronous job group with " + jobs.length + " jobs.", jobs);
     }
     /**
      * Constructor.
@@ -61,8 +60,8 @@ public class AsyncJobGroup extends AbstractJobGroup {
      * @param description job description
      */
     public AsyncJobGroup(
-            final String id, final IJob[] jobs, String description) {
-        super(id, jobs, description);
+            final String id, String description, final IJob... jobs) {
+        super(id, description, jobs);
     }
 
     /**

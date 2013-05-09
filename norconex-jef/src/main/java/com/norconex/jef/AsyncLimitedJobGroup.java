@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import com.norconex.commons.lang.Sleeper;
 import com.norconex.jef.progress.JobProgress;
 import com.norconex.jef.suite.JobSuite;
 
@@ -57,9 +58,9 @@ public class AsyncLimitedJobGroup extends AsyncJobGroup {
      * @param jobs jobs making up this group
      */
     public AsyncLimitedJobGroup(
-            final String id, final IJob[] jobs, int maxNumberOfRunningJobs) {
-        this(id, jobs, maxNumberOfRunningJobs, "Asynchronous job group with " 
-                + jobs.length + " jobs.");
+            final String id, int maxNumberOfRunningJobs, final IJob... jobs) {
+        this(id, maxNumberOfRunningJobs, "Asynchronous job group with " 
+                + jobs.length + " jobs.", jobs);
     }
     /**
      * Constructor.
@@ -67,15 +68,13 @@ public class AsyncLimitedJobGroup extends AsyncJobGroup {
      * @param jobs jobs making up this group
      */
     public AsyncLimitedJobGroup(
-            final String id, final IJob[] jobs,
-            int maxNumberOfRunningJobs, String description) {
-        super(id, jobs, description);
+            final String id,  int maxNumberOfRunningJobs, 
+            String description, final IJob... jobs) {
+        super(id, description, jobs);
         this.maxNumberOfRunningJobs = maxNumberOfRunningJobs;
     }
 
-    /**
-     * @see com.norconex.jef.IJob#execute(JobProgress, JobSuite)
-     */
+    @Override
     public final void execute(
             final JobProgress progress, final JobSuite suite) {
          registerGroupProgressMonitoring(progress, suite);
@@ -85,15 +84,7 @@ public class AsyncLimitedJobGroup extends AsyncJobGroup {
 
         
         IJob[] jobs = getJobs();
-        List<Thread> threads = new ArrayList<Thread>();
-        for (int x = 0; x < jobs.length && x < maxNumberOfRunningJobs; x++) {
-            final IJob job = jobs[x];
-            Thread t = createJobThread(job, suite, failedJobs);
-            debug("Starting thread from " + getId()
-                    + " for job: " + job.getId());
-            t.start();
-            threads.add(t);
-        }
+        List<Thread> threads = launchLimitedJobThreads(suite, failedJobs);
         boolean allJobStarted = threads.size() >= jobs.length;
         int totalNotAlive = 0;
         while (!allJobStarted) {
@@ -115,12 +106,7 @@ public class AsyncLimitedJobGroup extends AsyncJobGroup {
                 allJobStarted = true;
             }
             totalNotAlive = notAlive;
-            try {
-                // Sleep 1 seconds
-                Thread.sleep(1000);
-            } catch (InterruptedException ie) {
-                // ignore
-            }
+            Sleeper.sleepSeconds(1);
         }
 
         // Wait for all threads to finish
@@ -148,6 +134,22 @@ public class AsyncLimitedJobGroup extends AsyncJobGroup {
 
     }
 
+    private List<Thread> launchLimitedJobThreads(
+            final JobSuite suite, Collection<IJob> failedJobs) {
+        List<Thread> threads = new ArrayList<Thread>();
+        IJob[] jobs = getJobs();
+        for (int x = 0; x < jobs.length && x < maxNumberOfRunningJobs; x++) {
+            final IJob job = jobs[x];
+            Thread t = createJobThread(job, suite, failedJobs);
+            debug("Starting thread from " + getId()
+                    + " for job: " + job.getId());
+            t.start();
+            threads.add(t);
+        }
+        return threads;
+    }
+    
+    
     private Thread createJobThread(final IJob job, final JobSuite suite,
             final Collection<IJob> failedJobs) {
         return new Thread(job.getId()) {

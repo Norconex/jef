@@ -20,14 +20,13 @@ package com.norconex.jef.progress.snapshot;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
 import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -139,69 +138,36 @@ public class XMLProgressSnapshotSerializer
     private IProgressSnapshot readProgressSnapshot(
             Element jobElement) {
 
-        //2012-02-20: Did 2 hours in plane
-        
         ProgressSnapshot snapshot = new ProgressSnapshot();
-        snapshot.completionRatio = xmlDouble(jobElement, "completionRatio", 0);
-        snapshot.elapsedTime = xmlLong(jobElement, "elapsedTime", 0);
-        snapshot.endTime = xmlDate(jobElement, "endTime", null);
+        snapshot.setCompletionRatio(
+                xmlDouble(jobElement, "completionRatio", 0));
+        snapshot.setElapsedTime(xmlLong(jobElement, "elapsedTime", 0));
+        snapshot.setEndTime(xmlDate(jobElement, "endTime", null));
 //        snapshot.jobContext = jobElement.getJobContext();
-        snapshot.jobId = xmlString(jobElement, "id", null);
-        snapshot.lastActivity = xmlDate(jobElement, "lastActivity", null);
-        snapshot.metadata = xmlString(jobElement, "metadata", null);
-        snapshot.note = xmlString(jobElement, "note", null);
-        snapshot.recovery = xmlBoolean(jobElement, "recovery", false);
-        snapshot.startTime = xmlDate(jobElement, "startTime", null);
+        snapshot.setJobId(xmlString(jobElement, "id", null));
+        snapshot.setLastActivity(xmlDate(jobElement, "lastActivity", null));
+        snapshot.setMetadata(xmlString(jobElement, "metadata", null));
+        snapshot.setNote(xmlString(jobElement, "note", null));
+        snapshot.setRecovery(xmlBoolean(jobElement, "recovery", false));
+        snapshot.setStartTime(xmlDate(jobElement, "startTime", null));
         String status = xmlString(jobElement, "status", null);
         if (status != null) {
-            snapshot.status = IJobStatus.Status.valueOf(status);
+            snapshot.setStatus(IJobStatus.Status.valueOf(status));
         }
-        snapshot.stopRequested = xmlBoolean(jobElement, "stopRequested", false);
+        snapshot.setStopRequested(
+                xmlBoolean(jobElement, "stopRequested", false));
         
         NodeList jobNodes = jobElement.getElementsByTagName("job");
         for (int i = 0; i < jobNodes.getLength(); i++){
             Node jobNode = jobNodes.item(i);
             if (jobNode.getNodeType() == Node.ELEMENT_NODE){
                 Element childJobElement = (Element) jobNode;
-                snapshot.children.add(
+                snapshot.getChildren().add(
                         readProgressSnapshot(childJobElement));
             }
         }
         
         return snapshot;
-        
-//        
-//        NodeList statusNodes = doc.getElementsByTagName("job");
-//        for (int i = 0; i < statusNodes.getLength(); i++){
-//            Node statusNode = statusNodes.item(i);
-//            if (statusNode.getNodeType() == Node.ELEMENT_NODE){
-//                Element element = (Element) statusNode;
-//                String id = element.getAttribute("id");
-//                String type = element.getAttribute("type");
-//                NodeList jobNodes = element.getElementsByTagName("job");
-//                Node jobNode = jobNodes.item(0);
-//
-//                
-//                String jobXML = nodeToString(jobNode);
-//                
-//                System.out.println("ID:" + id + " type:" + type);
-//                System.out.println("Text Content:" + nodeToString(jobNode));//statusNode));
-//                
-//                IProgressSnapshot snapshot = 
-//                        DESERIALIZER.readProgressSnapshot(
-//                                new StringReader(jobXML));
-//                collectors.add(new CollectorStatus(
-//                        Long.parseLong(id),
-//                        CollectorType.valueOf(type),
-//                        snapshot));
-//                // Example:http://www.developerfusion.com/code/2064/a-simple-way-to-read-an-xml-file-in-java/
-//            }
-//        }
-//
-//        
-//        
-//        IJobStatus progress = jobSuite.getJobProgress(job);
-//        return snapshot;
     }
 
     
@@ -238,37 +204,6 @@ public class XMLProgressSnapshotSerializer
         }
     }
     
-    private String esc(String str) {
-        // Yes, Apache Commons Lang does it. Did not want to create dependency.
-        final StringBuilder result = new StringBuilder();
-        final StringCharacterIterator iterator = 
-                new StringCharacterIterator(str);
-        char character =  iterator.current();
-        while (character != CharacterIterator.DONE ){
-          if (character == '<') {
-            result.append("&lt;");
-          }
-          else if (character == '>') {
-            result.append("&gt;");
-          }
-          else if (character == '\"') {
-            result.append("&quot;");
-          }
-          else if (character == '\'') {
-            result.append("&#039;");
-          }
-          else if (character == '&') {
-             result.append("&amp;");
-          }
-          else {
-            //the char is not a special one
-            //add it to the result as is
-            result.append(character);
-          }
-          character = iterator.next();
-        }
-        return result.toString();
-    }
     private void writeDateTag(
             PrintWriter out, String tagName, Date tagValue, int depth)  {
         if (tagValue != null) {
@@ -282,7 +217,7 @@ public class XMLProgressSnapshotSerializer
             out.print("    <");
             out.print(tagName);
             out.print(">");
-            out.print(esc(tagValue));
+            out.print(StringEscapeUtils.escapeXml(tagValue));
             out.print("</");
             out.print(tagName);
             out.println(">");

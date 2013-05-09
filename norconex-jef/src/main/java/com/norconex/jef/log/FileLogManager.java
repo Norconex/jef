@@ -48,6 +48,9 @@ public class FileLogManager implements ILogManager {
     /** Log4J layout to use for the generated log. */
     private final ThreadSafeLayout layout;
     
+    private static final String LOG_SUFFIX = ".log";
+    
+    
 //    /**
 //     * Constructor.
 //     */
@@ -91,7 +94,7 @@ public class FileLogManager implements ILogManager {
     public final Appender createAppender(final String namespace)
             throws IOException {
         return new FileAppender(
-                layout, logdirLatest + "/" + namespace + ".log");
+                layout, logdirLatest + "/" + namespace + LOG_SUFFIX);
     }
     
     /**
@@ -101,12 +104,13 @@ public class FileLogManager implements ILogManager {
             throws IOException {
         String date = new SimpleDateFormat(
                 "yyyyMMddHHmmssSSSS").format(backupDate);
-        File progressFile = new File(logdirLatest + "/" + namespace + ".log");
+        File progressFile = new File(
+                logdirLatest + "/" + namespace + LOG_SUFFIX);
         File backupFile =
             new File(FileUtil.createDateDirs(logdirBackup, backupDate)
-                    + "/" + date + "__" + namespace + ".log");
+                    + "/" + date + "__" + namespace + LOG_SUFFIX);
         if (!progressFile.renameTo(backupFile)) {
-            throw new RuntimeException("Could not move file from \""
+            throw new IOException("Could not move file from \""
                     + progressFile + "\" to \"" + backupFile + "\"");
         }
     }
@@ -145,7 +149,7 @@ public class FileLogManager implements ILogManager {
         if (namespace == null) {
             return null;
         }
-        return new File(logdirLatest + "/" + namespace + ".log");
+        return new File(logdirLatest + "/" + namespace + LOG_SUFFIX);
     }
     
     //TODO consider using RegexFilteredInputStream

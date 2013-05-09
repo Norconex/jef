@@ -56,8 +56,8 @@ public abstract class AbstractJobGroup implements IJobGroup {
      * @param jobs jobs to be run by the group
      */
     public AbstractJobGroup(
-            final String id, final IJob[] jobs) {
-        this(id, jobs, "Group of jobs.");
+            final String id, final IJob... jobs) {
+        this(id, "Group of jobs.", jobs);
     }
     
     /**
@@ -67,7 +67,7 @@ public abstract class AbstractJobGroup implements IJobGroup {
      * @param description job description
      */
     public AbstractJobGroup(
-            final String id, final IJob[] jobs, final String description) {
+            final String id, final String description, final IJob... jobs) {
         super();
         this.description = description;
         if (id == null) {
@@ -120,32 +120,7 @@ public abstract class AbstractJobGroup implements IJobGroup {
      */
     protected final void registerGroupProgressMonitoring(
             final JobProgress groupProgress, final JobSuite suite) {
-        progressListener = new JobProgressStateChangeAdapter() {
-            private double[] completionRatios = new double[jobs.length];
-            public void jobSkipped(final IJobStatus progress) {
-                jobStateChanged(progress);
-            }
-            public void jobStateChanged(final IJobStatus progress) {
-                int jobIndex = jobIds.indexOf(progress.getJobId());
-                if (jobIndex >= 0) {
-                    completionRatios[jobIndex] = progress.getCompletionRatio();
-                }
-                // Compute average
-                int ratioTotal = 0;
-                int completedCount = 0;
-                for (int i = 0; i < completionRatios.length; i++) {
-                    if (completionRatios[i] >= 1.0) {
-                        completedCount++;
-                    }
-                    ratioTotal += (int) Math.round(
-                            completionRatios[i] * MAX_PROGRESS);
-                }
-                groupProgress.setProgress(Math.min(MAX_PROGRESS,
-                        (long) (ratioTotal / jobs.length)));
-                groupProgress.setNote(completedCount + " of "
-                        + jobs.length + " jobs completed.");
-            }
-        };
+        progressListener = new GroupProgressListener(groupProgress);
         suite.addJobProgressListener(progressListener);
     }
     /**
@@ -163,4 +138,36 @@ public abstract class AbstractJobGroup implements IJobGroup {
         // DOes nothing.  Default behaviour typically stops on its own
         // when all child jobs are stopped.
     }
+    
+    private class GroupProgressListener extends JobProgressStateChangeAdapter {
+        private double[] completionRatios = new double[jobs.length];
+        private final JobProgress groupProgress;
+        public GroupProgressListener(JobProgress groupProgress) {
+            super();
+            this.groupProgress = groupProgress;
+        }
+        public void jobSkipped(final IJobStatus progress) {
+            jobStateChanged(progress);
+        }
+        public void jobStateChanged(final IJobStatus progress) {
+            int jobIndex = jobIds.indexOf(progress.getJobId());
+            if (jobIndex >= 0) {
+                completionRatios[jobIndex] = progress.getCompletionRatio();
+            }
+            // Compute average
+            int ratioTotal = 0;
+            int completedCount = 0;
+            for (int i = 0; i < completionRatios.length; i++) {
+                if (completionRatios[i] >= 1.0) {
+                    completedCount++;
+                }
+                ratioTotal += (int) Math.round(
+                        completionRatios[i] * MAX_PROGRESS);
+            }
+            groupProgress.setProgress(Math.min(MAX_PROGRESS,
+                    (long) (ratioTotal / jobs.length)));
+            groupProgress.setNote(completedCount + " of "
+                    + jobs.length + " jobs completed.");
+        }
+    };
 }

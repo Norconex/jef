@@ -43,12 +43,12 @@ public class SyncJobGroup extends AbstractJobGroup {
     private static final Logger LOG =
             LogManager.getLogger(SyncJobGroup.class);
 
-    public SyncJobGroup(final String id, final IJob[] jobs) {
-        super(id, jobs, "Synchronous job group with " + jobs.length + " jobs.");
+    public SyncJobGroup(final String id, final IJob... jobs) {
+        super(id, "Synchronous job group with " + jobs.length + " jobs.", jobs);
     }
     public SyncJobGroup(
-            final String id, final IJob[] jobs, String description) {
-        super(id, jobs, description);
+            final String id, String description, final IJob... jobs) {
+        super(id, description, jobs);
     }
 
     /**

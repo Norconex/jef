@@ -258,7 +258,7 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
     <url>http://www.norconex.com</url>
   </organization>
   <url>http://jef.norconex.com</url>
-  <description></description>
+  <description>JEF is a Java API library meant to facilitate the lives of developers and integrators who have to build any kind of maintenance tasks on a server.</description>
   <issueManagement>
     <system>GitHub</system>
     <url>https://github.com/Norconex/jef/issues</url>
