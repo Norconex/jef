@@ -325,7 +325,6 @@ public final class JobProgress
         if (isCompleted()) { return Status.COMPLETED; }
         if (isPrematurlyEnded())  { return Status.PREMATURE_TERMINATION;  }
         if (isRunning())   { return Status.RUNNING;   }
-//        if (isStarted())   { return Status.STARTED;   }
         return Status.UNKNOWN;
     }
 

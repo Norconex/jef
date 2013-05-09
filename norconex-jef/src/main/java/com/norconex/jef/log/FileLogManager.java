@@ -51,13 +51,6 @@ public class FileLogManager implements ILogManager {
     private static final String LOG_SUFFIX = ".log";
     
     
-//    /**
-//     * Constructor.
-//     */
-//    public FileLogManager() {
-//        this(JefUtils.getDefaultWorkDir());
-//    }
-
     /**
      * Constructor.
      * @param logdir base directory where the log should be stored

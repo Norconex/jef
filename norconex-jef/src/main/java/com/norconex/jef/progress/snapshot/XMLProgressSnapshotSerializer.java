@@ -143,7 +143,6 @@ public class XMLProgressSnapshotSerializer
                 xmlDouble(jobElement, "completionRatio", 0));
         snapshot.setElapsedTime(xmlLong(jobElement, "elapsedTime", 0));
         snapshot.setEndTime(xmlDate(jobElement, "endTime", null));
-//        snapshot.jobContext = jobElement.getJobContext();
         snapshot.setJobId(xmlString(jobElement, "id", null));
         snapshot.setLastActivity(xmlDate(jobElement, "lastActivity", null));
         snapshot.setMetadata(xmlString(jobElement, "metadata", null));

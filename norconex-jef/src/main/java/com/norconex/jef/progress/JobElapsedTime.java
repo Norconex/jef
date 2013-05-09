@@ -122,31 +122,31 @@ public class JobElapsedTime {
     public final String getElapsedTimeAsString() {
         long time = getElapsedTime();
         if (time < 0) {
-            return ""; //$NON-NLS-1$
+            return ""; 
         }
-        String str = ""; //$NON-NLS-1$
+        String str = ""; 
         int days = (int) time / DAY;
         time -= days * DAY;
         if (days > 0) {
-            str += days + "d"; //$NON-NLS-1$
+            str += days + "d"; 
         }
         int hours = (int) time / HOUR;
         time -= hours * HOUR;
         if (hours > 0) {
-            str += hours + "h"; //$NON-NLS-1$
+            str += hours + "h"; 
         }
         int minutes = (int) time / MINUTE;
         time -= minutes * MINUTE;
         if (minutes > 0) {
-            str += minutes + "m"; //$NON-NLS-1$
+            str += minutes + "m"; 
         }
         int seconds = (int) time / SECOND;
         time -= seconds * SECOND;
         if (seconds > 0) {
-            str += seconds + "s"; //$NON-NLS-1$
+            str += seconds + "s"; 
         }
-        if (str.equals("")) { //$NON-NLS-1$
-            str += time + "ms"; //$NON-NLS-1$
+        if (str.equals("")) { 
+            str += time + "ms"; 
         }
         return str;
     }
