@@ -28,6 +28,9 @@ import java.io.Serializable;
  */
 public interface IJobContext extends Serializable {
 
+    int PROGRESS_ZERO = 0;
+    int PROGRESS_100 = 1000;
+    
     /**
      * Gets the job description.
      * @return job description
