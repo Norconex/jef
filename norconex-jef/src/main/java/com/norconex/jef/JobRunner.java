@@ -200,7 +200,7 @@ public class JobRunner {
             //System.exit(-1)
         } finally {
             elapsedTime.setEndTime(new Date());
-            if (!errorHandled) {
+            if (!success && !errorHandled) {
                 LOG.fatal("Fatal error occured in job: " + job.getId());
             }
             LOG.info("Running " + job.getId()  
