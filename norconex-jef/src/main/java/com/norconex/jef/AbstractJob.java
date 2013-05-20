@@ -37,9 +37,7 @@ public abstract class AbstractJob implements IJob {
         this.id = id;
     }
 
-    /**
-     * @see com.norconex.jef.IJob#getId()
-     */
+    @Override
     public final String getId() {
         return id;
     }

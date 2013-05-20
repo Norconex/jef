@@ -90,7 +90,7 @@ public class AsyncLimitedJobGroup extends AsyncJobGroup {
         while (!allJobStarted) {
             int notAlive = 0;
             for (int x = 0; x < threads.size(); x++) {
-                Thread thread = (Thread) threads.get(x);
+                Thread thread = threads.get(x);
                 if (!thread.isAlive()) {
                     notAlive++;
                 }
@@ -153,6 +153,7 @@ public class AsyncLimitedJobGroup extends AsyncJobGroup {
     private Thread createJobThread(final IJob job, final JobSuite suite,
             final Collection<IJob> failedJobs) {
         return new Thread(job.getId()) {
+            @Override
             public void run() {
                 JobRunner runner = new JobRunner();
                 debug("Thread from " + AsyncLimitedJobGroup.this.getId()

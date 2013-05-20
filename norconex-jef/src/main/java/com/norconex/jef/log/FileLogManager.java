@@ -81,18 +81,14 @@ public class FileLogManager implements ILogManager {
         }
     }
 
-    /**
-     * @see com.norconex.jef.log.ILogManager#createAppender(String)
-     */
+    @Override
     public final Appender createAppender(final String namespace)
             throws IOException {
         return new FileAppender(
                 layout, logdirLatest + "/" + namespace + LOG_SUFFIX);
     }
     
-    /**
-     * @see com.norconex.jef.log.ILogManager#backup(String, Date)
-     */
+    @Override
     public final void backup(final String namespace, final Date backupDate)
             throws IOException {
         String date = new SimpleDateFormat(
@@ -108,9 +104,7 @@ public class FileLogManager implements ILogManager {
         }
     }
 
-    /**
-     * @see com.norconex.jef.log.ILogManager#getLog(java.lang.String)
-     */
+    @Override
     public final InputStream getLog(final String namespace) throws IOException {
         File logFile = getLogFile(namespace);
         if (logFile != null && logFile.exists()) {
@@ -118,9 +112,7 @@ public class FileLogManager implements ILogManager {
         }
         return null;
     }
-    /**
-     * @see com.norconex.jef.log.ILogManager#getLog(java.lang.String)
-     */
+    @Override
     public InputStream getLog(String namespace,
             String jobId) throws IOException {
         if (jobId == null) {
@@ -166,6 +158,7 @@ public class FileLogManager implements ILogManager {
             nextLine();
         }
     
+        @Override
         public int read() throws IOException {
             if (lineStream == null) {
                 return -1;

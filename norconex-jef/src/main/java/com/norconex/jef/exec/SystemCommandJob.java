@@ -125,12 +125,15 @@ public class SystemCommandJob implements IJob {
     public IJobContext createJobContext() {
         return new IJobContext() {
             private static final long serialVersionUID = -779499724571527547L;
+            @Override
             public long getProgressMinimum() {
                 return 0;
             }
+            @Override
             public long getProgressMaximum() {
                 return systemCommands.length;
             }
+            @Override
             public String getDescription() {
                 return desc;
             }

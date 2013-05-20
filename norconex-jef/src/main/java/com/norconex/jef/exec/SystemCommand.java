@@ -267,8 +267,8 @@ public class SystemCommand {
 
     /**
      * Returns the command to be executed.
-     * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
     	String cmd = "";
     	for (int i = 0; i < command.length; i++) {
@@ -288,10 +288,9 @@ public class SystemCommand {
     				|| SystemUtils.IS_OS_WINDOWS_98
     				|| SystemUtils.IS_OS_WINDOWS_ME) {
     			return CMD_PREFIXES_WIN_LEGACY;
-    		} else {
-                // NT, 2000, XP and up
-    			return CMD_PREFIXES_WIN_CURRENT;
     		}
+            // NT, 2000, XP and up
+			return CMD_PREFIXES_WIN_CURRENT;
     	}
     	return EMPTY_STRINGS;
     }

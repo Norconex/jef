@@ -85,7 +85,9 @@ public class XMLProgressSnapshotSerializer
                     }
                 }
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            // swallow
+        }
         return defaultValue;
     }
 
@@ -98,6 +100,7 @@ public class XMLProgressSnapshotSerializer
                 return Double.parseDouble(value);
             }
         } catch (Exception e) {
+            // swallow
         }
         return defaultValue;
     }
@@ -109,6 +112,7 @@ public class XMLProgressSnapshotSerializer
                 return Boolean.parseBoolean(value);
             }
         } catch (Exception e) {
+            // swallow
         }
         return defaultValue;
     }
@@ -120,6 +124,7 @@ public class XMLProgressSnapshotSerializer
                 return Long.parseLong(value);
             }
         } catch (Exception e) {
+            // swallow
         }
         return defaultValue;
     }
@@ -131,6 +136,7 @@ public class XMLProgressSnapshotSerializer
                 return new Date(Long.parseLong(value));
             }
         } catch (Exception e) {
+            // swallow
         }
         return defaultValue;
     }

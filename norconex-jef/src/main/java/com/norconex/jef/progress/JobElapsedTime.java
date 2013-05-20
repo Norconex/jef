@@ -119,10 +119,11 @@ public class JobElapsedTime {
      * Gets the elapsed time as a string, in a human readable format.
      * @return elapsed time
      */
+    @SuppressWarnings("nls")
     public final String getElapsedTimeAsString() {
         long time = getElapsedTime();
         if (time < 0) {
-            return ""; 
+            return "";
         }
         String str = ""; 
         int days = (int) time / DAY;

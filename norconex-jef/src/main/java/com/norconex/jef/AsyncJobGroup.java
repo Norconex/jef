@@ -64,9 +64,7 @@ public class AsyncJobGroup extends AbstractJobGroup {
         super(id, description, jobs);
     }
 
-    /**
-     * @see com.norconex.jef.IJob#execute(JobProgress, JobSuite)
-     */
+    @Override
     public void execute(
             final JobProgress progress, final JobSuite suite) {
         registerGroupProgressMonitoring(progress, suite);
@@ -78,6 +76,7 @@ public class AsyncJobGroup extends AbstractJobGroup {
         for (int i = 0; i < jobs.length; i++) {
             final IJob job = jobs[i];
             threads[i] = new Thread(job.getId()) {
+                @Override
                 public void run() {
                     JobRunner runner = new JobRunner();
                     debug("Thread from " + AsyncJobGroup.this.getId()

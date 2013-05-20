@@ -69,6 +69,7 @@ public class FileStopRequestHandler
             final ISuiteStopRequestListener listener) {
         listening = true;
         new Thread() {
+            @Override
             public void run() {
                 while(listening) {
                     boolean exists = stopFile.exists();
@@ -84,7 +85,7 @@ public class FileStopRequestHandler
                     }
                     Sleeper.sleepSeconds(1);
                 }
-            };
+            }
         }.start();
     }
 

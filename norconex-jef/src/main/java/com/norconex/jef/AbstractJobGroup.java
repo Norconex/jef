@@ -85,27 +85,27 @@ public abstract class AbstractJobGroup implements IJobGroup {
         }
     }
 
-    /**
-     * @see com.norconex.jef.IJobGroup#getJobs()
-     */
+    @Override
     public final IJob[] getJobs() {
         return jobs;
     }
-    /**
-     * @see com.norconex.jef.IJob#getId()
-     */
+    @Override
     public final String getId() {
         return id;
     }
+    @Override
     public IJobContext createJobContext() {
         return new IJobContext() {
             private static final long serialVersionUID = -7997026549801055961L;
+            @Override
             public long getProgressMinimum() {
                 return 0;
             }
+            @Override
             public long getProgressMaximum() {
                 return MAX_PROGRESS;
             }
+            @Override
             public String getDescription() {
                 return description;
             }
@@ -146,9 +146,11 @@ public abstract class AbstractJobGroup implements IJobGroup {
             super();
             this.groupProgress = groupProgress;
         }
+        @Override
         public void jobSkipped(final IJobStatus progress) {
             jobStateChanged(progress);
         }
+        @Override
         public void jobStateChanged(final IJobStatus progress) {
             int jobIndex = jobIds.indexOf(progress.getJobId());
             if (jobIndex >= 0) {
@@ -165,9 +167,9 @@ public abstract class AbstractJobGroup implements IJobGroup {
                         completionRatios[i] * MAX_PROGRESS);
             }
             groupProgress.setProgress(Math.min(MAX_PROGRESS,
-                    (long) (ratioTotal / jobs.length)));
+                    (ratioTotal / jobs.length)));
             groupProgress.setNote(completedCount + " of "
                     + jobs.length + " jobs completed.");
         }
-    };
+    }
 }

@@ -51,9 +51,7 @@ public class SyncJobGroup extends AbstractJobGroup {
         super(id, description, jobs);
     }
 
-    /**
-     * @see com.norconex.jef.IJob#execute(JobProgress, JobSuite)
-     */
+    @Override
     public final void execute(
             final JobProgress progress, final JobSuite suite) {
 
@@ -71,10 +69,9 @@ public class SyncJobGroup extends AbstractJobGroup {
                 LOG.error(jobs[i].getId() + " failed.");
                 failedJob = jobs[i].getId();
                 break;
-            } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(jobs[i].getId() + " succeeded.");
-                }
+            }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(jobs[i].getId() + " succeeded.");
             }
             JobRunner.setCurrentJobId(getId());
         }

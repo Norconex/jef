@@ -58,10 +58,8 @@ public class ErrorMailNotifier
         super(host, sender, recipients);
     }
 
-    /**
-     * @see com.norconex.jef.error.IErrorHandler#handleError(IErrorEvent)
-     */
     @SuppressWarnings("nls")
+    @Override
     public final void handleError(final IErrorEvent event) {
         JobSuite suite = event.getJobSuite();
         ResourceBundle bundle =

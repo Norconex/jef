@@ -29,7 +29,7 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
- * Convinience class for sending simple emails.  It does not cover most
+ * Convenience class for sending simple emails.  It does not cover most
  * advanced needs (HTML images, attachments, etc).
  * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
  */
@@ -43,7 +43,7 @@ public class SimpleMailer {
     /** Email content type. */
     private final String contentType;
     /** Email recipients ("To field). */
-    private final String[] recipients;
+    private final String[] emailRecipients;
 
     /**
      * Constructor.
@@ -85,7 +85,7 @@ public class SimpleMailer {
             final String[] recipients, final String contentType) {
         super();
         this.sender = sender;
-        this.recipients = ArrayUtils.clone(recipients);
+        this.emailRecipients = ArrayUtils.clone(recipients);
 
         Properties sysProps = System.getProperties();
         if (sysProps == null) {
@@ -105,7 +105,7 @@ public class SimpleMailer {
     public final void send(
             final String subject, final String body)
             throws MessagingException {
-        send(recipients, subject, body);
+        send(emailRecipients, subject, body);
     }
     /**
      * Sends an email.

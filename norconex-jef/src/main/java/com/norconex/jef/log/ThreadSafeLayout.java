@@ -44,9 +44,7 @@ public class ThreadSafeLayout extends Layout {
         this.layout = layout;
     }
 
-    /**
-     * @see org.apache.log4j.Layout#activateOptions()
-     */
+    @Override
     public void activateOptions() {
         layout.activateOptions();
     }
@@ -56,6 +54,7 @@ public class ThreadSafeLayout extends Layout {
      * @see org.apache.log4j.Layout#format(org.apache.log4j.spi.LoggingEvent)
      */
     @SuppressWarnings("nls")
+    @Override
     public String format(LoggingEvent evt) {
         String jobId = JobRunner.getCurrentJobId();
         if (jobId == null) {
@@ -64,9 +63,7 @@ public class ThreadSafeLayout extends Layout {
         return jobId + ": " + layout.format(evt);
     }
 
-    /**
-     * @see org.apache.log4j.Layout#ignoresThrowable()
-     */
+    @Override
     public boolean ignoresThrowable() {
         return layout.ignoresThrowable();
     }

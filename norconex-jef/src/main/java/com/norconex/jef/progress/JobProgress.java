@@ -143,6 +143,7 @@ public final class JobProgress
      * @return job context
      * @since 2.0
      */
+    @Override
     public IJobContext getJobContext() {
         return jobContext;
     }
@@ -151,6 +152,7 @@ public final class JobProgress
      * Gets the current progress note.
      * @return Returns the note.
      */
+    @Override
     public String getNote() {
         return note;
     }
@@ -168,6 +170,7 @@ public final class JobProgress
      * Gets the current progress.
      * @return Returns the progress.
      */
+    @Override
     public long getProgress() {
         if (progress < jobContext.getProgressMinimum()) {
             return jobContext.getProgressMinimum();
@@ -197,6 +200,7 @@ public final class JobProgress
      * Gets the associated job unique identifier.
      * @return the associated job unique identifier
      */
+    @Override
     public String getJobId() {
         return jobId;
     }
@@ -206,6 +210,7 @@ public final class JobProgress
      * never finished.
      * @return end time
      */
+    @Override
     public Date getEndTime() {
         if (elapsedTime.getEndTime() != null) {
             return (Date) elapsedTime.getEndTime().clone();
@@ -234,6 +239,7 @@ public final class JobProgress
      * Gets the date on which last activity on the job execution occured.
      * @return last activity date
      */
+    @Override
     public Date getLastActivity() {
         if (elapsedTime.getLastActivity() != null) {
             return (Date) elapsedTime.getLastActivity().clone();
@@ -245,6 +251,7 @@ public final class JobProgress
      * Gets meta-data associated with this job progress.
      * @return meta-data
      */
+    @Override
     public String getMetadata() {
         return metadata;
     }
@@ -263,6 +270,7 @@ public final class JobProgress
      * never started.
      * @return start time
      */
+    @Override
     public Date getStartTime() {
         if (elapsedTime.getStartTime() != null) {
             return (Date) elapsedTime.getStartTime().clone();
@@ -274,6 +282,7 @@ public final class JobProgress
      * Gets how long it took to finish a job, in milliseconds.
      * @return job execution elapsed time
      */
+    @Override
     public long getElapsedTime() {
         return elapsedTime.getElapsedTime();
     }
@@ -307,6 +316,7 @@ public final class JobProgress
      * Gets the job completion ration.
      * @return a double between 0 and 1
      */
+    @Override
     public double getCompletionRatio() {
         long total = jobContext.getProgressMaximum() 
                 - jobContext.getProgressMinimum();
@@ -317,6 +327,7 @@ public final class JobProgress
      * Gets the job execution status.
      * @return execution status
      */
+    @Override
     public Status getStatus() {
         // The order is important to establish status
         if (isAborted())   { return Status.ABORTED;   }
@@ -337,7 +348,7 @@ public final class JobProgress
         return stopRequested && isRunning();
     }
 
-    
+    @Override
     public boolean isStopRequested() {
         return stopRequested;
     }
@@ -348,6 +359,7 @@ public final class JobProgress
      * @return <code>true</code> if the current progress is a recovery
      * @since 1.1.1
      */
+    @Override
     public boolean isRecovery() {
         return this.recovery;
     }

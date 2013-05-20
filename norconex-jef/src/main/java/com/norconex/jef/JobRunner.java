@@ -136,7 +136,7 @@ public class JobRunner {
      *         associated with the current thread
      */
     public static String getCurrentJobId() {
-        return (String) CURRENT_JOB_ID.get();
+        return CURRENT_JOB_ID.get();
     }
     
     /**
@@ -239,6 +239,7 @@ public class JobRunner {
             final JobElapsedTime elapsedTime, final JobProgress finalProgress) {
         return new Thread(
                 "activityTracker_" + job.getId()) {
+            @Override
             public void run() {
                 while (finalProgress.isStatus(
 //                        IJobStatus.Status.STARTED, 
@@ -253,7 +254,7 @@ public class JobRunner {
                     fireJobRunningVerified(
                             finalProgress, suite.getJobProgressListeners());
                 }
-            };
+            }
         };
     }
 
@@ -377,12 +378,15 @@ public class JobRunner {
             final JobProgress progress,
             final JobSuite suite) {
         IErrorEvent event = new IErrorEvent() {
+            @Override
             public Throwable getException() {
                 return t;
             }
+            @Override
             public JobSuite getJobSuite() {
                 return suite;
             }
+            @Override
             public JobProgress getProgress() {
                 return progress;
             }

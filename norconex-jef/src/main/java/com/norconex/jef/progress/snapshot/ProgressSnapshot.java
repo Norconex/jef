@@ -44,45 +44,59 @@ import com.norconex.jef.IJobContext;
     private boolean recovery;
     private final List<IProgressSnapshot> children = 
             new ArrayList<IProgressSnapshot>();
+    @Override
     public String getJobId() {
         return jobId;
     }
+    @Override
     public IJobContext getJobContext() {
         return jobContext;
     }
+    @Override
     public String getNote() {
         return note;
     }
+    @Override
     public long getProgress() {
         return progress;
     }
+    @Override
     public Date getEndTime() {
         return endTime;
     }
+    @Override
     public Date getStartTime() {
         return startTime;
     }
+    @Override
     public Date getLastActivity() {
         return lastActivity;
     }
+    @Override
     public String getMetadata() {
         return metadata;
     }
+    @Override
     public boolean isStopRequested() {
         return stopRequested;
     }
+    @Override
     public long getElapsedTime() {
         return elapsedTime;
     }
+    @Override
     public double getCompletionRatio() {
         return completionRatio;
     }
+    @Override
     public Status getStatus() {
         return status;
     }
+    @Override
     public boolean isRecovery() {
         return recovery;
     }
+    @Override
     public List<IProgressSnapshot> getChildren() {
         return children;
     }

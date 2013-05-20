@@ -44,11 +44,7 @@ public abstract class AbstractResumableJob implements IJob {
         super();
     }
 
-    /**
-     * @see com.norconex.jef.IJob#execute(
-     *              com.norconex.jef.progress.JobProgress,
-     *              com.norconex.jef.suite.JobSuite)
-     */
+    @Override
     public final void execute(
             final JobProgress progress, final JobSuite suite) {
         

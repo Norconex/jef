@@ -73,7 +73,7 @@ public interface IJobStatus extends Serializable {
          * are stopped.
          */
         STOPPED
-    };
+    }
 
     /**
      * The ID of the job this status represents.

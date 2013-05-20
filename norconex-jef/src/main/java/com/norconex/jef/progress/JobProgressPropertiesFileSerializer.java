@@ -72,9 +72,7 @@ public class JobProgressPropertiesFileSerializer
         }
     }
 
-    /**
-     * @see IJobProgressSerializer#serialize(String, IJobStatus)
-     */
+    @Override
     public final void serialize(
             String namespace, final IJobStatus jobProgress)
             throws IOException {
@@ -112,6 +110,7 @@ public class JobProgressPropertiesFileSerializer
         os.close();
     }
 
+    @Override
     public final JobProgress deserialize(
             String namespace, final String jobId, final IJobContext jobContext)
             throws IOException {
@@ -147,10 +146,7 @@ public class JobProgressPropertiesFileSerializer
         return null;
     }
 
-    /**
-     * @see com.norconex.jef.progress.IJobProgressSerializer#remove(
-     *          java.lang.String, java.lang.String)
-     */
+    @Override
     public final void remove(final String namespace, final String jobId)
             throws IOException {
         File file = getProgressFile(namespace, jobId);
@@ -160,10 +156,7 @@ public class JobProgressPropertiesFileSerializer
         }
     }
 
-    /**
-     * @see com.norconex.jef.progress.IJobProgressSerializer#backup(
-     *              java.lang.String, java.lang.String, java.util.Date)
-     */
+    @Override
     public final void backup(
             final String namespace, final String jobId, final Date backupDate)
             throws IOException {

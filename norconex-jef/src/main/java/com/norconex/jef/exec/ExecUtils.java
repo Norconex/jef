@@ -151,7 +151,7 @@ public final class ExecUtils {
     public static void watchProcessOutput(
             Process process,
             IStreamListener outputListener,
-            IStreamListener errorListener) throws InterruptedException {
+            IStreamListener errorListener) {
         watchProcessOutput(process,
                 new IStreamListener[] {outputListener},
                 new IStreamListener[] {errorListener});
@@ -181,7 +181,7 @@ public final class ExecUtils {
                 JobRunner.setCurrentJobId(jobId);
             }
         };
-        output.addStreamListeners(outputListeners);
+        output.addStreamListener(outputListeners);
         output.start();
 
         // listen for error
@@ -192,7 +192,7 @@ public final class ExecUtils {
                 JobRunner.setCurrentJobId(jobId);
             }
         };
-        error.addStreamListeners(errorListeners);
+        error.addStreamListener(errorListeners);
         error.start();
     }
     

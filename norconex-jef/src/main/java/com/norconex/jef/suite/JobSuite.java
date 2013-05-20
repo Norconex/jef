@@ -86,7 +86,7 @@ public final class JobSuite {
                     new ArrayList<ISuiteStopRequestListener>());
     
     /** Root job. */
-    private final IJob job;
+    private final IJob rootJob;
     /** Unique identifiers of all jobs making up the suite in logical order. */
     private final List<String> jobIds = new ArrayList<String>();
     /** Mapping of jobIds and actual jobs for fast-access. */
@@ -169,7 +169,7 @@ public final class JobSuite {
             throw new IllegalArgumentException(
                     "Log manager cannot be null.");
         }
-        this.job = job;
+        this.rootJob = job;
         this.progressSerializer = progressSerializer;
         this.namespace = job.getId();
         this.logManager = logManager;
@@ -179,9 +179,11 @@ public final class JobSuite {
 
         // Add serialization support.
         addJobProgressListener(new JobProgressStateChangeAdapter() {
+            @Override
             public void jobStateChanged(final IJobStatus progress) {
                 serialize(progress);
             }
+            @Override
             public void jobRunningVerified(final IJobStatus progress) {
                 serialize(progress);
             }
@@ -209,7 +211,7 @@ public final class JobSuite {
      * @return suite root job
      */
     public IJob getRootJob() {
-        return job;
+        return rootJob;
     }
 
     public IJobContext getJobContext(String jobId) {
@@ -224,7 +226,7 @@ public final class JobSuite {
      * @return job unique identifiers
      */
     public String[] getJobIds() {
-        return (String[]) jobIds.toArray(new String[]{});
+        return jobIds.toArray(new String[]{});
     }
 
     public IJobSuiteStopRequestHandler getStopRequestHandler() {
@@ -236,7 +238,7 @@ public final class JobSuite {
      */
     private void loadJobIds(final IJob parentJob) {
         if (jobIds.contains(parentJob.getId())) {
-            throw new IllegalArgumentException("Job suite '" + job.getId()
+            throw new IllegalArgumentException("Job suite '" + rootJob.getId()
                     + "' contains two or more jobs with the same id: '"
                     + parentJob.getId() + "'.");
         }
@@ -285,8 +287,7 @@ public final class JobSuite {
      */
     public IJobProgressListener[] getJobProgressListeners() {
         synchronized (progressListeners) {
-            return (IJobProgressListener[]) progressListeners.toArray(
-                    EMPTY_PROGRESS_LISTENERS);
+            return progressListeners.toArray(EMPTY_PROGRESS_LISTENERS);
         }
     }
 
@@ -316,8 +317,7 @@ public final class JobSuite {
      */
     public ISuiteStopRequestListener[] getSuiteStopRequestListeners() {
         synchronized (stopListeners) {
-            return (ISuiteStopRequestListener[]) stopListeners.toArray(
-                    EMPTY_STOP_LISTENERS);
+            return stopListeners.toArray(EMPTY_STOP_LISTENERS);
         }
     }
     
@@ -347,8 +347,7 @@ public final class JobSuite {
      */
     public ISuiteLifeCycleListener[] getSuiteLifeCycleListeners() {
         synchronized (suiteListeners) {
-            return (ISuiteLifeCycleListener[]) suiteListeners.toArray(
-                    EMPTY_SUITE_LISTENERS);
+            return suiteListeners.toArray(EMPTY_SUITE_LISTENERS);
         }
     }
 
@@ -376,8 +375,7 @@ public final class JobSuite {
      */
     public IErrorHandler[] getErrorHandlers() {
         synchronized (errorHandlers) {
-            return (IErrorHandler[]) errorHandlers.toArray(
-                    EMPTY_ERROR_HANDLERS);
+            return errorHandlers.toArray(EMPTY_ERROR_HANDLERS);
         }
     }
 
@@ -433,7 +431,7 @@ public final class JobSuite {
      * @since 1.1
      */
     public IJob getJob(String jobId) {
-        return (IJob) jobByIds.get(jobId);
+        return jobByIds.get(jobId);
     }
 
     /**
@@ -452,10 +450,11 @@ public final class JobSuite {
         accept(new AbstractJobSuiteVisitor() {
             @Override
             public void visitJob(final IJob job) {
-                final IJobStatus progress = getJobProgress(job);
+                final IJobStatus jobProgress = getJobProgress(job);
                 new Thread(){
+                    @Override
                     public void run() {
-                        stopJob(job, progress);
+                        stopJob(job, jobProgress);
                     }
                 }.start();
             }
@@ -531,6 +530,5 @@ public final class JobSuite {
                 }
             }
         }
-    };
-    
+    }
 }
