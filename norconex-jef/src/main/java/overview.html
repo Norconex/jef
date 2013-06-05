@@ -22,6 +22,7 @@ This library constitutes the Norconex Java Execution Framework.
 </p>
 <p>
 Simple steps to get started:
+</p>
 <ul>
   <li>Create one or more jobs ({@link com.norconex.jef.IJob}) to accomplish
       the required tasks.</li>
@@ -36,11 +37,11 @@ Simple steps to get started:
   <li>Run your job suite by passing it to 
       {@link com.norconex.jef.JobRunner#runSuite(com.norconex.jef.suite.JobSuite)}.</li>
 </ul>
-</p>
 
 
 <p>
 The creation of a job suite may look like this:
+</p>
 <pre>
     public class MyJobSuiteFactory implements IJobSuiteFactory {
     
@@ -62,10 +63,10 @@ The creation of a job suite may look like this:
         }
     }
 </pre>
-</p>
 
 <p>
 In the end, launching a job suite may look like this:
+</p>
 
 <pre>
     IJobSuiteFactory factory = new MyJobSuiteFactory();
@@ -74,6 +75,5 @@ In the end, launching a job suite may look like this:
     jobRunner.runSuite(suite);
 </pre>
 
-</p>
 
 </body>
