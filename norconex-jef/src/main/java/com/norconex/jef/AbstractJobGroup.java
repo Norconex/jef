@@ -29,7 +29,7 @@ import com.norconex.jef.suite.JobSuite;
 /**
  * Base implementation for job groups.  The group progress is an average
  * of all job progress it contains, on a factor of 100.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 @SuppressWarnings("nls")
 public abstract class AbstractJobGroup implements IJobGroup {

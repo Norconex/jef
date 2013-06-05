@@ -21,7 +21,7 @@ package com.norconex.jef.exec;
  * Upon failure, code embedded in the <code>run</code> method will get
  * executed over and over again, provided that the executing class
  * supports <code>IRerunnable</code>.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  * @see Rerunner
  */
 public interface IRerunnable {

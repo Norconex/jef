@@ -27,7 +27,7 @@ import com.norconex.jef.JobRunner;
  * id associated with the current thread, separated with colon-space (": ").
  * If no jobs are associated with
  * a given log event, the prefix "[non-job]: " will get prepended.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  * @see FileLogManager
  */
 public class ThreadSafeLayout extends Layout {

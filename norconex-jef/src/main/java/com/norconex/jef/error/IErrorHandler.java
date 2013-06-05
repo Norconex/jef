@@ -20,7 +20,7 @@ package com.norconex.jef.error;
 /**
  * Job Execution Framework error handler. Error handlers are typically added to
  * a <code>JobSuite</code>.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 public interface IErrorHandler {
 

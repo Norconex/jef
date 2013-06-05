@@ -19,7 +19,7 @@ package com.norconex.jef;
 
 /**
  * Basic POJO implementation of {@link IJobContext}.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  * @since 2.0
  */
 public class JobContext implements IJobContext {

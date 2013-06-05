@@ -28,7 +28,7 @@ package com.norconex.jef.suite;
  * To further ensure potential integration, implementors should make sure
  * they provide an empty constructor and setting attributes on factories
  * shall be done using accessor methods (JavaBean style).
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 public interface IJobSuiteFactory {
 

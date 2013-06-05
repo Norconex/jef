@@ -23,7 +23,7 @@ package com.norconex.jef.exec;
  * been reached.  In cases when the code being rerun threw one or more
  * exception, this exception's cause will hold the last exception thrown
  * by that code.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  * @see Rerunner
  */
 public class RerunnableException extends Exception {

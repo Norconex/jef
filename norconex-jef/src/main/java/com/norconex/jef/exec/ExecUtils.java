@@ -23,7 +23,7 @@ import com.norconex.jef.JobRunner;
 
 /**
  * Utility methods related to process execution.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 @SuppressWarnings("nls")
 public final class ExecUtils {

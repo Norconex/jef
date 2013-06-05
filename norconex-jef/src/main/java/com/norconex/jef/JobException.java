@@ -21,7 +21,7 @@ package com.norconex.jef;
  * Represents a job-related exception.  Implementors are invited to
  * wrap exceptions they want explicitly handled by the framework in instances
  * of <code>JobException</code>.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 public class JobException extends RuntimeException {
 

@@ -24,7 +24,7 @@ import com.norconex.jef.JobException;
 
 /**
  * Utility methods for facilitating common job progress operations.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  * @since 1.1
  */
 @SuppressWarnings("nls")

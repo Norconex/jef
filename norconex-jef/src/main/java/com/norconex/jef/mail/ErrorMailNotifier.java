@@ -33,7 +33,7 @@ import com.norconex.jef.suite.JobSuite;
 
 /**
  * Simple error handler notifying email recipients when exceptions occur.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 public class ErrorMailNotifier
         extends AbstractMailNotifier implements IErrorHandler {

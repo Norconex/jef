@@ -19,7 +19,7 @@ package com.norconex.jef.progress;
 
 /**
  * Listener for job progress events.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 public interface IJobProgressListener {
 

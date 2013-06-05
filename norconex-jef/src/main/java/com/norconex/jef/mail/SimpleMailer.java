@@ -31,7 +31,7 @@ import org.apache.commons.lang3.ArrayUtils;
 /**
  * Convenience class for sending simple emails.  It does not cover most
  * advanced needs (HTML images, attachments, etc).
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 @SuppressWarnings("nls")
 public class SimpleMailer {

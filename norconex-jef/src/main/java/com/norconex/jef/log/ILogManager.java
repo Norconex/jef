@@ -26,7 +26,7 @@ import org.apache.log4j.Appender;
 /**
  * Class responsible for everything that relates to the underlying logging
  * mechanism.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 public interface ILogManager {
 

@@ -20,7 +20,7 @@ package com.norconex.jef;
 /**
  * Convenient base class for implementing jobs.  Provides a default
  * implementation of getId() passed at construction time.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  * @since 1.1
  */
 public abstract class AbstractJob implements IJob {

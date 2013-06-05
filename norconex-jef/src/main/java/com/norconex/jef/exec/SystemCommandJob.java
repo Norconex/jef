@@ -38,7 +38,7 @@ import com.norconex.jef.suite.JobSuite;
  * commands, you may want to create a custom job where you can keep track
  * of the command progress and translate that somehow into a job progress
  * (whenever possible).
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  * @since 1.1
  */
 public class SystemCommandJob implements IJob {

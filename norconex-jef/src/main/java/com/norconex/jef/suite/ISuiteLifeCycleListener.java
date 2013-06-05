@@ -19,7 +19,7 @@ package com.norconex.jef.suite;
 
 /**
  * Listener for life-cycle activities on a job suite.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 public interface ISuiteLifeCycleListener {
 

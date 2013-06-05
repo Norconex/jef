@@ -33,7 +33,7 @@ import com.norconex.jef.suite.JobSuite;
  * benefits to using this class over a straight implementation of
  * <code>IJob</code>.</p>
  * 
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 public abstract class AbstractResumableJob implements IJob {
 

@@ -20,7 +20,7 @@ package com.norconex.jef.exec;
 /**
  * Responsible for filtering exceptions.  Only exceptions returning
  * <code>true</code> shall be considered in their given context.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  * @see Rerunner
  */
 public interface IExceptionFilter {

@@ -39,7 +39,7 @@ import com.norconex.jef.AsyncJobGroup;
  * specific commands as well as preventing process hanging on some OS when
  * there is nowhere to display the output).  
  * 
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  * @since 1.1
  */
 @SuppressWarnings("nls")

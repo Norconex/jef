@@ -24,7 +24,7 @@ package com.norconex.jef.progress;
  * jobStarted, jobResumed</code> all invoke
  * <code>jobStateChanged</code> for convenience.
  * Override that method for common behaviour upon any type of state change.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 public class JobProgressStateChangeAdapter extends JobProgressAdapter {
 

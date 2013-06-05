@@ -26,7 +26,7 @@ import com.norconex.jef.suite.JobSuite;
 
 /**
  * Convenience base class for sending email notifications.
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 public abstract class AbstractMailNotifier {
 

@@ -28,7 +28,7 @@ import com.norconex.commons.lang.Sleeper;
  * will return the last exception encountered if there was one, or throw
  * a {@link RuntimeException} if {@link IRerunnable} simply returned
  * <code>false</code>. 
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 public class Rerunner {
 

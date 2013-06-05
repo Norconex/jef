@@ -36,7 +36,7 @@ import com.norconex.jef.suite.JobSuite;
  * in the group from running.  On the other hand, one or more exception will
  * result in this group to fail.
  *
- * @author <a href="mailto:pascal.essiembre@norconex.com">Pascal Essiembre</a>
+ * @author Pascal Essiembre
  */
 @SuppressWarnings("nls")
 public class AsyncJobGroup extends AbstractJobGroup {
