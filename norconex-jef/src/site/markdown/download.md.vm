@@ -25,22 +25,12 @@ Download
 
 Latest stable release
    
-  * None yet.
-
-   <!--${currentStableVersion} --> 
+  * [${currentStableVersion}](http://norconex.s3.amazonaws.com/repo/release/com/norconex/jef/norconex-jef/${currentStableVersion}/norconex-jef-${currentStableVersion}.zip)
 
 Older releases:
   
   * None yet.
 
-Snapshot releases:
-
-  * [3.0.0-20130501.015238-3](http://norconex.s3.amazonaws.com/repo/snapshot/com/norconex/jef/norconex-jef/3.0.0-SNAPSHOT/norconex-jef-3.0.0-20130501.015238-3.zip)
-
-**Note:** Snapshot releases are only listed until first stable release.
-After that, they will be available through the Norconex Snapshot maven
-repository (see below).
-  
 <h3>Source</h3>
   
 Source code can be obtained on GitHub: <https://github.com/Norconex/jef/tree/master/norconex-jef>.
