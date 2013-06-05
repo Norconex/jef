@@ -87,7 +87,7 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
     <dependency>
         <groupId>com.norconex.commons</groupId>
         <artifactId>norconex-commons-lang</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </dependency>
     <dependency>
         <groupId>org.apache.geronimo.javamail</groupId>
