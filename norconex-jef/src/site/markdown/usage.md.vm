@@ -1,4 +1,4 @@
-<!---
+#*
  Copyright 2010-2013 Norconex Inc.
  
  This file is part of Norconex JEF.
@@ -15,7 +15,7 @@
  
  You should have received a copy of the GNU General Public License
  along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
--->
+*#
 <head><title>Getting Started</title><meta name="Author" content="Norconex Inc." /></head> 
 
 #parse("adsense.html")
