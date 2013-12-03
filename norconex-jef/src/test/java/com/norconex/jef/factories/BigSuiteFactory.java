@@ -1,7 +1,13 @@
 package com.norconex.jef.factories;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import com.norconex.jef.AsyncJobGroup;
 import com.norconex.jef.IJob;
+import com.norconex.jef.JobException;
+import com.norconex.jef.JobRunner;
 import com.norconex.jef.SyncJobGroup;
 import com.norconex.jef.jobs.PrintProgressListener;
 import com.norconex.jef.jobs.SleepyJob;
@@ -39,5 +45,14 @@ public class BigSuiteFactory implements IJobSuiteFactory {
         JobSuite jobSuite = new JobSuite(job);
         jobSuite.addJobProgressListener(new PrintProgressListener());
         return jobSuite;
+    }
+    
+    @Test
+    public void testJobSuite() throws JobException {
+        JobSuite suite = new BigSuiteFactory().createJobSuite();
+        JobRunner runner = new JobRunner();
+        boolean success = runner.runSuite(suite, true);
+//        assertTrue("Suite did not complete properly: "
+//                + suite.getSuiteStatus(), success);
     }
 }

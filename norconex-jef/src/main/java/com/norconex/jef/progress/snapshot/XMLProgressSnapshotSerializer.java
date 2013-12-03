@@ -1,17 +1,17 @@
 /* Copyright 2010-2013 Norconex Inc.
- * 
+ *
  * This file is part of Norconex JEF.
- * 
+ *
  * Norconex JEF is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * Norconex JEF is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ *
+ * Norconex JEF is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,7 +26,9 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -42,7 +44,7 @@ import com.norconex.jef.progress.IJobStatus;
  * @since 2.0
  */
 @SuppressWarnings("nls")
-public class XMLProgressSnapshotSerializer 
+public class XMLProgressSnapshotSerializer
         implements IProgressSnapshotSerializer {
 
     private static final long serialVersionUID = -8458122489700630248L;
@@ -51,14 +53,14 @@ public class XMLProgressSnapshotSerializer
     public void writeProgressSnapshot(
             Writer writer, IProgressSnapshot snapshot) {
         PrintWriter out = new PrintWriter(writer);
-        writeProgressSnapshot(out, snapshot, 0);
+        writeProgressSnapshot(out, snapshot);
     }
     @Override
     public IProgressSnapshot readProgressSnapshot(Reader in) {
         try {
-            DocumentBuilderFactory docBuilderFactory = 
+            DocumentBuilderFactory docBuilderFactory =
                     DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = 
+            DocumentBuilder docBuilder =
                     docBuilderFactory.newDocumentBuilder();
             Document doc = docBuilder.parse(new InputSource(in));
             // normalize text representation
@@ -91,7 +93,7 @@ public class XMLProgressSnapshotSerializer
         return defaultValue;
     }
 
-    
+
     private double xmlDouble(
             Element element, String name, double defaultValue) {
         try {
@@ -140,7 +142,7 @@ public class XMLProgressSnapshotSerializer
         }
         return defaultValue;
     }
-    
+
     private IProgressSnapshot readProgressSnapshot(
             Element jobElement) {
 
@@ -161,7 +163,7 @@ public class XMLProgressSnapshotSerializer
         }
         snapshot.setStopRequested(
                 xmlBoolean(jobElement, "stopRequested", false));
-        
+
         NodeList jobNodes = jobElement.getElementsByTagName("job");
         for (int i = 0; i < jobNodes.getLength(); i++){
             Node jobNode = jobNodes.item(i);
@@ -171,61 +173,50 @@ public class XMLProgressSnapshotSerializer
                         readProgressSnapshot(childJobElement));
             }
         }
-        
+
         return snapshot;
     }
 
-    
-    private void writeProgressSnapshot(
-            PrintWriter out, IProgressSnapshot progress, int depth) {
 
-        indent(out, depth);
-        out.println("<job>");
-        writeTag(out, "id", progress.getJobId(), depth);
-        writeTag(out, "note", progress.getNote(), depth);
-        writeTag(out, "completionRatio", 
-                Double.toString(progress.getCompletionRatio()), depth);
-        writeDateTag(out, "startTime", progress.getStartTime(), depth);
-        writeDateTag(out, "endTime", progress.getEndTime(), depth);
-        writeDateTag(out, "lastActivity", progress.getLastActivity(), depth);
-        writeTag(out, "status", progress.getStatus().toString(), depth);
-        writeTag(out, "recovery", 
-                Boolean.toString(progress.isRecovery()), depth);
+    private void writeProgressSnapshot(
+            PrintWriter out, IProgressSnapshot progress) {
+
+        out.print("<job>");
+        writeTag(out, "id", progress.getJobId());
+        writeTag(out, "note", progress.getNote());
+        writeTag(out, "completionRatio",
+                Double.toString(progress.getCompletionRatio()));
+        writeDateTag(out, "startTime", progress.getStartTime());
+        writeDateTag(out, "endTime", progress.getEndTime());
+        writeDateTag(out, "lastActivity", progress.getLastActivity());
+        writeTag(out, "status", ObjectUtils.toString(
+                progress.getStatus()));
+        writeTag(out, "recovery",
+                Boolean.toString(progress.isRecovery()));
         List<IProgressSnapshot> children = progress.getChildren();
-        indent(out, depth + 1);
-        out.println("<children>");
+        out.print("<children>");
         for (IProgressSnapshot childProgress : children) {
-            writeProgressSnapshot(out, childProgress, depth + 1);
+            writeProgressSnapshot(out, childProgress);
         }
-        indent(out, depth + 1);
-        out.println("</children>");
-        indent(out, depth);
-        out.println("</job>");
+        out.print("</children>");
+        out.print("</job>");
     }
-    
-    private void indent(PrintWriter out, int depth) {
-        for (int i = 0; i < depth; i++) {
-            out.print("    ");
-        }
-    }
-    
+
     private void writeDateTag(
-            PrintWriter out, String tagName, Date tagValue, int depth)  {
+            PrintWriter out, String tagName, Date tagValue)  {
         if (tagValue != null) {
-            writeTag(out, tagName, Long.toString(tagValue.getTime()), depth);
+            writeTag(out, tagName, Long.toString(tagValue.getTime()));
         }
     }
-    private void writeTag(PrintWriter out,
-            String tagName, String tagValue, int depth) {
-        if (tagValue != null && tagValue.trim().length() > 0) {
-            indent(out, depth);
-            out.print("    <");
+    private void writeTag(PrintWriter out, String tagName, String tagValue) {
+        if (StringUtils.isNotBlank(tagValue)) {
+            out.print("<");
             out.print(tagName);
             out.print(">");
             out.print(StringEscapeUtils.escapeXml(tagValue));
             out.print("</");
             out.print(tagName);
-            out.println(">");
+            out.print(">");
         }
     }
 

@@ -1,17 +1,17 @@
 /* Copyright 2010-2013 Norconex Inc.
- * 
+ *
  * This file is part of Norconex JEF.
- * 
+ *
  * Norconex JEF is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * Norconex JEF is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ *
+ * Norconex JEF is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -32,15 +32,18 @@ public final class ProgressSnapshotTaker {
     public static IProgressSnapshot takeSnapshot(JobSuite jobSuite) {
         return takeSnapshot(jobSuite, jobSuite.getRootJob());
     }
-    
+
     private static IProgressSnapshot takeSnapshot(JobSuite jobSuite, IJob job) {
         IJobStatus progress = jobSuite.getJobProgress(job);
         ProgressSnapshot snapshot = new ProgressSnapshot();
+        snapshot.setJobId(job.getId());
+        if (progress == null) {
+            return snapshot;
+        }
         snapshot.setCompletionRatio(progress.getCompletionRatio());
         snapshot.setElapsedTime(progress.getElapsedTime());
         snapshot.setEndTime(progress.getEndTime());
         snapshot.setJobContext(progress.getJobContext());
-        snapshot.setJobId(progress.getJobId());
         snapshot.setLastActivity(progress.getLastActivity());
         snapshot.setMetadata(progress.getMetadata());
         snapshot.setNote(progress.getNote());

@@ -1,17 +1,17 @@
 /* Copyright 2010-2013 Norconex Inc.
- * 
+ *
  * This file is part of Norconex JEF.
- * 
+ *
  * Norconex JEF is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * Norconex JEF is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ *
+ * Norconex JEF is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -65,7 +65,7 @@ public final class JobSuite {
         new ISuiteStopRequestListener[] {};
 
     private static final int STOP_WAIT_DELAY = 5;
-    
+
     /** Job progress serializer. */
     private final IJobProgressSerializer progressSerializer;
     /** Job log manager. */
@@ -84,22 +84,22 @@ public final class JobSuite {
     private final List<ISuiteStopRequestListener> stopListeners =
             Collections.synchronizedList(
                     new ArrayList<ISuiteStopRequestListener>());
-    
+
     /** Root job. */
     private final IJob rootJob;
     /** Unique identifiers of all jobs making up the suite in logical order. */
     private final List<String> jobIds = new ArrayList<String>();
     /** Mapping of jobIds and actual jobs for fast-access. */
     private final Map<String, IJob> jobByIds = new HashMap<String, IJob>();
-    
+
     private final IJobSuiteStopRequestHandler stopRequestHandler;
-    
+
     /** Unique identifier for this job suite. */
     private String namespace;
 
-    private final Map<String, IJobContext> jobContexts = 
+    private final Map<String, IJobContext> jobContexts =
             new HashMap<String, IJobContext>();
-    
+
     /**
      * Creates a new job suite using a {@link FileLogManager} and
      * a {@link JobProgressPropertiesFileSerializer}.
@@ -140,10 +140,10 @@ public final class JobSuite {
             final IJob job,
             final IJobProgressSerializer progressSerializer,
             final ILogManager logManager) {
-        this(job, progressSerializer, logManager, 
+        this(job, progressSerializer, logManager,
                 new FileStopRequestHandler(
                         job.getId(), getDefaultWorkDir()));
-        
+
     }
     /**
      * Creates a new job suite.
@@ -173,7 +173,7 @@ public final class JobSuite {
         this.progressSerializer = progressSerializer;
         this.namespace = job.getId();
         this.logManager = logManager;
-        
+
 
         loadJobIds(job);
 
@@ -198,14 +198,18 @@ public final class JobSuite {
     }
 
     /**
-     * Gets the job suite status.  This is equivalent of getting the 
+     * Gets the job suite status.  This is equivalent of getting the
      * status on the root job for this suite.
      * @return suite status
      */
     public IJobStatus.Status getSuiteStatus() {
-        return getJobProgress(getRootJob()).getStatus();
+        IJobStatus status = getJobProgress(getRootJob());
+        if (status != null) {
+            return status.getStatus();
+        }
+        return null;
     }
-    
+
     /**
      * Gets the suite root job.
      * @return suite root job
@@ -220,7 +224,7 @@ public final class JobSuite {
     public IJobContext getJobContext(IJob job) {
         return jobContexts.get(job.getId());
     }
-    
+
     /**
      * Gets all job identifiers in order provided by the suite hierarchy.
      * @return job unique identifiers
@@ -244,7 +248,7 @@ public final class JobSuite {
         }
         jobIds.add(parentJob.getId());
         jobByIds.put(parentJob.getId(), parentJob);
-        jobContexts.put(parentJob.getId(), 
+        jobContexts.put(parentJob.getId(),
                 new JobContext(parentJob.createJobContext()));
         if (parentJob instanceof IJobGroup) {
             IJob[] jobs = ((IJobGroup) parentJob).getJobs();
@@ -320,7 +324,7 @@ public final class JobSuite {
             return stopListeners.toArray(EMPTY_STOP_LISTENERS);
         }
     }
-    
+
     /**
      * Adds a suite life cycle listener.
      * @param listener suite life cycle listener to add
@@ -461,8 +465,8 @@ public final class JobSuite {
         });
     }
 
-    
-    
+
+
     /**
      * Accepts a job suite visitor.
      * @param visitor job suite visitor
@@ -490,7 +494,7 @@ public final class JobSuite {
             }
         }
     }
-    
+
     /**
      * Gets the default path to the JEF working directory for file-system
      * related operations.  The path is determined in one of the following
@@ -513,8 +517,8 @@ public final class JobSuite {
             dir.mkdirs();
         }
         return jobDir;
-    }    
-    
+    }
+
     private void stopJob(final IJob job, final IJobStatus progress) {
         job.stop(progress, JobSuite.this);
         while (progress.getStatus()  == IJobStatus.Status.RUNNING) {

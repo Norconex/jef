@@ -1,8 +1,9 @@
 /**
- * 
+ *
  */
 package com.norconex.jef.jobs;
 
+import com.norconex.commons.lang.Sleeper;
 import com.norconex.jef.IJob;
 import com.norconex.jef.IJobContext;
 import com.norconex.jef.JobContext;
@@ -13,7 +14,7 @@ import com.norconex.jef.suite.JobSuite;
 
 /**
  * Sleeps for a give number of seconds, and report itself every given seconds.
- * 
+ *
  * @author Pascal Essiembre (pascal.essiembre&#x40;norconex.com)
  */
 public class SleepyJob implements IJob {
@@ -63,26 +64,21 @@ public class SleepyJob implements IJob {
     public void execute(JobProgress progress, JobSuite suite)
             throws JobException {
 
-        long elapsedTime = progress.getProgress() * 1000;
-//        LOG.info("START PROGRESS IS: " + elapsedTime);
-        System.out.println("START PROGRESS IS: " + elapsedTime);
-        while (elapsedTime < sleepSeconds * 1000) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new JobException(e);
-            }
-            elapsedTime += 1000;
-            if (elapsedTime % (reportSeconds * 1000) == 0) {
+        long elapsedSeconds = progress.getProgress();
+        System.out.println("START PROGRESS IS: " + elapsedSeconds);
+
+        while (elapsedSeconds < sleepSeconds) {
+            Sleeper.sleepSeconds(1);
+            elapsedSeconds++;
+            if (elapsedSeconds % reportSeconds == 0) {
 //                LOG.info("[" + getId() + "] Slept for "
 //                      + (elapsedTime / 1000) + " seconds.");
 
                 System.out.println("[" + getId() + "] Slept for "
-                        + (elapsedTime / 1000) + " seconds.");
-                progress.setProgress((elapsedTime / 1000));
-                progress.setNote(
-                        "Slept for " + progress.getProgress() + " seconds.");
+                        + elapsedSeconds + " seconds.");
             }
+            progress.setProgress(elapsedSeconds);
+            progress.setNote("Slept for " + elapsedSeconds + " seconds.");
 //            progress.incrementProgress(1);
 //            progress.setNote(
 //                    "Slept for " + progress.getProgress() + " seconds.");
@@ -91,7 +87,7 @@ public class SleepyJob implements IJob {
                 "Done sleeping for " + progress.getProgress() + " seconds.");
     }
 
-	@Override
+        @Override
 	public IJobContext createJobContext() {
 		return new JobContext(
 		        getDescription(), getProgressMinimum(), getProgressMaximum());
