@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -17,8 +17,8 @@
  */
 package com.norconex.jef.error;
 
-import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef4.status.IJobStatus;
+import com.norconex.jef4.suite.JobSuite;
 
 /**
  * Event thrown by the framework to all registered <code>ErrorHandler</code>
@@ -43,5 +43,5 @@ public interface IErrorEvent {
      * Gets the job progress of the job from which the error got triggered.
      * @return job progress
      */
-    JobProgress getProgress();
+    IJobStatus getJobStatus();
 }

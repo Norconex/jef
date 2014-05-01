@@ -12,7 +12,7 @@ import com.norconex.jef.SyncJobGroup;
 import com.norconex.jef.jobs.CrashingJob;
 import com.norconex.jef.jobs.SleepyJob;
 import com.norconex.jef.suite.IJobSuiteFactory;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 public class AsyncFailSuiteFactory implements IJobSuiteFactory {
 
@@ -31,7 +31,7 @@ public class AsyncFailSuiteFactory implements IJobSuiteFactory {
     }
 
     @Override
-    public JobSuite createJobSuite() {
+    public JobSuiteOLD createJobSuite() {
         String suiteName = "test.failsuite";
         if (suiteNamePrefixString != null) {
             suiteName = suiteNamePrefixString + "-" + suiteName;
@@ -57,14 +57,14 @@ public class AsyncFailSuiteFactory implements IJobSuiteFactory {
                         new SleepyJob(4, 2),
                 }),
         });
-        JobSuite context = new JobSuite(syncGroup);  
+        JobSuiteOLD context = new JobSuiteOLD(syncGroup);  
 
         return context;
     }
 
     @Test
     public void testJobSuite() throws JobException {
-        JobSuite suite = new AsyncFailSuiteFactory().createJobSuite();
+        JobSuiteOLD suite = new AsyncFailSuiteFactory().createJobSuite();
         JobRunner runner = new JobRunner();
         boolean success = runner.runSuite(suite, true);
         assertFalse("Suite was expected to fail, but did not.", success);

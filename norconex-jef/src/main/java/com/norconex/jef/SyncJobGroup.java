@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -21,7 +21,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 
 /**
@@ -53,7 +53,7 @@ public class SyncJobGroup extends AbstractJobGroup {
 
     @Override
     public final void execute(
-            final JobProgress progress, final JobSuite suite) {
+            final JobProgress progress, final JobSuiteOLD suite) {
 
         registerGroupProgressMonitoring(progress, suite);
 

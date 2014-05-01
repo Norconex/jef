@@ -10,7 +10,7 @@ import com.norconex.jef.JobContext;
 import com.norconex.jef.JobException;
 import com.norconex.jef.progress.IJobStatus;
 import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * Sleeps for a give number of seconds, and report itself every given seconds.
@@ -61,7 +61,7 @@ public class SleepyJob implements IJob {
      *      com.norconex.jef.JobContext)
      */
     @Override
-    public void execute(JobProgress progress, JobSuite suite)
+    public void execute(JobProgress progress, JobSuiteOLD suite)
             throws JobException {
 
         long elapsedSeconds = progress.getProgress();
@@ -94,7 +94,7 @@ public class SleepyJob implements IJob {
 	}
 
 	@Override
-	public void stop(IJobStatus progress, JobSuite suite) {
+	public void stop(IJobStatus progress, JobSuiteOLD suite) {
 	    // Unstoppable
 	}
 

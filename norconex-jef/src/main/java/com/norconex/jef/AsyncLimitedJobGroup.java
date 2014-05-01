@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 
 import com.norconex.commons.lang.Sleeper;
 import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * Job responsible for running a group of jobs asynchronously with only so many
@@ -76,7 +76,7 @@ public class AsyncLimitedJobGroup extends AsyncJobGroup {
 
     @Override
     public final void execute(
-            final JobProgress progress, final JobSuite suite) {
+            final JobProgress progress, final JobSuiteOLD suite) {
          registerGroupProgressMonitoring(progress, suite);
 
         final Collection<IJob> failedJobs =
@@ -135,7 +135,7 @@ public class AsyncLimitedJobGroup extends AsyncJobGroup {
     }
 
     private List<Thread> launchLimitedJobThreads(
-            final JobSuite suite, Collection<IJob> failedJobs) {
+            final JobSuiteOLD suite, Collection<IJob> failedJobs) {
         List<Thread> threads = new ArrayList<Thread>();
         IJob[] jobs = getJobs();
         for (int x = 0; x < jobs.length && x < maxNumberOfRunningJobs; x++) {
@@ -150,7 +150,7 @@ public class AsyncLimitedJobGroup extends AsyncJobGroup {
     }
     
     
-    private Thread createJobThread(final IJob job, final JobSuite suite,
+    private Thread createJobThread(final IJob job, final JobSuiteOLD suite,
             final Collection<IJob> failedJobs) {
         return new Thread(job.getId()) {
             @Override

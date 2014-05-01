@@ -12,7 +12,7 @@ import com.norconex.jef.SyncJobGroup;
 import com.norconex.jef.jobs.RecoverableSleepyJob;
 import com.norconex.jef.jobs.SleepyJob;
 import com.norconex.jef.suite.IJobSuiteFactory;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 public class BigRecoverySuiteFactory implements IJobSuiteFactory {
 
@@ -21,7 +21,7 @@ public class BigRecoverySuiteFactory implements IJobSuiteFactory {
     }
 
     @Override
-    public JobSuite createJobSuite() {
+    public JobSuiteOLD createJobSuite() {
         
         IJob suite = new AsyncJobGroup("test-RecoverableJobs", new IJob[] {
                 new RecoverableSleepyJob(30, 5),
@@ -41,12 +41,12 @@ public class BigRecoverySuiteFactory implements IJobSuiteFactory {
                 }),
         });
         
-        return new JobSuite(suite);
+        return new JobSuiteOLD(suite);
     }
 
     @Test
     public void testJobSuite() throws JobException {
-        JobSuite suite = new BigRecoverySuiteFactory().createJobSuite();
+        JobSuiteOLD suite = new BigRecoverySuiteFactory().createJobSuite();
         JobRunner runner = new JobRunner();
         boolean success = runner.runSuite(suite, true);
         assertTrue("Suite did not complete properly: "

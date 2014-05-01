@@ -12,7 +12,7 @@ import com.norconex.jef.SyncJobGroup;
 import com.norconex.jef.jobs.PrintProgressListener;
 import com.norconex.jef.jobs.SleepyJob;
 import com.norconex.jef.suite.IJobSuiteFactory;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 public class BigSuiteFactory implements IJobSuiteFactory {
 
@@ -21,7 +21,7 @@ public class BigSuiteFactory implements IJobSuiteFactory {
     }
 
     @Override
-    public JobSuite createJobSuite() {
+    public JobSuiteOLD createJobSuite() {
         
         
         IJob job = new AsyncJobGroup("test.async.1", new IJob[] {
@@ -42,14 +42,14 @@ public class BigSuiteFactory implements IJobSuiteFactory {
                 }),
         });
 
-        JobSuite jobSuite = new JobSuite(job);
-        jobSuite.addJobProgressListener(new PrintProgressListener());
-        return jobSuite;
+        JobSuiteOLD jobSuiteOLD = new JobSuiteOLD(job);
+        jobSuiteOLD.addJobProgressListener(new PrintProgressListener());
+        return jobSuiteOLD;
     }
     
     @Test
     public void testJobSuite() throws JobException {
-        JobSuite suite = new BigSuiteFactory().createJobSuite();
+        JobSuiteOLD suite = new BigSuiteFactory().createJobSuite();
         JobRunner runner = new JobRunner();
         boolean success = runner.runSuite(suite, true);
 //        assertTrue("Suite did not complete properly: "

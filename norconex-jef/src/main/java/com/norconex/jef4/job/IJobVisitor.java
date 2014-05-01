@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -15,30 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef;
+package com.norconex.jef4.job;
+
+import com.norconex.jef4.status.IJobStatus;
 
 /**
- * Convenient base class for implementing jobs.  Provides a default
- * implementation of getId() passed at construction time.
+ * Allows one to "visit" a job suite and walk its job hierarchy with 
+ * minimal effort.  
  * @author Pascal Essiembre
  * @since 1.1
  */
-public abstract class AbstractJob implements IJob {
-
-    /** Job unique identifier. */
-    private final String id;
-    
+public interface IJobVisitor {
     /**
-     * Creates a new job.
-     * @param id unique job identifier
+     * Visits a job.
+     * @param job job visited
+     * @param jobStatus status of visited job
      */
-    public AbstractJob(String id) {
-        super();
-        this.id = id;
-    }
-
-    @Override
-    public final String getId() {
-        return id;
-    }
+    void visitJob(IJob job, IJobStatus jobStatus);
 }

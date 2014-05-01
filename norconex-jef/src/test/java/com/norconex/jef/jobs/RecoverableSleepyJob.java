@@ -9,7 +9,7 @@ import com.norconex.jef.JobContext;
 import com.norconex.jef.JobException;
 import com.norconex.jef.progress.IJobStatus;
 import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * Sleeps for a give number of seconds, and report itself every given seconds.
@@ -62,12 +62,12 @@ public class RecoverableSleepyJob extends AbstractResumableJob {
     }
 
     @Override
-    protected void startExecution(JobProgress progress, JobSuite context) {
+    protected void startExecution(JobProgress progress, JobSuiteOLD context) {
         sleep(progress);
     }
 
     @Override
-    protected void resumeExecution(JobProgress progress, JobSuite context) {
+    protected void resumeExecution(JobProgress progress, JobSuiteOLD context) {
         
         sleep(progress);
     }
@@ -96,7 +96,7 @@ public class RecoverableSleepyJob extends AbstractResumableJob {
 	}
 
 	@Override
-	public void stop(IJobStatus progress, JobSuite suite) {
+	public void stop(IJobStatus progress, JobSuiteOLD suite) {
 		// Unstoppable
 	}
 

@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -36,6 +36,6 @@ public interface IJobSuiteFactory {
      * Creates a job suite.
      * @return job suite
      */
-    JobSuite createJobSuite();
+    JobSuiteOLD createJobSuite();
 
 }

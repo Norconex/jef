@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -20,13 +20,14 @@ package com.norconex.jef.progress;
 import java.io.IOException;
 import java.util.Date;
 
+import com.norconex.commons.lang.config.IXMLConfigurable;
 import com.norconex.jef.IJobContext;
 
 /**
  * Responsible for serializing a job progress.
  * @author Pascal Essiembre
  */
-public interface IJobProgressSerializer {
+public interface IJobProgressSerializer extends IXMLConfigurable {
 
     /**
      * Serializes a job progress.

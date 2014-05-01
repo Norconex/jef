@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -26,7 +26,7 @@ import javax.mail.internet.AddressException;
 
 import com.norconex.jef.JobException;
 import com.norconex.jef.suite.ISuiteLifeCycleListener;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * Simple suite life-cycle listener notifying email recipients when a job suite
@@ -55,16 +55,16 @@ public class SuiteCompletedMailNotifier
     }
 
     @Override
-    public void suiteAborted(final JobSuite suite) {
+    public void suiteAborted(final JobSuiteOLD suite) {
         //do nothing
     }
     @Override
-    public void suiteStarted(final JobSuite suite) {
+    public void suiteStarted(final JobSuiteOLD suite) {
         //do nothing
     }
     @Override
     @SuppressWarnings("nls")
-    public final void suiteCompleted(final JobSuite suite) {
+    public final void suiteCompleted(final JobSuiteOLD suite) {
         ResourceBundle bundle =
             ResourceBundle.getBundle(this.getClass().getName());
         String subject = MessageFormat.format(
@@ -88,15 +88,15 @@ public class SuiteCompletedMailNotifier
         }
     }
     @Override
-    public void suiteTerminatedPrematuraly(final JobSuite suite) {
+    public void suiteTerminatedPrematuraly(final JobSuiteOLD suite) {
         // do nothing
     }
     @Override
-    public void suiteStopped(JobSuite suite) {
+    public void suiteStopped(JobSuiteOLD suite) {
         // do nothing
     }
     @Override
-    public void suiteStopping(JobSuite suite) {
+    public void suiteStopping(JobSuiteOLD suite) {
         // do nothing
     }
 }

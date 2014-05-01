@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -34,7 +34,7 @@ import com.norconex.jef.progress.JobProgress;
 import com.norconex.jef.suite.IJobSuiteStopRequestHandler;
 import com.norconex.jef.suite.ISuiteLifeCycleListener;
 import com.norconex.jef.suite.ISuiteStopRequestListener;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * Responsible for managing the execution of a suite and its related jobs.
@@ -56,7 +56,7 @@ public class JobRunner {
      * @param suite the job suite to run
      * @return <code>true</code> if the suite ran successfully
      */
-    public final boolean runSuite(final JobSuite suite) {
+    public final boolean runSuite(final JobSuiteOLD suite) {
         return runSuite(suite, false);
     }
     /**
@@ -67,7 +67,7 @@ public class JobRunner {
      * @return <code>true</code> if the suite ran successfully
      */
     public final boolean runSuite(
-            final JobSuite suite, final boolean resumeIfIncomplete) {
+            final JobSuiteOLD suite, final boolean resumeIfIncomplete) {
         boolean success = false;
         try {
             ensureCleanState(suite, resumeIfIncomplete);
@@ -146,7 +146,7 @@ public class JobRunner {
      * @return <code>true</code> if the job ran successfully
      */
     /*default*/ 
-    final boolean runJob(final IJob job, final JobSuite suite) {
+    final boolean runJob(final IJob job, final JobSuiteOLD suite) {
         boolean success = false;
         setCurrentJobId(job.getId());
         final JobElapsedTime elapsedTime = new JobElapsedTime();
@@ -219,7 +219,7 @@ public class JobRunner {
         return success;
     }
 
-    private JobProgress createProgress(final IJob job, final JobSuite suite,
+    private JobProgress createProgress(final IJob job, final JobSuiteOLD suite,
             final JobElapsedTime elapsedTime) {
         JobProgress progress;
         JobProgress recoveredProgress = recoverProgress(suite, job);
@@ -235,14 +235,14 @@ public class JobRunner {
     }
     
     private Thread createActivityNotifier(
-            final IJob job, final JobSuite suite,
+            final IJob job, final JobSuiteOLD suite,
             final JobElapsedTime elapsedTime, final JobProgress finalProgress) {
         return new Thread(
                 "activityTracker_" + job.getId()) {
             @Override
             public void run() {
                 while (finalProgress.isStatus(
-//                        IJobStatus.Status.STARTED, 
+//                        IJobExecutionStatus.Status.STARTED, 
                         IJobStatus.Status.RUNNING,
                         IJobStatus.Status.STOPPING)) {
                     Sleeper.sleepMillis(JobProgress.ACTIVITY_CHECK);
@@ -265,7 +265,7 @@ public class JobRunner {
      * @throws IOException problem reading progress
      */
     private void ensureCleanState(
-            final JobSuite suite, final boolean resumeIfIncomplete)
+            final JobSuiteOLD suite, final boolean resumeIfIncomplete)
             throws IOException {
         //If suite completed, throw exception, unless we backup first
         JobProgress existingProgress =
@@ -305,27 +305,27 @@ public class JobRunner {
         }
     }
 
-    private void fireSuiteStarted(final JobSuite suite) {
+    private void fireSuiteStarted(final JobSuiteOLD suite) {
         for (ISuiteLifeCycleListener l : suite.getSuiteLifeCycleListeners()) {
             l.suiteStarted(suite);
         }
     }
-    private void fireSuiteAborted(final JobSuite suite) {
+    private void fireSuiteAborted(final JobSuiteOLD suite) {
         for (ISuiteLifeCycleListener l : suite.getSuiteLifeCycleListeners()) {
             l.suiteAborted(suite);
         }
     }
-    private void fireSuiteFinished(final JobSuite suite) {
+    private void fireSuiteFinished(final JobSuiteOLD suite) {
         for (ISuiteLifeCycleListener l : suite.getSuiteLifeCycleListeners()) {
             l.suiteTerminatedPrematuraly(suite);
         }
     }
-    private void fireSuiteCompleted(final JobSuite suite) {
+    private void fireSuiteCompleted(final JobSuiteOLD suite) {
         for (ISuiteLifeCycleListener l : suite.getSuiteLifeCycleListeners()) {
             l.suiteCompleted(suite);
         }
     }
-    private void fireStopRequested(final JobSuite suite) {
+    private void fireStopRequested(final JobSuiteOLD suite) {
         for (ISuiteStopRequestListener l : 
                 suite.getSuiteStopRequestListeners()) {
             l.stopRequestReceived();
@@ -376,14 +376,14 @@ public class JobRunner {
     private void handleError(
             final Throwable t,
             final JobProgress progress,
-            final JobSuite suite) {
+            final JobSuiteOLD suite) {
         IErrorEvent event = new IErrorEvent() {
             @Override
             public Throwable getException() {
                 return t;
             }
             @Override
-            public JobSuite getJobSuite() {
+            public JobSuiteOLD getJobSuite() {
                 return suite;
             }
             @Override
@@ -407,7 +407,7 @@ public class JobRunner {
      * @param job job for which to recover progress
      * @return recovered progress
      */
-    private JobProgress recoverProgress(final JobSuite suite, final IJob job) {
+    private JobProgress recoverProgress(final JobSuiteOLD suite, final IJob job) {
         JobProgress recoveredProgress;
         try {
             recoveredProgress = suite.getJobProgressSerializer().deserialize(

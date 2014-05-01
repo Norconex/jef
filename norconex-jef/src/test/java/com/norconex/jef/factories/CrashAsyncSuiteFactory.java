@@ -13,7 +13,7 @@ import com.norconex.jef.jobs.CrashingJob;
 import com.norconex.jef.jobs.SleepyJob;
 import com.norconex.jef.mail.ErrorMailNotifier;
 import com.norconex.jef.suite.IJobSuiteFactory;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 public class CrashAsyncSuiteFactory implements IJobSuiteFactory {
 
@@ -45,7 +45,7 @@ public class CrashAsyncSuiteFactory implements IJobSuiteFactory {
     }
 
     @Override
-    public JobSuite createJobSuite() {
+    public JobSuiteOLD createJobSuite() {
         
         IJob asyncListGroup = new AsyncJobGroup(
             "test.crash.async", new IJob[] {
@@ -56,7 +56,7 @@ public class CrashAsyncSuiteFactory implements IJobSuiteFactory {
             }
         );
                 
-        JobSuite suite = new JobSuite(asyncListGroup);
+        JobSuiteOLD suite = new JobSuiteOLD(asyncListGroup);
         
         if (StringUtils.isNotBlank(smtpServer)
                 && StringUtils.isNotBlank(fromEmail)
@@ -68,7 +68,7 @@ public class CrashAsyncSuiteFactory implements IJobSuiteFactory {
     }
     @Test
     public void testJobSuite() throws JobException {
-        JobSuite suite = new CrashAsyncSuiteFactory().createJobSuite();
+        JobSuiteOLD suite = new CrashAsyncSuiteFactory().createJobSuite();
         JobRunner runner = new JobRunner();
         boolean success = runner.runSuite(suite, true);
         assertFalse("Suite was expected to crash, but did not.", success);

@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -29,7 +29,7 @@ import javax.mail.internet.AddressException;
 import com.norconex.jef.JobException;
 import com.norconex.jef.error.IErrorEvent;
 import com.norconex.jef.error.IErrorHandler;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * Simple error handler notifying email recipients when exceptions occur.
@@ -61,7 +61,7 @@ public class ErrorMailNotifier
     @SuppressWarnings("nls")
     @Override
     public final void handleError(final IErrorEvent event) {
-        JobSuite suite = event.getJobSuite();
+        JobSuiteOLD suite = event.getJobSuite();
         ResourceBundle bundle =
                 ResourceBundle.getBundle(this.getClass().getName());
         String subject = MessageFormat.format(

@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -24,6 +24,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -44,6 +46,8 @@ import com.norconex.jef.IJobContext;
 @SuppressWarnings("nls")
 public class JobProgressPropertiesFileSerializer
         implements IJobProgressSerializer {
+
+    private static final long serialVersionUID = 132626905287944939L;
 
     /** Logger. */
     private static final Logger LOG =
@@ -194,5 +198,17 @@ public class JobProgressPropertiesFileSerializer
             return new File(jobdirBackup + "/" + date + "__"
                     + namespace + "__" + jobId + ".job");
         }
+    }
+
+    @Override
+    public void loadFromXML(Reader in) throws IOException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void saveToXML(Writer out) throws IOException {
+        // TODO Auto-generated method stub
+        
     }
 }

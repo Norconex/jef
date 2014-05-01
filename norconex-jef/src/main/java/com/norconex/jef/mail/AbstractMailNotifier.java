@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -22,7 +22,7 @@ import java.io.IOException;
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.norconex.commons.lang.io.IOUtil;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * Convenience base class for sending email notifications.
@@ -84,7 +84,7 @@ public abstract class AbstractMailNotifier {
      * @throws IOException problem getting lines
      */
     @SuppressWarnings("nls")
-    protected final String getLogTail(final JobSuite suite, final int lineQty)
+    protected final String getLogTail(final JobSuiteOLD suite, final int lineQty)
             throws IOException {
         StringBuffer logTail = new StringBuffer();
         String[] lines = IOUtil.tail(

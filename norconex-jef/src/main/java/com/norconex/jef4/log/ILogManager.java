@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef.log;
+package com.norconex.jef4.log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,12 +23,16 @@ import java.util.Date;
 
 import org.apache.log4j.Appender;
 
+import com.norconex.commons.lang.config.IXMLConfigurable;
+
 /**
  * Class responsible for everything that relates to the underlying logging
  * mechanism.
+ * <p/>
+ * When saving as XML, the tag name must be called "logManager".
  * @author Pascal Essiembre
  */
-public interface ILogManager {
+public interface ILogManager extends IXMLConfigurable {
 
     /**
      * Creates a Log4J appender for the given name space.

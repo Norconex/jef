@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  *
  * This file is part of Norconex JEF.
  *
@@ -32,13 +32,13 @@ import com.norconex.jef.IJobGroup;
 import com.norconex.jef.JobContext;
 import com.norconex.jef.JobException;
 import com.norconex.jef.error.IErrorHandler;
-import com.norconex.jef.log.FileLogManager;
-import com.norconex.jef.log.ILogManager;
 import com.norconex.jef.progress.IJobProgressListener;
 import com.norconex.jef.progress.IJobProgressSerializer;
 import com.norconex.jef.progress.IJobStatus;
 import com.norconex.jef.progress.JobProgressPropertiesFileSerializer;
 import com.norconex.jef.progress.JobProgressStateChangeAdapter;
+import com.norconex.jef4.log.FileLogManager;
+import com.norconex.jef4.log.ILogManager;
 
 /**
  * A job suite is an amalgamation of jobs, represented as a single executable
@@ -49,8 +49,9 @@ import com.norconex.jef.progress.JobProgressStateChangeAdapter;
  * @author Pascal Essiembre
  */
 @SuppressWarnings("nls")
-public final class JobSuite {
+public final class JobSuiteOLD {
 
+    
     /** Empty progress listeners. */
     private static final IJobProgressListener[] EMPTY_PROGRESS_LISTENERS =
             new IJobProgressListener[] {};
@@ -105,7 +106,7 @@ public final class JobSuite {
      * a {@link JobProgressPropertiesFileSerializer}.
      * @param job root job for the suite
      */
-    public JobSuite(final IJob job) {
+    public JobSuiteOLD(final IJob job) {
         this(job, new JobProgressPropertiesFileSerializer(getDefaultWorkDir()));
     }
     /**
@@ -113,7 +114,7 @@ public final class JobSuite {
      * @param job root job for the suite
      * @param progressSerializer job progress serializer
      */
-    public JobSuite(
+    public JobSuiteOLD(
             final IJob job, final IJobProgressSerializer progressSerializer) {
         this(job, progressSerializer, new FileLogManager(getDefaultWorkDir()));
     }
@@ -124,7 +125,7 @@ public final class JobSuite {
      * @param logManager Log4J log manager
      * @since 1.1.1
      */
-    public JobSuite(
+    public JobSuiteOLD(
             final IJob job,
             final ILogManager logManager) {
         this(job, new JobProgressPropertiesFileSerializer(
@@ -136,7 +137,7 @@ public final class JobSuite {
      * @param progressSerializer job progress serializer
      * @param logManager Log4J log manager
      */
-    public JobSuite(
+    public JobSuiteOLD(
             final IJob job,
             final IJobProgressSerializer progressSerializer,
             final ILogManager logManager) {
@@ -151,7 +152,7 @@ public final class JobSuite {
      * @param progressSerializer job progress serializer
      * @param logManager Log4J log manager
      */
-    public JobSuite(
+    public JobSuiteOLD(
             final IJob job,
             final IJobProgressSerializer progressSerializer,
             final ILogManager logManager,
@@ -520,7 +521,7 @@ public final class JobSuite {
     }
 
     private void stopJob(final IJob job, final IJobStatus progress) {
-        job.stop(progress, JobSuite.this);
+        job.stop(progress, JobSuiteOLD.this);
         while (progress.getStatus()  == IJobStatus.Status.RUNNING) {
             Sleeper.sleepSeconds(STOP_WAIT_DELAY);
         }
@@ -530,7 +531,7 @@ public final class JobSuite {
             }
             if (job.getId().equals(getNamespace())) {
                 for (ISuiteLifeCycleListener listener : suiteListeners) {
-                    listener.suiteStopped(JobSuite.this);
+                    listener.suiteStopped(JobSuiteOLD.this);
                 }
             }
         }

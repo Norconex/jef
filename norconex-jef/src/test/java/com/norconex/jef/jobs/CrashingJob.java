@@ -11,7 +11,7 @@ import com.norconex.jef.JobContext;
 import com.norconex.jef.JobException;
 import com.norconex.jef.progress.IJobStatus;
 import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * This job crashes, throwing a <code>JobException</code> after the number
@@ -53,7 +53,7 @@ public class CrashingJob implements IJob {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void execute(JobProgress progress, JobSuite context)
+    public void execute(JobProgress progress, JobSuiteOLD context)
             throws JobException {
         
         try {
@@ -81,7 +81,7 @@ public class CrashingJob implements IJob {
 	}
 
 	@Override
-	public void stop(IJobStatus progress, JobSuite suite) {
+	public void stop(IJobStatus progress, JobSuiteOLD suite) {
 		// TODO Unstoppable
 	}
 

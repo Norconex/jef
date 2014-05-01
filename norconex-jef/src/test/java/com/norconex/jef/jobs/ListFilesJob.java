@@ -16,7 +16,7 @@ import com.norconex.jef.JobContext;
 import com.norconex.jef.JobException;
 import com.norconex.jef.progress.IJobStatus;
 import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * Job for listing the files in a directory, including subdirectories.
@@ -62,7 +62,7 @@ public class ListFilesJob implements IJob {
     }
 
     @Override
-    public void execute(JobProgress progress, JobSuite context)
+    public void execute(JobProgress progress, JobSuiteOLD context)
             throws JobException {
         try {
             PrintWriter out = new PrintWriter(new BufferedWriter(
@@ -107,7 +107,7 @@ public class ListFilesJob implements IJob {
 	}
 
 	@Override
-	public void stop(IJobStatus progress, JobSuite suite) {
+	public void stop(IJobStatus progress, JobSuiteOLD suite) {
 		// Unstoppable
 	}
 

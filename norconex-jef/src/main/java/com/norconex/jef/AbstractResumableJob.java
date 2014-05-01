@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -19,7 +19,7 @@ package com.norconex.jef;
 
 import com.norconex.jef.progress.IJobStatus;
 import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * <p>Convenience class separating normal execution from recovery.  If the job
@@ -46,7 +46,7 @@ public abstract class AbstractResumableJob implements IJob {
 
     @Override
     public final void execute(
-            final JobProgress progress, final JobSuite suite) {
+            final JobProgress progress, final JobSuiteOLD suite) {
         
         if (!progress.isRecovery()) {
             startExecution(progress, suite);
@@ -61,12 +61,12 @@ public abstract class AbstractResumableJob implements IJob {
      * @param suite job suite
      */
     protected abstract void startExecution(
-            JobProgress progress, JobSuite suite);
+            JobProgress progress, JobSuiteOLD suite);
     /**
      * Resumes the execution of a job.
      * @param progress job progress
      * @param suite job suite
      */
     protected abstract void resumeExecution(
-            JobProgress progress, JobSuite suite);
+            JobProgress progress, JobSuiteOLD suite);
 }

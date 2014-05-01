@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -30,9 +30,9 @@ import com.norconex.jef.progress.IJobStatus;
 public interface IJobSuiteVisitor {
     /**
      * Visits a job suite.
-     * @param jobSuite job suite visited
+     * @param jobSuiteOLD job suite visited
      */
-    void visitJobSuite(JobSuite jobSuite);
+    void visitJobSuite(JobSuiteOLD jobSuiteOLD);
     /**
      * Visits a job.
      * @param job job visited

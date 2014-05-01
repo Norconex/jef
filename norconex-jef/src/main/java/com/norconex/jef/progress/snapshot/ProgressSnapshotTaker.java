@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  *
  * This file is part of Norconex JEF.
  *
@@ -21,7 +21,7 @@ package com.norconex.jef.progress.snapshot;
 import com.norconex.jef.IJob;
 import com.norconex.jef.IJobGroup;
 import com.norconex.jef.progress.IJobStatus;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 public final class ProgressSnapshotTaker {
 
@@ -29,12 +29,12 @@ public final class ProgressSnapshotTaker {
         super();
     }
 
-    public static IProgressSnapshot takeSnapshot(JobSuite jobSuite) {
-        return takeSnapshot(jobSuite, jobSuite.getRootJob());
+    public static IProgressSnapshot takeSnapshot(JobSuiteOLD jobSuiteOLD) {
+        return takeSnapshot(jobSuiteOLD, jobSuiteOLD.getRootJob());
     }
 
-    private static IProgressSnapshot takeSnapshot(JobSuite jobSuite, IJob job) {
-        IJobStatus progress = jobSuite.getJobProgress(job);
+    private static IProgressSnapshot takeSnapshot(JobSuiteOLD jobSuiteOLD, IJob job) {
+        IJobStatus progress = jobSuiteOLD.getJobProgress(job);
         ProgressSnapshot snapshot = new ProgressSnapshot();
         snapshot.setJobId(job.getId());
         if (progress == null) {
@@ -57,7 +57,7 @@ public final class ProgressSnapshotTaker {
             if (jobs != null && jobs.length > 0) {
                 for (IJob childJob : jobs) {
                     snapshot.getChildren().add(
-                            takeSnapshot(jobSuite, childJob));
+                            takeSnapshot(jobSuiteOLD, childJob));
                 }
             }
         }

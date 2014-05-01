@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -25,27 +25,27 @@ package com.norconex.jef.suite;
 public class SuiteLifeCycleAdapter implements ISuiteLifeCycleListener {
 
     @Override
-    public void suiteAborted(final JobSuite suite) {
+    public void suiteAborted(final JobSuiteOLD suite) {
         // do nothing
     }
     @Override
-    public void suiteTerminatedPrematuraly(final JobSuite suite) {
+    public void suiteTerminatedPrematuraly(final JobSuiteOLD suite) {
         // do nothing
     }
     @Override
-    public void suiteStarted(final JobSuite suite) {
+    public void suiteStarted(final JobSuiteOLD suite) {
         // do nothing
     }
     @Override
-    public void suiteCompleted(final JobSuite suite) {
+    public void suiteCompleted(final JobSuiteOLD suite) {
         // do nothing
     }
     @Override
-    public void suiteStopped(JobSuite suite) {
+    public void suiteStopped(JobSuiteOLD suite) {
         // TODO Auto-generated method stub
     }
     @Override
-    public void suiteStopping(JobSuite suite) {
+    public void suiteStopping(JobSuiteOLD suite) {
         // TODO Auto-generated method stub
     }
 }

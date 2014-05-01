@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -19,7 +19,7 @@ package com.norconex.jef;
 
 import com.norconex.jef.progress.IJobStatus;
 import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * <p>A job to be executed by the Job Execution Framework.
@@ -66,7 +66,7 @@ public interface IJob {
      * @param progress current job progress
      * @param suite job suite this job is part of
      */
-    void execute(final JobProgress progress, final JobSuite suite);
+    void execute(final JobProgress progress, final JobSuiteOLD suite);
 
     /**
      * Stops this job.  Implementors are responsible for terminating
@@ -77,6 +77,6 @@ public interface IJob {
      * @param suite job suite this job is part of
      * @since 2.0
      */
-    void stop(final IJobStatus progress, final JobSuite suite);
+    void stop(final IJobStatus progress, final JobSuiteOLD suite);
 
 }

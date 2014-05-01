@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -16,6 +16,8 @@
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.norconex.jef.exec;
+
+//TODO rename Retriable and move to Norconex Commons lang
 
 /**
  * Upon failure, code embedded in the <code>run</code> method will get

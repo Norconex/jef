@@ -12,7 +12,7 @@ import com.norconex.jef.JobException;
 import com.norconex.jef.exec.ExecUtils;
 import com.norconex.jef.progress.IJobStatus;
 import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 import com.norconex.jef.jobs.watcher.LoopProcessKiller;
 
 /**
@@ -51,7 +51,7 @@ public class LoopProcessJob implements IJob {
     }
 
     @Override
-    public void execute(JobProgress progress, JobSuite context)
+    public void execute(JobProgress progress, JobSuiteOLD context)
             throws JobException {
         
         try {
@@ -83,7 +83,7 @@ public class LoopProcessJob implements IJob {
 	}
 
 	@Override
-	public void stop(IJobStatus progress, JobSuite suite) {
+	public void stop(IJobStatus progress, JobSuiteOLD suite) {
 	    // can't be stopped
 	}
 }

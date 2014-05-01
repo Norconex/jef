@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -24,7 +24,7 @@ import com.norconex.jef.progress.IJobProgressListener;
 import com.norconex.jef.progress.IJobStatus;
 import com.norconex.jef.progress.JobProgress;
 import com.norconex.jef.progress.JobProgressStateChangeAdapter;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * Base implementation for job groups.  The group progress is an average
@@ -119,7 +119,7 @@ public abstract class AbstractJobGroup implements IJobGroup {
      * @param suite suite for which we are tracking job progress
      */
     protected final void registerGroupProgressMonitoring(
-            final JobProgress groupProgress, final JobSuite suite) {
+            final JobProgress groupProgress, final JobSuiteOLD suite) {
         progressListener = new GroupProgressListener(groupProgress);
         suite.addJobProgressListener(progressListener);
     }
@@ -128,13 +128,13 @@ public abstract class AbstractJobGroup implements IJobGroup {
      * @param suite suite on which we were monitoring job progress
      */
     protected final void unregisterGroupProgressMonitoring(
-            final JobSuite suite) {
+            final JobSuiteOLD suite) {
         suite.removeJobProgressListener(progressListener);
         progressListener = null;
     }
     
     @Override
-    public void stop(IJobStatus progress, final JobSuite suite) {
+    public void stop(IJobStatus progress, final JobSuiteOLD suite) {
         // DOes nothing.  Default behaviour typically stops on its own
         // when all child jobs are stopped.
     }

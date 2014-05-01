@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -21,7 +21,7 @@ import com.norconex.jef.IJob;
 import com.norconex.jef.progress.IJobStatus;
 
 /**
- * Convenience base implementation of {@link IJobSuiteVisitor}.
+ * Convenience base implementation of {@link IJobVisitor}.
  * All methods are empty (do nothing) and are meant for developers to pick
  * and chose the method to overwrite.
  * @author Pascal Essiembre
@@ -40,7 +40,7 @@ public abstract class AbstractJobSuiteVisitor implements IJobSuiteVisitor {
     }
 
     @Override
-    public void visitJobSuite(JobSuite jobSuite) {
+    public void visitJobSuite(JobSuiteOLD jobSuiteOLD) {
         // do nothing
     }
 }

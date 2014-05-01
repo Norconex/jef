@@ -12,7 +12,7 @@ import com.norconex.jef.JobRunner;
 import com.norconex.jef.jobs.SleepyJob;
 import com.norconex.jef.mail.SuiteCompletedMailNotifier;
 import com.norconex.jef.suite.IJobSuiteFactory;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 public class AsyncSuiteFactory implements IJobSuiteFactory {
 
@@ -43,14 +43,14 @@ public class AsyncSuiteFactory implements IJobSuiteFactory {
     }
 
     @Override
-    public JobSuite createJobSuite() {
+    public JobSuiteOLD createJobSuite() {
         IJob asyncListGroup = new AsyncJobGroup(
             "test.async", new IJob[] {
                     new SleepyJob(10, 5),
                     new SleepyJob(15, 10),
             }
         );
-        JobSuite context = new JobSuite(asyncListGroup);  
+        JobSuiteOLD context = new JobSuiteOLD(asyncListGroup);  
         
         if (StringUtils.isNotBlank(smtpServer)
                 && StringUtils.isNotBlank(fromEmail)
@@ -65,7 +65,7 @@ public class AsyncSuiteFactory implements IJobSuiteFactory {
     
     @Test
     public void testJobSuite() throws JobException {
-        JobSuite suite = new AsyncSuiteFactory().createJobSuite();
+        JobSuiteOLD suite = new AsyncSuiteFactory().createJobSuite();
         JobRunner runner = new JobRunner();
         boolean success = runner.runSuite(suite, true);
         assertTrue("Suite did not complete properly: "

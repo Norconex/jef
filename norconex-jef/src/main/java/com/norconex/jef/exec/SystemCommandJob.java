@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -28,7 +28,7 @@ import com.norconex.jef.IJobContext;
 import com.norconex.jef.JobException;
 import com.norconex.jef.progress.IJobStatus;
 import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * JEF job for executing an arbitrary number of commands.  The job progress is
@@ -142,7 +142,7 @@ public class SystemCommandJob implements IJob {
     
     @SuppressWarnings("nls")
     @Override
-    public void execute(JobProgress progress, JobSuite suite) {
+    public void execute(JobProgress progress, JobSuiteOLD suite) {
         for (int i = (int) progress.getProgress();
         		i < systemCommands.length; i++) {
             SystemCommand systemCommand = systemCommands[i];
@@ -174,7 +174,7 @@ public class SystemCommandJob implements IJob {
      * @since 2.0
      */
     @Override
-    public void stop(IJobStatus progress, JobSuite suite) {
+    public void stop(IJobStatus progress, JobSuiteOLD suite) {
         for (SystemCommand command : systemCommands) {
             command.abort();
         }

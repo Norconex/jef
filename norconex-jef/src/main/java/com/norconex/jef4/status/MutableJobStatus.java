@@ -1,0 +1,139 @@
+package com.norconex.jef4.status;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import com.norconex.commons.lang.map.Properties;
+import com.norconex.jef.progress.JobElapsedTime;
+
+public class MutableJobStatus implements IJobStatus {
+
+    private static final long serialVersionUID = -3106380316055356588L;
+    private final String name;
+    private double progress;
+    private String note;
+    private Properties properties = new Properties();
+    private JobDuration duration = new JobDuration();
+    private Date lastActivity;
+
+//    private final List<IJobStatusChangeListener> listeners =
+//            Collections.synchronizedList(
+//                    new ArrayList<IJobStatusChangeListener>());
+    
+    public MutableJobStatus(String jobName) {
+        this.name = jobName;
+    }
+
+    @Override
+    public String getJobName() {
+        return name;
+    }
+
+    @Override
+    public JobState getState() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public double getProgress() {
+        return progress;
+    }
+
+    @Override
+    public String getNote() {
+        return note;
+    }
+
+    @Override
+    public JobDuration getDuration() {
+        return duration;
+    }
+
+    @Override
+    public Properties getProperties() {
+        return properties;
+    }
+
+    public void setProgress(double progress) {
+        this.progress = progress;
+    }
+    
+    public void setNote(String note) {
+        this.note = note;
+    }
+    
+    
+
+    
+//    /**
+//     * Adds a job status change listener.
+//     * @param listener job status change listener to add
+//     */
+//    public void addJobProgressListener(
+//            final IJobStatusChangeListener listener) {
+//        synchronized (listeners) {
+//            listeners.add(0, listener);
+//        }
+//    }
+//    /**
+//     * Removes a job status change listener.
+//     * @param listener job status change listener to remove
+//     */
+//    public void removeJobProgressListener(
+//            final IJobStatusChangeListener listener) {
+//        synchronized (listeners) {
+//            listeners.remove(listener);
+//        }
+//    }
+    
+    public void setDuration(JobDuration duration) {
+        this.duration = duration;
+    }
+
+    /**
+     * Gets the last activity.
+     * @return last activity
+     */
+    public Date getLastActivity() {
+        return lastActivity;
+    }
+    /**
+     * Sets the last activity.
+     * @param lastActivity last activity
+     */
+    public void setLastActivity(final Date lastActivity) {
+        this.lastActivity = lastActivity;
+    }
+    
+    /**
+     * Notifies all listeners of a change of status.
+     */
+    @SuppressWarnings("nls")
+    protected synchronized void fireProgressChanged() {
+//        if (progress > jobContext.getProgressMaximum()) {
+//            LOG.warn("Execution progress ("
+//                    + progress + ") exceeds allowed job "
+//                    + "maximum (" + jobContext.getProgressMaximum()
+//                    + ") for job: " + getJobId());
+//        }
+//        synchronized (listeners) {
+//            for (IJobLifeCycleListener listener : listeners) {
+//                listener.jobProgressed(this);
+//            }
+//        }
+//        if (LOG.isDebugEnabled()) {
+//            LOG.debug("Progress changed: job='" + getJobId()
+//                    + "'; progress=" + getProgress()
+//                    + "; note='" + getNote() + "'.");
+//        }
+    }
+
+    @Override
+    public int getResumeAttempts() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+}

@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -27,31 +27,31 @@ public interface ISuiteLifeCycleListener {
      * Invoked when a job suite is stopped.
      * @param suite job suite
      */
-    void suiteStopped(JobSuite suite);
+    void suiteStopped(JobSuiteOLD suite);
     /**
      * Invoked when a job suite is stopping.
      * @param suite job suite
      */
-    void suiteStopping(JobSuite suite);
+    void suiteStopping(JobSuiteOLD suite);
     /**
      * Invoked when a job suite is started.
      * @param suite job suite
      */
-    void suiteStarted(JobSuite suite);
+    void suiteStarted(JobSuiteOLD suite);
     /**
      * Invoked when a job suite is aborted.  This method offers little in
      * terms of error handling.  Refer to
      * {@link com.norconex.jef.error.IErrorHandler} to implement error handing.
      * @param suite job suite
      */
-    void suiteAborted(JobSuite suite);
+    void suiteAborted(JobSuiteOLD suite);
     /**
      * Invoked when a job suite finished executing.  A job may finish
      * without having completed successfully.
      * @param suite job suite
      * @since 2.0
      */
-    void suiteTerminatedPrematuraly(JobSuite suite);
+    void suiteTerminatedPrematuraly(JobSuiteOLD suite);
     /**
      * Invoked when a job suite completes.  A completed job suite is one
      * where all job executions returned <code>true</code> and
@@ -59,5 +59,5 @@ public interface ISuiteLifeCycleListener {
      * this is usually a good indication of success.
      * @param suite job suite
      */
-    void suiteCompleted(JobSuite suite);
+    void suiteCompleted(JobSuiteOLD suite);
 }

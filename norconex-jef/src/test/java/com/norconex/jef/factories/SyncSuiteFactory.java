@@ -9,7 +9,7 @@ import com.norconex.jef.JobException;
 import com.norconex.jef.JobRunner;
 import com.norconex.jef.SyncJobGroup;
 import com.norconex.jef.suite.IJobSuiteFactory;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 import com.norconex.jef.jobs.ListFilesJob;
 
 public class SyncSuiteFactory implements IJobSuiteFactory {
@@ -19,7 +19,7 @@ public class SyncSuiteFactory implements IJobSuiteFactory {
     }
 
     @Override
-    public JobSuite createJobSuite() {
+    public JobSuiteOLD createJobSuite() {
         String path = getPath();
         if (path == null) {
             System.out.println("No valid path given.");
@@ -35,7 +35,7 @@ public class SyncSuiteFactory implements IJobSuiteFactory {
         IJob syncListGroup = new SyncJobGroup("test.sync", new IJob[] {
                 listAlljob, listRootFilesJob });
 
-        return new JobSuite(syncListGroup);
+        return new JobSuiteOLD(syncListGroup);
     }
 
     private String getPath() {
@@ -56,7 +56,7 @@ public class SyncSuiteFactory implements IJobSuiteFactory {
 
     @Test
     public void testJobSuite() throws JobException {
-        JobSuite suite = new SyncSuiteFactory().createJobSuite();
+        JobSuiteOLD suite = new SyncSuiteFactory().createJobSuite();
         JobRunner runner = new JobRunner();
         boolean success = runner.runSuite(suite, true);
 //        assertTrue("Suite did not complete properly: "

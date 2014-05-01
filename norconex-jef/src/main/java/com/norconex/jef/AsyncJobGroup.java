@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Norconex Inc.
+/* Copyright 2010-2014 Norconex Inc.
  * 
  * This file is part of Norconex JEF.
  * 
@@ -25,7 +25,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuite;
+import com.norconex.jef.suite.JobSuiteOLD;
 
 /**
  * Job responsible for running a group of jobs asynchronously.  All jobs
@@ -66,7 +66,7 @@ public class AsyncJobGroup extends AbstractJobGroup {
 
     @Override
     public void execute(
-            final JobProgress progress, final JobSuite suite) {
+            final JobProgress progress, final JobSuiteOLD suite) {
         registerGroupProgressMonitoring(progress, suite);
         final Collection<IJob> failedJobs =
                 Collections.synchronizedCollection(new ArrayList<IJob>());
