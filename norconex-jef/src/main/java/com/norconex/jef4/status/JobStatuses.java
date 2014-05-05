@@ -12,20 +12,22 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import com.norconex.commons.lang.PercentFormatter;
 import com.norconex.commons.lang.config.ConfigurationUtil;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.job.group.IJobGroup;
 
-public class JobStatusTree implements Serializable {
+public class JobStatuses implements Serializable {
     private static final long serialVersionUID = 74258557029725685L;
 
     private final JobStatusTreeNode rootNode;
     private Map<String, JobStatusTreeNode> flattenNodes = 
             new ListOrderedMap<>();
     
-    public JobStatusTree(JobStatusTreeNode rootNode) {
+    public JobStatuses(JobStatusTreeNode rootNode) {
         this.rootNode = rootNode;
         flattenNode(rootNode);
     }
@@ -67,6 +69,20 @@ public class JobStatusTree implements Serializable {
         }
         return statuses;
     }
+    
+    public void accept(IJobStatusVisitor visitor) {
+        accept(visitor, getRoot().getJobName());
+    }
+    private void accept(IJobStatusVisitor visitor, String jobName) {
+        if (visitor != null) {
+            IJobStatus status = getJobStatus(jobName);
+            visitor.visitJobStatus(getJobStatus(jobName));
+            for (IJobStatus child : getChildren(status)) {
+                accept(visitor, child.getJobName());
+            }
+        }
+    }
+    
     private void flattenNode(JobStatusTreeNode node) {
         flattenNodes.put(node.jobStatus.getJobName(), node);
         for (JobStatusTreeNode childNode : node.children) {
@@ -74,11 +90,11 @@ public class JobStatusTree implements Serializable {
         }
     }
     
-    public static JobStatusTree create(IJob rootJob) {
+    public static JobStatuses create(IJob rootJob) {
         if (rootJob == null) {
             throw new IllegalArgumentException("Root job cannot be null.");
         }
-        return new JobStatusTree(createTreeNode(rootJob));
+        return new JobStatuses(createTreeNode(rootJob));
     }
     private static JobStatusTreeNode createTreeNode(IJob job) {
         IJobStatus status = new MutableJobStatus(job.getName());
@@ -96,7 +112,7 @@ public class JobStatusTree implements Serializable {
     }
     
     
-    public static JobStatusTree snapshot(File suiteIndex)
+    public static JobStatuses snapshot(File suiteIndex)
             throws IOException {
         //--- Ensure file looks good ---
         if (suiteIndex == null) {
@@ -126,7 +142,7 @@ public class JobStatusTree implements Serializable {
         //--- Load status tree ---
         IJobStatusStore serial = 
                 ConfigurationUtil.newInstance(xml, "jobStatusSerializer");
-        return new JobStatusTree(
+        return new JobStatuses(
                 loadTreeNode(xml.configurationAt("job"), suiteName, serial));
     }
     
@@ -165,6 +181,57 @@ public class JobStatusTree implements Serializable {
             } else {
                 this.children = children;
             }
+        }
+    }
+    
+    
+    
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((flattenNodes == null) ? 0 : flattenNodes.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        JobStatuses other = (JobStatuses) obj;
+        if (flattenNodes == null) {
+            if (other.flattenNodes != null) {
+                return false;
+            }
+        } else if (!flattenNodes.equals(other.flattenNodes)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder b = new StringBuilder();
+        toString(b, getRoot().getJobName(), 0);
+        return b.toString();
+    }
+    private void toString(StringBuilder b, String jobName, int depth) {
+        IJobStatus status = getJobStatus(jobName);
+        b.append(StringUtils.repeat(' ', depth * 4));
+        b.append(StringUtils.leftPad(new PercentFormatter().format(
+                status.getProgress()), 4));
+        b.append("  ").append(status.getJobName());
+        b.append(System.lineSeparator());
+        for (IJobStatus child : getChildren(status)) {
+            toString(b, child.getJobName(), depth + 1);
         }
     }
 }

@@ -17,13 +17,10 @@
  */
 package com.norconex.jef4.log;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
@@ -35,6 +32,8 @@ import org.apache.log4j.Layout;
 import org.apache.log4j.PatternLayout;
 
 import com.norconex.commons.lang.file.FileUtil;
+import com.norconex.commons.lang.io.FilteredInputStream;
+import com.norconex.commons.lang.io.IInputStreamFilter;
 
 /**
  * Log manager using the file system to store its logs.
@@ -107,10 +106,7 @@ public class FileLogManager implements ILogManager {
         File backupFile = new File(
                 backupDir + "/" + date + "__" + namespace + LOG_SUFFIX);
 
-        if (!progressFile.renameTo(backupFile)) {
-            throw new IOException("Could not move file from \""
-                    + progressFile + "\" to \"" + backupFile + "\"");
-        }
+        FileUtil.moveFile(progressFile, backupFile);
     }
 
     @Override
@@ -129,7 +125,8 @@ public class FileLogManager implements ILogManager {
         }
         InputStream fullLog = getLog(namespace);
         if (fullLog != null) {
-            return new FilteredInputStream(getLog(namespace), jobId);
+            return new FilteredInputStream(
+                    getLog(namespace), new StartWithFilter(jobId));
         }
         return null;
     }
@@ -146,64 +143,6 @@ public class FileLogManager implements ILogManager {
         return new File(logdirLatest + "/" + namespace + LOG_SUFFIX);
     }
     
-    //TODO consider using RegexFilteredInputStream
-    private class FilteredInputStream extends InputStream {
-    
-        private final BufferedReader bufferedInput;
-        private final String startsWith;
-        private InputStream lineStream;
-        private boolean closed = false;
-    
-        /**
-         * Constructor.
-         * @throws IOException
-         */
-        public FilteredInputStream(InputStream is, String startsWith)
-                throws IOException {
-            super();
-            this.bufferedInput = new BufferedReader(
-                    new InputStreamReader(is));
-            this.startsWith = startsWith;
-            nextLine();
-        }
-    
-        @Override
-        public int read() throws IOException {
-            if (lineStream == null) {
-                return -1;
-            }
-            int ch = lineStream.read();
-            if (ch == -1) {
-                if (!nextLine()) {
-                    return -1;
-                }
-                return read();
-            }
-            return ch;
-        }
-    
-        private boolean nextLine() throws IOException {
-            if (lineStream != null) {
-                lineStream.close();
-                lineStream = null;
-            }
-            if (closed) {
-                return false;
-            }
-            String line;
-            while ((line = bufferedInput.readLine()) != null) {
-                if (line.startsWith(startsWith + ":")) {
-                    line += "\n";
-                    lineStream = new ByteArrayInputStream(line.getBytes());
-                    return true;
-                }
-            }
-            bufferedInput.close();
-            closed = true;
-            return false;
-        }
-    }
-
     @Override
     public void loadFromXML(Reader in) throws IOException {
         // TODO Auto-generated method stub
@@ -214,6 +153,18 @@ public class FileLogManager implements ILogManager {
     public void saveToXML(Writer out) throws IOException {
         // TODO Auto-generated method stub
         
+    }
+
+    private class StartWithFilter implements IInputStreamFilter {
+        private final String startsWith;
+        public StartWithFilter(String startsWith) {
+            super();
+            this.startsWith = startsWith;
+        }
+        @Override
+        public boolean accept(String line) {
+            return line.startsWith(startsWith + ":");
+        }
     }
 
 }

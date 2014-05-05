@@ -76,5 +76,5 @@ public interface IJobStatusStore extends IXMLConfigurable {
      * @param suiteName
      * @param jobName
      */
-    long touch(String suiteName, String jobName);
+    long touch(String suiteName, String jobName) throws IOException;
 }

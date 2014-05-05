@@ -4,8 +4,6 @@
 package com.norconex.jef4.jobs;
 
 import com.norconex.commons.lang.Sleeper;
-import com.norconex.jef.JobException;
-import com.norconex.jef.suite.JobSuiteOLD;
 import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.status.IJobStatus;
 import com.norconex.jef4.status.JobStatusUpdater;
@@ -90,28 +88,27 @@ public class SleepyJob implements IJob {
 
     @Override
     public void execute(JobStatusUpdater statusUpdater, JobSuite suite) {
-        Sleeper.sleepSeconds(sleepSeconds);
-//      long elapsedSeconds = progress.getProgress();
-//      System.out.println("START PROGRESS IS: " + elapsedSeconds);
-//
-//      while (elapsedSeconds < sleepSeconds) {
-//          Sleeper.sleepSeconds(1);
-//          elapsedSeconds++;
-//          if (elapsedSeconds % reportSeconds == 0) {
-////              LOG.info("[" + getId() + "] Slept for "
-////                    + (elapsedTime / 1000) + " seconds.");
-//
-//              System.out.println("[" + getId() + "] Slept for "
-//                      + elapsedSeconds + " seconds.");
-//          }
-//          statusUpdater.setProgress(elapsedSeconds);
-//          statusUpdater.setNote("Slept for " + elapsedSeconds + " seconds.");
-////          progress.incrementProgress(1);
-////          progress.setNote(
-////                  "Slept for " + progress.getProgress() + " seconds.");
-//      }
-//      statusUpdater.setNote(
-//              "Done sleeping for " + progress.getProgress() + " seconds.");
+      double elapsedSeconds = statusUpdater.getProgress();
+      System.out.println("START PROGRESS IS: " + elapsedSeconds);
+
+      while (elapsedSeconds < sleepSeconds) {
+          Sleeper.sleepSeconds(1);
+          elapsedSeconds++;
+          if (elapsedSeconds % reportSeconds == 0) {
+//              LOG.info("[" + getId() + "] Slept for "
+//                    + (elapsedTime / 1000) + " seconds.");
+
+              System.out.println("[" + getName() + "] Slept for "
+                      + elapsedSeconds + " seconds.");
+          }
+          statusUpdater.setProgress(elapsedSeconds / sleepSeconds);
+          statusUpdater.setNote("Slept for " + elapsedSeconds + " seconds.");
+//          progress.incrementProgress(1);
+//          progress.setNote(
+//                  "Slept for " + progress.getProgress() + " seconds.");
+      }
+      statusUpdater.setNote(
+              "Done sleeping for " + statusUpdater.getProgress() + " seconds.");
     }
 
     @Override

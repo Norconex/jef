@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -186,7 +187,7 @@ public class FileJobStatusStore implements IJobStatusStore {
             is.close();
             return jobStatus;
         }
-        return null;
+        return new MutableJobStatus(jobName);
     }
 
     @Override
@@ -209,11 +210,10 @@ public class FileJobStatusStore implements IJobStatusStore {
     }
 
     @Override
-    public long touch(String suiteName, String jobName) {
+    public long touch(String suiteName, String jobName) throws IOException {
         File file = getStatusFile(suiteName, jobName);
-        long time = System.currentTimeMillis();
-        file.setLastModified(time);
-        return time;
+        FileUtils.touch(file);
+        return file.lastModified();
     }
     
     /**
@@ -258,7 +258,7 @@ public class FileJobStatusStore implements IJobStatusStore {
     @Override
     public void loadFromXML(Reader in) throws IOException {
         XMLConfiguration xml = ConfigurationLoader.loadXML(in);
-        setStatusDirectory(xml.getString(statusDir));
+        setStatusDirectory(xml.getString("statusDir", statusDir));
     }
 
     @Override
