@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef.exec;
+package com.norconex.jef4.exec;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.norconex.commons.lang.io.IStreamListener;
-import com.norconex.jef.AsyncJobGroup;
+import com.norconex.jef4.job.group.AsyncJobGroup;
 
 /**
  * Represents a program to be executed by the underlying system

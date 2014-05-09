@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Date;
 
 import com.norconex.commons.lang.config.IXMLConfigurable;
-import com.norconex.jef.IJobContext;
 
 /**
  * Responsible for serializing and deserializing a job status.
@@ -32,15 +31,15 @@ import com.norconex.jef.IJobContext;
 public interface IJobStatusStore extends IXMLConfigurable {
 
     /**
-     * Serializes a job progress.
+     * Writes a job progress.
      * @param suiteName name space given to the job progress
-     * @param jobProgress job progress
+     * @param jobStatus job progress
      * @throws IOException problem serializing job progress
      */
     void write(String suiteName, IJobStatus jobStatus)
               throws IOException;
     /**
-     * Deserializes a job progress.  Implementors are required to always
+     * Reads a job progress.  Implementors are required to always
      * return a job progress (<code>null</code> is not allowed).
      * @param suiteName name space given to the job progress
      * @param jobName job unique identifier
@@ -52,18 +51,16 @@ public interface IJobStatusStore extends IXMLConfigurable {
             throws IOException;
     /**
      * Removes job progress.  A removed job progress can no longer be
-     * obtained using the {@link #deserialize(String, String, IJobContext)} 
-     * method.
-     * @param namespace name space given to the job progress
+     * obtained using the {@link #read(String, String)} method.
+     * @param suiteName name space given to the job progress
      * @param jobName unique identifier of job we want to remove status
      * @throws IOException problem removing job progress
      */
     void remove(String suiteName, String jobName) throws IOException;
     /**
      * Backups job progress.  A backed-up job progress can no longer be
-     * obtained using the {@link #deserialize(String, String, IJobContext)}
-     * method.
-     * @param namespace name space given to the job progress
+     * obtained using the {@link #read(String, String)} method.
+     * @param suiteName name space given to the job progress
      * @param jobId unique identifier of job progress we want to backup
      * @param backupDate date used to timestamp to backup
      * @throws IOException problem backing-up job progress
@@ -72,9 +69,11 @@ public interface IJobStatusStore extends IXMLConfigurable {
             throws IOException;
     
     /**
-     * Marks the status with the current date so ....
-     * @param suiteName
-     * @param jobName
+     * Marks the status with the current date so it shows as being active.
+     * @param suiteName suite name
+     * @param jobName job name
+     * @return new file timestamp as an EPOC long value
+     * @throws IOException problem touching the file
      */
     long touch(String suiteName, String jobName) throws IOException;
 }

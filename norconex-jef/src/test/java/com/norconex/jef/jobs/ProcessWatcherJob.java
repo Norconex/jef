@@ -10,11 +10,11 @@ import com.norconex.jef.IJob;
 import com.norconex.jef.IJobContext;
 import com.norconex.jef.JobContext;
 import com.norconex.jef.JobException;
-import com.norconex.jef.exec.ExecUtils;
 import com.norconex.jef.jobs.watcher.ProcessListener;
 import com.norconex.jef.progress.IJobStatus;
 import com.norconex.jef.progress.JobProgress;
 import com.norconex.jef.suite.JobSuiteOLD;
+import com.norconex.jef4.exec.ExecUtils;
 
 /**
  * Job for listing the files in a directory, including subdirectories.

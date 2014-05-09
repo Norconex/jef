@@ -15,21 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef.exec;
-
-//TODO rename Retriable and move to Norconex Commons lang
+package com.norconex.jef4.exec;
 
 /**
- * Upon failure, code embedded in the <code>run</code> method will get
- * executed over and over again, provided that the executing class
- * supports <code>IRerunnable</code>.
+ * Responsible for filtering exceptions.  Only exceptions returning
+ * <code>true</code> shall be considered in their given context.
  * @author Pascal Essiembre
- * @see Rerunner
+ * @see RetriableExecutor
  */
-public interface IRerunnable {
+public interface IExceptionFilter {
+
     /**
-     * Code to be executed until successful (no exception thrown).
-     * @throws RerunnableException any exception
+     * Filters an exception.
+     * @param e the exception to filter
+     * @return <code>true</code> to consider an exception, <code>false</code>
+     *         to rule it out
      */
-    void run() throws RerunnableException;
+    boolean accept(Exception e);
 }

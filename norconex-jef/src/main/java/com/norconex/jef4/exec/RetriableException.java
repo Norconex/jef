@@ -15,15 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef;
+package com.norconex.jef4.exec;
 
 /**
- * Represents a job-related exception.  Implementors are invited to
- * wrap exceptions they want explicitly handled by the framework in instances
- * of <code>JobException</code>.
+ * An exception throws by a executing {@link RetriableExecutor} instance when the 
+ * code executed itself threw an exception, or maximum retry attempts has
+ * been reached.  In cases when the code being rerun threw one or more
+ * exception, this exception's cause will hold the last exception thrown
+ * by that code.
  * @author Pascal Essiembre
+ * @see RetriableExecutor
  */
-public class JobException extends RuntimeException {
+public class RetriableException extends Exception {
 
     /** For serialisation. */
     private static final long serialVersionUID = 5236102272021889018L;
@@ -31,19 +34,19 @@ public class JobException extends RuntimeException {
     /**
      * @see Exception#Exception(java.lang.String)
      */
-    public JobException(final String arg0) {
-        super(arg0);
+    public RetriableException(final String message) {
+        super(message);
     }
     /**
      * @see Exception#Exception(java.lang.Throwable)
      */
-    public JobException(final Throwable arg0) {
-        super(arg0);
+    public RetriableException(final Throwable cause) {
+        super(cause);
     }
     /**
      * @see Exception#Exception(java.lang.String, java.lang.Throwable)
      */
-    public JobException(final String arg0, final Throwable arg1) {
-        super(arg0, arg1);
+    public RetriableException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 }

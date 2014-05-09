@@ -62,7 +62,7 @@ public class CrashingJob implements IJob {
             Constructor constructor =
                     exceptionClass.getConstructor(new Class[] {String.class});
             throw (Throwable) constructor.newInstance(new Object[]{
-                    "I am job " + getId() + " and I just felt "
+                    "I am job " + getName() + " and I just felt "
                   + "like throwing an exception of type "
                   + exceptionClass.toString()});
             

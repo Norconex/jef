@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef.exec;
+package com.norconex.jef4.exec;
 
 import com.norconex.commons.lang.io.IStreamListener;
 import com.norconex.commons.lang.io.StreamGobbler;
-import com.norconex.jef.JobRunner;
+import com.norconex.jef4.suite.JobSuite;
 
 /**
  * Utility methods related to process execution.
@@ -172,13 +172,13 @@ public final class ExecUtils {
             Process process,
             IStreamListener[] outputListeners,
             IStreamListener[] errorListeners) {
-        final String jobId = JobRunner.getCurrentJobId();
+        final String jobId = JobSuite.getCurrentJobId();
         // listen for output
         StreamGobbler output = 
                 new StreamGobbler(process.getInputStream(), STDOUT) {
             @Override
             protected void beforeStreaming() {
-                JobRunner.setCurrentJobId(jobId);
+                JobSuite.setCurrentJobId(jobId);
             }
         };
         output.addStreamListener(outputListeners);
@@ -189,7 +189,7 @@ public final class ExecUtils {
             new StreamGobbler(process.getErrorStream(), STDERR) {
             @Override
             protected void beforeStreaming() {
-                JobRunner.setCurrentJobId(jobId);
+                JobSuite.setCurrentJobId(jobId);
             }
         };
         error.addStreamListener(errorListeners);

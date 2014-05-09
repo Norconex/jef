@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.norconex.jef.error.IErrorHandler;
 import com.norconex.jef4.job.IJobErrorListener;
 import com.norconex.jef4.job.IJobLifeCycleListener;
 import com.norconex.jef4.log.ILogManager;

@@ -27,9 +27,9 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import com.norconex.jef.JobException;
 import com.norconex.jef4.JEFException;
 import com.norconex.jef4.job.IJob;
+import com.norconex.jef4.job.JobException;
 import com.norconex.jef4.suite.JobSuite;
 
 /**

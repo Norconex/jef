@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef.exec;
+package com.norconex.jef4.exec;
 
 import java.io.IOException;
 
@@ -23,12 +23,11 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import com.norconex.jef.IJob;
-import com.norconex.jef.IJobContext;
-import com.norconex.jef.JobException;
-import com.norconex.jef.progress.IJobStatus;
-import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuiteOLD;
+import com.norconex.jef4.job.IJob;
+import com.norconex.jef4.job.JobException;
+import com.norconex.jef4.status.IJobStatus;
+import com.norconex.jef4.status.JobStatusUpdater;
+import com.norconex.jef4.suite.JobSuite;
 
 /**
  * JEF job for executing an arbitrary number of commands.  The job progress is
@@ -45,12 +44,10 @@ public class SystemCommandJob implements IJob {
 
     /** Logger. */
     private static final Logger LOG =
-    		LogManager.getLogger(SystemCommandJob.class);
+            LogManager.getLogger(SystemCommandJob.class);
 
-    /** Job unique id. */
-    private final String id;
-    /** Job description. */
-    private final String desc;
+    /** Job unique name. */
+    private final String name;
     /** Commands to be executed. */
     private final SystemCommand[] systemCommands;
 
@@ -60,108 +57,60 @@ public class SystemCommandJob implements IJob {
      * constructor for taking multiple systems commands as string, every
      * commands supplied are converted to {@link SystemCommand} instances
      * internally.
-     * @param id job id
-     * @param desc job description
+     * @param name job name
      * @param commands array of individual commands to be executed
-     * @see SystemCommandJob#SystemCommandJob(String, String, SystemCommand[])
+     * @see SystemCommandJob#SystemCommandJob(String, SystemCommand[])
      */
     @SuppressWarnings("nls")
-    public SystemCommandJob(String id, String desc, String[] commands) {
+    public SystemCommandJob(String name, String... commands) {
         super();
         if (commands == null) {
-        	throw new IllegalArgumentException(
-        			"\"commands\" argument cannot be null.");
+            throw new IllegalArgumentException(
+                    "\"commands\" argument cannot be null.");
         }
-        this.id = id;
-        this.desc = desc;
+        this.name = name;
         this.systemCommands = new SystemCommand[commands.length];
         for (int i = 0; i < commands.length; i++) {
-			this.systemCommands[i] = new SystemCommand(commands[i]);
-		}
-    }
-    /**
-     * Creates a JEF job for executing a system command.  This is a convenience
-     * constructor for taking a command as a string, the
-     * command supplied is converted to a {@link SystemCommand} instance
-     * internally.
-     * @param id job id
-     * @param desc job description
-     * @param command commands to be executed
-     */
-    public SystemCommandJob(String id, String desc, String command) {
-    	this(id, desc, new String[] {command});
+            this.systemCommands[i] = new SystemCommand(commands[i]);
+        }
     }
     
     /**
      * Creates a JEF job for executing system commands.
-     * @param id job id
-     * @param desc job description
+     * @param name job name
      * @param commands commands to be executed
      */
-    public SystemCommandJob(String id, String desc, SystemCommand[] commands) {
+    public SystemCommandJob(
+            String name, SystemCommand... commands) {
         super();
-        this.id = id;
-        this.desc = desc;
+        this.name = name;
         this.systemCommands = ArrayUtils.clone(commands);
     }
-    /**
-     * Creates a JEF job for executing a system command.
-     * @param id job id
-     * @param desc job description
-     * @param command commands to be executed
-     */
-    public SystemCommandJob(String id, String desc, SystemCommand command) {
-        super();
-        this.id = id;
-        this.desc = desc;
-        this.systemCommands = new SystemCommand[] { command };
+    
+    @Override
+    public String getName() {
+        return name;
     }
     
     @Override
-    public String getId() {
-        return id;
-    }
-    @Override
-    public IJobContext createJobContext() {
-        return new IJobContext() {
-            private static final long serialVersionUID = -779499724571527547L;
-            @Override
-            public long getProgressMinimum() {
-                return 0;
-            }
-            @Override
-            public long getProgressMaximum() {
-                return systemCommands.length;
-            }
-            @Override
-            public String getDescription() {
-                return desc;
-            }
-        };
-    }
-    
-    @SuppressWarnings("nls")
-    @Override
-    public void execute(JobProgress progress, JobSuiteOLD suite) {
-        for (int i = (int) progress.getProgress();
-        		i < systemCommands.length; i++) {
+    public void execute(JobStatusUpdater statusUpdater, JobSuite suite) {
+        double commandCount = systemCommands.length;
+        double commandsRan = statusUpdater.getProperties().getDouble("ran", 0d);
+        for (int i = (int) commandsRan; i < commandCount; i++) {
             SystemCommand systemCommand = systemCommands[i];
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Executing command: " + systemCommand);
             }
-            progress.setNote("Executing: " + systemCommand);
+            statusUpdater.setNote("Executing: " + systemCommand);
             try {
                 systemCommand.execute();
-                progress.incrementProgress(1);
-            } catch (IOException e) {
+                statusUpdater.setProgress(commandsRan / commandCount);
+            } catch (IOException | InterruptedException e) {
                 throw new JobException("Cannot execute command: "
-                		+ systemCommand, e);
-            } catch (InterruptedException e) {
-                throw new JobException("Cannot execute command: "
-                		+ systemCommand, e);
+                        + systemCommand, e);
             }
         }
-        progress.setNote("Done.");
+        statusUpdater.setNote("Done.");
     }
     
     /**
@@ -174,7 +123,7 @@ public class SystemCommandJob implements IJob {
      * @since 2.0
      */
     @Override
-    public void stop(IJobStatus progress, JobSuiteOLD suite) {
+    public void stop(IJobStatus status, JobSuite suite) {
         for (SystemCommand command : systemCommands) {
             command.abort();
         }

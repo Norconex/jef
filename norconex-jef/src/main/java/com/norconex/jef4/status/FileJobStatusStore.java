@@ -42,8 +42,8 @@ import org.apache.log4j.Logger;
 import com.norconex.commons.lang.config.ConfigurationLoader;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.commons.lang.map.Properties;
-import com.norconex.jef.JobException;
 import com.norconex.jef4.JEFUtil;
+import com.norconex.jef4.job.JobException;
 
 /**
  * Serializer using a file to store job status information. The created

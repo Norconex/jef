@@ -32,7 +32,7 @@ public class RecoverableSleepyJob extends AbstractResumableJob {
     }
 
     /**
-     * @see com.norconex.jef.IJob#getId()
+     * @see com.norconex.jef.IJob#getName()
      */
     @Override
     public String getId() {

@@ -143,7 +143,7 @@ public final class JobSuiteOLD {
             final ILogManager logManager) {
         this(job, progressSerializer, logManager,
                 new FileStopRequestHandler(
-                        job.getId(), getDefaultWorkDir()));
+                        job.getName(), getDefaultWorkDir()));
 
     }
     /**
@@ -172,7 +172,7 @@ public final class JobSuiteOLD {
         }
         this.rootJob = job;
         this.progressSerializer = progressSerializer;
-        this.namespace = job.getId();
+        this.namespace = job.getName();
         this.logManager = logManager;
 
 
@@ -223,7 +223,7 @@ public final class JobSuiteOLD {
         return jobContexts.get(jobId);
     }
     public IJobContext getJobContext(IJob job) {
-        return jobContexts.get(job.getId());
+        return jobContexts.get(job.getName());
     }
 
     /**
@@ -242,14 +242,14 @@ public final class JobSuiteOLD {
      * @param parentJob parent job, to grab identifiers from
      */
     private void loadJobIds(final IJob parentJob) {
-        if (jobIds.contains(parentJob.getId())) {
-            throw new IllegalArgumentException("Job suite '" + rootJob.getId()
+        if (jobIds.contains(parentJob.getName())) {
+            throw new IllegalArgumentException("Job suite '" + rootJob.getName()
                     + "' contains two or more jobs with the same id: '"
-                    + parentJob.getId() + "'.");
+                    + parentJob.getName() + "'.");
         }
-        jobIds.add(parentJob.getId());
-        jobByIds.put(parentJob.getId(), parentJob);
-        jobContexts.put(parentJob.getId(),
+        jobIds.add(parentJob.getName());
+        jobByIds.put(parentJob.getName(), parentJob);
+        jobContexts.put(parentJob.getName(),
                 new JobContext(parentJob.createJobContext()));
         if (parentJob instanceof IJobGroup) {
             IJob[] jobs = ((IJobGroup) parentJob).getJobs();
@@ -409,10 +409,10 @@ public final class JobSuiteOLD {
     public IJobStatus getJobProgress(IJob job) {
         try {
             return getJobProgressSerializer().deserialize(
-                    namespace, job.getId(), getJobContext(job));
+                    namespace, job.getName(), getJobContext(job));
         } catch (IOException e) {
             throw new JobException("Cannot deserialize job progress for job: "
-                    + job.getId(), e);
+                    + job.getName(), e);
         }
     }
 
@@ -529,7 +529,7 @@ public final class JobSuiteOLD {
             for (IJobProgressListener listener : progressListeners) {
                 listener.jobStopped(progress);
             }
-            if (job.getId().equals(getNamespace())) {
+            if (job.getName().equals(getNamespace())) {
                 for (ISuiteLifeCycleListener listener : suiteListeners) {
                     listener.suiteStopped(JobSuiteOLD.this);
                 }

@@ -15,18 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef.exec;
+package com.norconex.jef4.job;
 
 /**
- * An exception throws by a executing {@link Rerunner} instance when the 
- * code executed itself threw an exception, or maximum retry attempts has
- * been reached.  In cases when the code being rerun threw one or more
- * exception, this exception's cause will hold the last exception thrown
- * by that code.
+ * Represents a job-related exception.  Implementors are invited to
+ * wrap exceptions they want explicitly handled by the framework in instances
+ * of <code>JobException</code>.
  * @author Pascal Essiembre
- * @see Rerunner
  */
-public class RerunnableException extends Exception {
+public class JobException extends RuntimeException {
 
     /** For serialisation. */
     private static final long serialVersionUID = 5236102272021889018L;
@@ -34,19 +31,19 @@ public class RerunnableException extends Exception {
     /**
      * @see Exception#Exception(java.lang.String)
      */
-    public RerunnableException(final String message) {
+    public JobException(final String message) {
         super(message);
     }
     /**
      * @see Exception#Exception(java.lang.Throwable)
      */
-    public RerunnableException(final Throwable cause) {
-        super(cause);
+    public JobException(final Throwable exception) {
+        super(exception);
     }
     /**
      * @see Exception#Exception(java.lang.String, java.lang.Throwable)
      */
-    public RerunnableException(final String message, final Throwable cause) {
-        super(message, cause);
+    public JobException(final String message, final Throwable exception) {
+        super(message, exception);
     }
 }

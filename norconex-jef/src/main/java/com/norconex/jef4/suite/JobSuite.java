@@ -37,7 +37,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.norconex.commons.lang.file.FileUtil;
-import com.norconex.jef.JobException;
 import com.norconex.jef4.JEFException;
 import com.norconex.jef4.JEFUtil;
 import com.norconex.jef4.job.IJob;
@@ -45,6 +44,7 @@ import com.norconex.jef4.job.IJobErrorListener;
 import com.norconex.jef4.job.IJobLifeCycleListener;
 import com.norconex.jef4.job.IJobVisitor;
 import com.norconex.jef4.job.JobErrorEvent;
+import com.norconex.jef4.job.JobException;
 import com.norconex.jef4.job.group.IJobGroup;
 import com.norconex.jef4.log.FileLogManager;
 import com.norconex.jef4.log.ILogManager;

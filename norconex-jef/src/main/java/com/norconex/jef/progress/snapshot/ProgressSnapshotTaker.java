@@ -36,7 +36,7 @@ public final class ProgressSnapshotTaker {
     private static IProgressSnapshot takeSnapshot(JobSuiteOLD jobSuiteOLD, IJob job) {
         IJobStatus progress = jobSuiteOLD.getJobProgress(job);
         ProgressSnapshot snapshot = new ProgressSnapshot();
-        snapshot.setJobId(job.getId());
+        snapshot.setJobId(job.getName());
         if (progress == null) {
             return snapshot;
         }

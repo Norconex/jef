@@ -1,12 +1,8 @@
 package com.norconex.jef4.status;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import com.norconex.commons.lang.map.Properties;
-import com.norconex.jef.progress.JobElapsedTime;
 
 public class MutableJobStatus implements IJobStatus {
 

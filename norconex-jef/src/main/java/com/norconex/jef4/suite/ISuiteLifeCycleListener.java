@@ -41,7 +41,7 @@ public interface ISuiteLifeCycleListener {
     /**
      * Invoked when a job suite is aborted.  This method offers little in
      * terms of error handling.  Refer to
-     * {@link com.norconex.jef.error.IErrorHandler} to implement error handing.
+     * {@link com.norconex.jef4.job.IJobErrorListener} for more options.
      * @param suite job suite
      */
     void suiteAborted(JobSuite suite);

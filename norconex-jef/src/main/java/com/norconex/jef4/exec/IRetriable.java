@@ -15,19 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef.error;
+package com.norconex.jef4.exec;
+
+//TODO rename Retriable and move to Norconex Commons lang
 
 /**
- * Job Execution Framework error handler. Error handlers are typically added to
- * a <code>JobSuite</code>.
+ * Upon failure, code embedded in the <code>run</code> method will get
+ * executed over and over again, provided that the executing class
+ * supports <code>IRetriable</code>.
  * @author Pascal Essiembre
+ * @see RetriableExecutor
  */
-public interface IErrorHandler {
-
+public interface IRetriable {
     /**
-     * Handles an error.
-     * @param event error event
+     * Code to be executed until successful (no exception thrown).
+     * @throws RetriableException any exception
      */
-    void handleError(IErrorEvent event);
-
+    void run() throws RetriableException;
 }

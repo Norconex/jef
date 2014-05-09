@@ -74,7 +74,7 @@ public class SleepyJob implements IJob {
 //                LOG.info("[" + getId() + "] Slept for "
 //                      + (elapsedTime / 1000) + " seconds.");
 
-                System.out.println("[" + getId() + "] Slept for "
+                System.out.println("[" + getName() + "] Slept for "
                         + elapsedSeconds + " seconds.");
             }
             progress.setProgress(elapsedSeconds);
