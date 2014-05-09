@@ -15,13 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef;
+package com.norconex.jef4.job.group;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuiteOLD;
+import com.norconex.jef.JobException;
+import com.norconex.jef4.job.IJob;
+import com.norconex.jef4.suite.JobSuite;
 
 
 /**
@@ -43,44 +44,35 @@ public class SyncJobGroup extends AbstractJobGroup {
     private static final Logger LOG =
             LogManager.getLogger(SyncJobGroup.class);
 
-    public SyncJobGroup(final String id, final IJob... jobs) {
-        super(id, "Synchronous job group with " + jobs.length + " jobs.", jobs);
-    }
     public SyncJobGroup(
-            final String id, String description, final IJob... jobs) {
-        super(id, description, jobs);
+            final String name, final IJob... jobs) {
+        super(name, jobs);
     }
 
     @Override
-    public final void execute(
-            final JobProgress progress, final JobSuiteOLD suite) {
-
-        registerGroupProgressMonitoring(progress, suite);
+    public void executeGroup(JobSuite suite) {
 
         IJob[] jobs = getJobs();
         String failedJob = null;
         for (int i = 0; i < jobs.length; i++) {
-            JobRunner runner = new JobRunner();
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Synchronous group " + getId()
-                        + " about to run synchronous job: " + jobs[i].getId());
+                LOG.debug("Synchronous group \"" + getName() + "\" "
+                        + "about to run synchronous job \""
+                        + jobs[i].getName() + "\".");
             }
-            if (!runner.runJob(jobs[i], suite)) {
-                LOG.error(jobs[i].getId() + " failed.");
-                failedJob = jobs[i].getId();
+            if (!suite.runJob(jobs[i])) {
+                LOG.error("\"" + jobs[i].getName() + "\" failed.");
+                failedJob = jobs[i].getName();
                 break;
             }
             if (LOG.isDebugEnabled()) {
-                LOG.debug(jobs[i].getId() + " succeeded.");
+                LOG.debug("\"" + jobs[i].getName() + "\" succeeded.");
             }
-            JobRunner.setCurrentJobId(getId());
         }
-
-        unregisterGroupProgressMonitoring(suite);
-
         if (failedJob != null) {
             throw new JobException(
-                    failedJob + " failed in sync group " + getId());
+                    "\"" + failedJob + "\" failed in sync group " + getName());
         }
+        //JobSuite.setCurrentJobId(getName());
     }
 }

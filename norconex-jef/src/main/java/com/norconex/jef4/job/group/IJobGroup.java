@@ -18,6 +18,7 @@
 package com.norconex.jef4.job.group;
 
 import com.norconex.jef4.job.IJob;
+import com.norconex.jef4.status.IJobStatus;
 
 
 /**
@@ -33,4 +34,7 @@ public interface IJobGroup extends IJob {
      * @return jobs in the group
      */
     IJob[] getJobs();
+    
+    
+    void groupProgressed(IJobStatus childJobStatus);
 }

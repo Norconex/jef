@@ -69,6 +69,17 @@ public class JobStatuses implements Serializable {
         }
         return statuses;
     }
+
+    public IJobStatus getParent(IJobStatus jobStatus) {
+        return getParent(jobStatus.getJobName());
+    }
+    public IJobStatus getParent(String jobName) {
+        JobStatusTreeNode node = flattenNodes.get(jobName);
+        if (node == null) {
+            return null;
+        }
+        return node.parentStatus;
+    }
     
     public void accept(IJobStatusVisitor visitor) {
         accept(visitor, getRoot().getJobName());
@@ -94,21 +105,22 @@ public class JobStatuses implements Serializable {
         if (rootJob == null) {
             throw new IllegalArgumentException("Root job cannot be null.");
         }
-        return new JobStatuses(createTreeNode(rootJob));
+        return new JobStatuses(createTreeNode(null, rootJob));
     }
-    private static JobStatusTreeNode createTreeNode(IJob job) {
+    private static JobStatusTreeNode createTreeNode(
+            IJobStatus parentStatus, IJob job) {
         IJobStatus status = new MutableJobStatus(job.getName());
         List<JobStatusTreeNode> childNodes = new ArrayList<>();
         if (job instanceof IJobGroup) {
             IJob[] jobs = ((IJobGroup) job).getJobs();
             for (IJob childJob : jobs) {
-                JobStatusTreeNode childNode = createTreeNode(childJob);
+                JobStatusTreeNode childNode = createTreeNode(status, childJob);
                 if (childNode != null) {
                     childNodes.add(childNode);
                 }
             }
         }
-        return new JobStatusTreeNode(status, childNodes);
+        return new JobStatusTreeNode(parentStatus, status, childNodes);
     }
     
     
@@ -142,11 +154,12 @@ public class JobStatuses implements Serializable {
         //--- Load status tree ---
         IJobStatusStore serial = 
                 ConfigurationUtil.newInstance(xml, "jobStatusSerializer");
-        return new JobStatuses(
-                loadTreeNode(xml.configurationAt("job"), suiteName, serial));
+        return new JobStatuses(loadTreeNode(
+                null, xml.configurationAt("job"), suiteName, serial));
     }
     
     private static JobStatusTreeNode loadTreeNode(
+            IJobStatus parentStatus,
             HierarchicalConfiguration jobXML, String suiteName, 
             IJobStatusStore serial) throws IOException {
         if (jobXML == null) {
@@ -158,23 +171,26 @@ public class JobStatuses implements Serializable {
         List<JobStatusTreeNode> childNodes = new ArrayList<JobStatusTreeNode>();
         if (xmls != null) {
             for (HierarchicalConfiguration xml : xmls) {
-                JobStatusTreeNode child = loadTreeNode(xml, suiteName, serial);
+                JobStatusTreeNode child = loadTreeNode(
+                        jobStatus, xml, suiteName, serial);
                 if (child != null) {
                     childNodes.add(child);
                 }
             }
         }
-        return new JobStatusTreeNode(jobStatus, childNodes);
+        return new JobStatusTreeNode(parentStatus, jobStatus, childNodes);
     }
     
     //--- Class: JobStatusTreeNode ---------------------------------------------
     public static class JobStatusTreeNode implements Serializable {
         private static final long serialVersionUID = 5605697815222704629L;
+        private final IJobStatus parentStatus;
         private final IJobStatus jobStatus;
         private final List<JobStatusTreeNode> children;
-        public JobStatusTreeNode(
+        public JobStatusTreeNode(IJobStatus parentStatus,
                 IJobStatus jobStatus, List<JobStatusTreeNode> children) {
             super();
+            this.parentStatus = parentStatus;
             this.jobStatus = jobStatus;
             if (children == null) {
                 this.children = new ArrayList<>(0);

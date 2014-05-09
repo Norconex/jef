@@ -31,7 +31,7 @@ public class SleepyJob implements IJob {
 
     @Override
     public String getName() {
-        return "job.sleep." + sleepSeconds + "-" + reportSeconds;
+        return "Sleepy Job " + sleepSeconds + "-" + reportSeconds;
     }
 
     public String getDescription() {

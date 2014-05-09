@@ -20,7 +20,7 @@ package com.norconex.jef4.log;
 import org.apache.log4j.Layout;
 import org.apache.log4j.spi.LoggingEvent;
 
-import com.norconex.jef.JobRunner;
+import com.norconex.jef4.suite.JobSuite;
 
 /**
  * Log layout decorator, prefixing any existing layout with the job
@@ -56,7 +56,7 @@ public class ThreadSafeLayout extends Layout {
     @SuppressWarnings("nls")
     @Override
     public String format(LoggingEvent evt) {
-        String jobId = JobRunner.getCurrentJobId();
+        String jobId = JobSuite.getCurrentJobId();
         if (jobId == null) {
             return "[non-job]: " + layout.format(evt);
         }

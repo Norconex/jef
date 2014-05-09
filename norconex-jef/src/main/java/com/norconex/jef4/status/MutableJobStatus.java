@@ -18,10 +18,6 @@ public class MutableJobStatus implements IJobStatus {
     private JobDuration duration = new JobDuration();
     private Date lastActivity;
 
-//    private final List<IJobStatusChangeListener> listeners =
-//            Collections.synchronizedList(
-//                    new ArrayList<IJobStatusChangeListener>());
-    
     public MutableJobStatus(String jobName) {
         this.name = jobName;
     }
@@ -65,29 +61,7 @@ public class MutableJobStatus implements IJobStatus {
         this.note = note;
     }
     
-    
 
-    
-//    /**
-//     * Adds a job status change listener.
-//     * @param listener job status change listener to add
-//     */
-//    public void addJobProgressListener(
-//            final IJobStatusChangeListener listener) {
-//        synchronized (listeners) {
-//            listeners.add(0, listener);
-//        }
-//    }
-//    /**
-//     * Removes a job status change listener.
-//     * @param listener job status change listener to remove
-//     */
-//    public void removeJobProgressListener(
-//            final IJobStatusChangeListener listener) {
-//        synchronized (listeners) {
-//            listeners.remove(listener);
-//        }
-//    }
     
     public void setDuration(JobDuration duration) {
         this.duration = duration;
@@ -108,29 +82,6 @@ public class MutableJobStatus implements IJobStatus {
         this.lastActivity = lastActivity;
     }
     
-    /**
-     * Notifies all listeners of a change of status.
-     */
-    @SuppressWarnings("nls")
-    protected synchronized void fireProgressChanged() {
-//        if (progress > jobContext.getProgressMaximum()) {
-//            LOG.warn("Execution progress ("
-//                    + progress + ") exceeds allowed job "
-//                    + "maximum (" + jobContext.getProgressMaximum()
-//                    + ") for job: " + getJobId());
-//        }
-//        synchronized (listeners) {
-//            for (IJobLifeCycleListener listener : listeners) {
-//                listener.jobProgressed(this);
-//            }
-//        }
-//        if (LOG.isDebugEnabled()) {
-//            LOG.debug("Progress changed: job='" + getJobId()
-//                    + "'; progress=" + getProgress()
-//                    + "; note='" + getNote() + "'.");
-//        }
-    }
-
     @Override
     public int getResumeAttempts() {
         // TODO Auto-generated method stub

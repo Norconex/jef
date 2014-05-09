@@ -64,6 +64,11 @@ public abstract class AbstractJobStateChangeListener extends AbstractJobLifeCycl
         jobStateChanged(progress);
     }
     
+    @Override
+    public final void jobSkipped(IJobStatus progress) {
+        jobStateChanged(progress);
+    }
+    
     /**
      * Invoked when any of the following are invoked 
      * (unless they are overridden):

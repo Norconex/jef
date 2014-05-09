@@ -19,7 +19,7 @@ public class JobSuiteStatusIndexSerializerTest {
         JobSuiteConfig config = new JobSuiteConfig();
         config.setWorkdir("c:\\temp\\jef-tests");
         IJob job = new SleepyJob(5, 1);
-        JobSuite suite = new JobSuite(config, job);
+        JobSuite suite = new JobSuite(job, config);
         Assert.assertTrue("Execution returned false.", suite.execute());
 
         JobStatuses tree = 

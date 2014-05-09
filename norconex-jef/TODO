@@ -1,4 +1,6 @@
 
+- Use Apache Commons Exec wherever appropriate.
+
 - Add dynamic jobs
 - Add state jobs (e.g. OK, WARN, ERROR, CRITICAL)
 - Allow for jobs without expected end value?

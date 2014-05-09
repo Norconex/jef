@@ -25,9 +25,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.LogManager;
@@ -75,6 +78,9 @@ public final class JobSuite {
     private static final ThreadLocal<String> CURRENT_JOB_ID = 
             new ThreadLocal<String>();
     
+
+    
+    private final Map<String, IJob> jobs = new HashMap<>();
     private final IJob rootJob;
     private final JobSuiteConfig config;
     private final String workdir;
@@ -82,11 +88,16 @@ public final class JobSuite {
     private final IJobStatusStore jobStatusStore;
     private JobStatuses jobStatuses;
     private final List<IJobLifeCycleListener> jobLifeCycleListeners;
-    private final List<IJobErrorListener> errorListeners;
+    private final List<IJobErrorListener> jobErrorListeners;
     private final List<ISuiteLifeCycleListener> suiteLifeCycleListeners;
     private final JobHeartbeatGenerator heartbeatGenerator;
     
-    public JobSuite(JobSuiteConfig config, IJob rootJob) {
+
+    public JobSuite(final IJob rootJob) {
+        this(rootJob, new JobSuiteConfig());
+    }
+
+    public JobSuite(final IJob rootJob, JobSuiteConfig config) {
         super();
         this.rootJob = rootJob;
         this.config = config;
@@ -98,9 +109,16 @@ public final class JobSuite {
                 Collections.unmodifiableList(config.getJobLifeCycleListeners());
         this.suiteLifeCycleListeners = Collections.unmodifiableList(
                 config.getSuiteLifeCycleListeners());
-        this.errorListeners = 
+        this.jobErrorListeners = 
                 Collections.unmodifiableList(config.getJobErrorListeners());
         this.heartbeatGenerator = new JobHeartbeatGenerator(this);
+        
+        accept(new IJobVisitor() {
+            @Override
+            public void visitJob(IJob job, IJobStatus jobStatus) {
+                jobs.put(job.getName(), job);
+            }
+        });
     }
 
     public IJob getRootJob() {
@@ -110,6 +128,16 @@ public final class JobSuite {
         return config;
     }
 
+    public IJobStatus getJobStatus(IJob job) {
+        if (job == null) {
+            return null;
+        }
+        return getJobStatus(job.getName());
+    }
+    public IJobStatus getJobStatus(String jobName) {
+        return jobStatuses.getJobStatus(jobName);
+    }
+    
     public boolean execute() {
         return execute(false);
     }
@@ -151,7 +179,17 @@ public final class JobSuite {
     public void accept(IJobVisitor visitor, Class<IJob> jobClassFilter) {
         accept(visitor, getRootJob(), jobClassFilter);
     }    
+
     
+    /**
+     * Gets the job identifier representing the currently running job for the
+     * current thread.
+     * @return job identifier or <code>null</code> if no job is currently
+     *         associated with the current thread
+     */
+    public static String getCurrentJobId() {
+        return CURRENT_JOB_ID.get();
+    }
     /**
      * Sets a job identifier as the currently running job for the
      * the current thread.  This method is called by the framework.
@@ -196,8 +234,8 @@ public final class JobSuite {
     /*default*/ List<IJobLifeCycleListener> getJobLifeCycleListeners() {
         return jobLifeCycleListeners;
     }
-    /*default*/ List<IJobErrorListener> getErrorListeners() {
-        return errorListeners;
+    /*default*/ List<IJobErrorListener> getJobErrorListeners() {
+        return jobErrorListeners;
     }
     /*default*/ List<ISuiteLifeCycleListener> getSuiteLifeCycleListeners() {
         return suiteLifeCycleListeners;
@@ -242,7 +280,8 @@ public final class JobSuite {
     }
     
     //TODO make public, to allow to start a specific job??
-    /*default*/ boolean runJob(IJob job) {
+    //TODO document this is not a public method?
+    public boolean runJob(final IJob job) {
         boolean success = false;
         setCurrentJobId(job.getName());
         
@@ -270,13 +309,33 @@ public final class JobSuite {
             }
 
             heartbeatGenerator.register(status);
-            job.execute(new JobStatusUpdater(
-                    getName(), getJobStatusStore(), status), this);
+            //--- Execute ---
+            job.execute(new JobStatusUpdater(status) {
+                protected void statusUpdated(MutableJobStatus status) {
+                    try {
+                        getJobStatusStore().write(getName(), status);
+                    } catch (IOException e) {
+                        throw new JEFException(
+                                "Cannot persist status update for job: "
+                                        + status.getJobName(), e);
+                    }
+                    fire(jobLifeCycleListeners, "jobProgressed", status);
+                    IJobStatus parentStatus = jobStatuses.getParent(status);
+                    if (parentStatus != null) {
+                        IJobGroup jobGroup = 
+                                (IJobGroup) jobs.get(parentStatus.getJobName());
+                        if (jobGroup != null) {
+                            jobGroup.groupProgressed(status);
+                        }
+                    }
+                };
+
+            }, this);
             success = true;
         } catch (Exception e) {
             success = false;
             LOG.error("Execution failed for job: " + job.getName(), e);
-            fire(errorListeners, "jobError", 
+            fire(jobErrorListeners, "jobError", 
                     new JobErrorEvent(e, this, status));
             if (status != null) {
                 status.setNote("Error occured: " + e.getLocalizedMessage());
@@ -307,7 +366,11 @@ public final class JobSuite {
             return;
         }
         if (jobClassFilter == null || jobClassFilter.isInstance(job)) {
-            visitor.visitJob(job, jobStatuses.getJobStatus(job));
+            IJobStatus status = null;
+            if (jobStatuses != null) {
+                status = jobStatuses.getJobStatus(job);
+            }
+            visitor.visitJob(job, status);
         }
         if (job instanceof IJobGroup) {
             for (IJob childJob : ((IJobGroup) job).getJobs()) {
@@ -428,9 +491,14 @@ public final class JobSuite {
     }
     
     private String resolveWorkdir(String configWorkdir) {
-        File dir = new File(configWorkdir);
-        if (dir == null || (dir.exists() && !dir.isDirectory())) {
+        File dir = null;
+        if (StringUtils.isBlank(configWorkdir)) {
             dir = JEFUtil.FALLBACK_WORKDIR;
+        } else {
+            dir = new File(configWorkdir);
+            if (dir.exists() && !dir.isDirectory()) {
+                dir = JEFUtil.FALLBACK_WORKDIR;
+            }
         }
         if (!dir.exists()) {
             dir.mkdirs();
