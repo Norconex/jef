@@ -27,24 +27,10 @@ public class JobDuration {
 
     private Date resumedStartTime;
     private Date resumedLastActivity;
-    private long resumedDuration;
     
-    
-//    /** One second in milliseconds. */
-//    private static final int SECOND = 1000;
-//    /** One minute in milliseconds. */
-//    private static final int MINUTE = 60 * SECOND;
-//    /** One hour in milliseconds. */
-//    private static final int HOUR = 60 * MINUTE;
-//    /** One day in milliseconds. */
-//    private static final int DAY = 24 * HOUR;
-
     private Date startTime;
     private Date endTime;
     
-    //TODO move lastActivity to IJobStatus:
-
-
     /**
      * Creates a job elapsed time.
      */
@@ -91,7 +77,7 @@ public class JobDuration {
         if (startTime != null && endTime != null) {
             return endTime.getTime() - startTime.getTime();
         }
-        return -1;
+        return 0;
     }
     
     /**
@@ -101,11 +87,8 @@ public class JobDuration {
      * as calling {@link #getDuration()}.
      * @return the total elapsed time
      */
-    public final long getFullDuration() {
-        if (startTime != null && endTime != null) {
-            return endTime.getTime() - startTime.getTime();
-        }
-        return -1;
+    public final long getTotalDuration() {
+        return getDuration() + getResumedDuration();
     }
 
     public Date getResumedStartTime() {
@@ -125,13 +108,12 @@ public class JobDuration {
     }
 
     public long getResumedDuration() {
-        return resumedDuration;
+        if (resumedStartTime != null && resumedLastActivity != null) {
+            return resumedLastActivity.getTime() - resumedStartTime.getTime();
+        }
+        return 0;
     }
 
-    public void setResumedDuration(long resumedDuration) {
-        this.resumedDuration = resumedDuration;
-    }
-    
     
     
 //    public class TimeRange implements Serializable {

@@ -17,13 +17,15 @@
  */
 package com.norconex.jef4.job;
 
+import com.norconex.jef4.JEFException;
+
 /**
  * Represents a job-related exception.  Implementors are invited to
  * wrap exceptions they want explicitly handled by the framework in instances
  * of <code>JobException</code>.
  * @author Pascal Essiembre
  */
-public class JobException extends RuntimeException {
+public class JobException extends JEFException {
 
     /** For serialisation. */
     private static final long serialVersionUID = 5236102272021889018L;

@@ -15,32 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef.suite;
+package com.norconex.jef4.suite;
 
-import com.norconex.jef.IJob;
-import com.norconex.jef.progress.IJobStatus;
 
 /**
- * Convenience base implementation of {@link IJobVisitor}.
- * All methods are empty (do nothing) and are meant for developers to pick
- * and chose the method to overwrite.
+ * Job suites are an optional concept allowing to further abstract the
+ * job creation process.  This class is responsible for creating
+ * the job suite used to execute an assembly of jobs.
+ * Even though factories are not necessary to create job suites, they may 
+ * facilitate integration with other applications or frameworks
+ * and their use is recommended.
+ * To further ensure potential integration, implementors should make sure
+ * they provide an empty constructor and setting attributes on factories
+ * shall be done using accessor methods (JavaBean style).
  * @author Pascal Essiembre
- * @since 1.1
  */
-public abstract class AbstractJobSuiteVisitor implements IJobSuiteVisitor {
+public interface IJobSuiteFactory {
 
-    @Override
-    public void visitJob(IJob job) {
-        // do nothing
-    }
+    /**
+     * Creates a job suite.
+     * @return job suite
+     */
+    JobSuite createJobSuite();
 
-    @Override
-    public void visitJobProgress(IJobStatus jobProgress) {
-        // do nothing
-    }
-
-    @Override
-    public void visitJobSuite(JobSuiteOLD jobSuiteOLD) {
-        // do nothing
-    }
 }

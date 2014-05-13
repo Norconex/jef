@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef.mail;
+package com.norconex.jef4.mail;
 
 import java.util.Properties;
 

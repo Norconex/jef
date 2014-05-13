@@ -212,7 +212,7 @@ public final class JobSuite {
     public String getWorkdir() {
         return workdir;
     }
-    /*default*/ ILogManager getLogManager() {
+    public ILogManager getLogManager() {
         return logManager;
     }
     /*default*/ IJobStatusStore getJobStatusSerializer() {
@@ -358,6 +358,20 @@ public final class JobSuite {
             }
         }
         return success;
+    }
+    
+    public void stop() throws IOException {
+        getSuiteStopFile().createNewFile();
+    }
+    
+    public static void stop(File indexFile) throws IOException {
+        if (indexFile == null || !indexFile.exists() || !indexFile.isFile()) {
+            throw new JEFException("Invalid index file: " + indexFile);
+        }
+        String stopPath = 
+                StringUtils.removeEnd(indexFile.getAbsolutePath(), "index");
+        stopPath += ".stop";
+        new File(stopPath).createNewFile();
     }
     
     private void accept(

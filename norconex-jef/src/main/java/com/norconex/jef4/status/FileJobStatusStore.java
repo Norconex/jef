@@ -112,36 +112,37 @@ public class FileJobStatusStore implements IJobStatusStore {
             file.createNewFile();
         }
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Serializing file: " + file);
+            LOG.debug("Writing status file: " + file);
         }
         Properties config = new Properties();
         config.setString("jobName", jobStatus.getJobName());
-//        config.setLong("minimum", jobContext.getProgressMinimum());
-//        config.setLong("maximum", jobContext.getProgressMaximum());
         config.setDouble("progress", jobStatus.getProgress());
-
-//        if (jobStatus.isStopRequested()) {
-//            config.setBoolean("stop", true);
-//        }
         if (jobStatus.getNote() != null) {
             config.setString("note", jobStatus.getNote());
         }
-//        if (jobStatus.getMetadata() != null) {
-//            config.setString("metadata", jobStatus.getMetadata());
-//        }
-//        if (jobStatus.getStartTime() != null) {
-//            config.setDate("startTime", jobStatus.getStartTime());
-//        }
-//        if (jobStatus.getEndTime() != null) {
-//            config.setDate("endTime", jobStatus.getEndTime());
-//        }
+        JobDuration duration = jobStatus.getDuration();
+        if (jobStatus.getResumeAttempts() > 0) {
+            config.setInt("resumeAttempts", jobStatus.getResumeAttempts());
+            config.setDate("resumedStartTime", duration.getResumedStartTime());
+            config.setDate("resumedLastActivity", 
+                    duration.getResumedLastActivity());
+        }
+        if (duration.getStartTime() != null) {
+            config.setDate("startTime", duration.getStartTime());
+        }
+        if (duration.getEndTime() != null) {
+            config.setDate("endTime", duration.getEndTime());
+        }
+        if (jobStatus.isStopping() || jobStatus.isStopped()) {
+            config.setBoolean("stopped", true);
+        }
         Properties props = jobStatus.getProperties();
         for (String key : props.keySet()) {
             config.put("prop." + key, props.get(key));
         }
         
         OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
-        config.store(os, "Progress for job: " + jobStatus.getJobName());
+        config.store(os, "Status for job: " + jobStatus.getJobName());
         os.close();
     }
 
@@ -149,45 +150,47 @@ public class FileJobStatusStore implements IJobStatusStore {
     public final IJobStatus read(
             String suiteName, final String jobName)
             throws IOException {
+        MutableJobStatus jobStatus = new MutableJobStatus(jobName);
         File file = getStatusFile(suiteName, jobName);
         
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Deserializing file: " + file);
+            LOG.debug("Reading status file: " + file);
         }
-        if (file.exists()) {
-            MutableJobStatus jobStatus = new MutableJobStatus(jobName);
-            
-            
-//            JobDuration elapsedTime = new JobDuration();
-//            progress = new JobProgress(jobId, jobContext, elapsedTime);
-            Properties config = new Properties();
-            InputStream is = new FileInputStream(file);
-            config.load(is);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(jobName + " last active time: "
-                        + new Date(file.lastModified()));
-            }
-//            elapsedTime.setLastActivity(new Date(file.lastModified()));
-//            elapsedTime.setStartTime(config.getDate("startTime"));
-//            elapsedTime.setEndTime(config.getDate("endTime"));
-//            progress.setMetadata(config.getString("metadata"));
-            jobStatus.setNote(config.getString("note"));
-//            if (config.getBoolean("stop", false)) {
-//                progress.stopRequestReceived();
-//            }
-            jobStatus.setProgress(config.getDouble("progress", 0d));
-            
-            Properties props = jobStatus.getProperties();
-            for (String key : config.keySet()) {
-                if (key.startsWith("prop.")) {
-                    props.put(StringUtils.removeStart(
-                            "prop.", key), props.get(key));
-                }
-            }
-            is.close();
+        if (!file.exists()) {
             return jobStatus;
         }
-        return new MutableJobStatus(jobName);
+        
+
+        Properties config = new Properties();
+        InputStream is = new FileInputStream(file);
+        config.load(is);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(jobName + " last active time: "
+                    + new Date(file.lastModified()));
+        }
+        jobStatus.setProgress(config.getDouble("progress", 0d));
+        jobStatus.setNote(config.getString("note", null));
+        jobStatus.setResumeAttempts(config.getInt("resumeAttempts", 0));
+        
+        JobDuration duration = new JobDuration();
+        duration.setResumedStartTime(config.getDate("resumedStartTime", null));
+        duration.setResumedLastActivity(
+                config.getDate("resumedLastActivity", null));
+        duration.setStartTime(config.getDate("startTime", null));
+        duration.setEndTime(config.getDate("endTime", null));
+        jobStatus.setDuration(duration);
+
+        jobStatus.setStopRequested(config.getBoolean("stopped", false));
+        
+        Properties props = jobStatus.getProperties();
+        for (String key : config.keySet()) {
+            if (key.startsWith("prop.")) {
+                props.put(StringUtils.removeStart(
+                        "prop.", key), props.get(key));
+            }
+        }
+        is.close();
+        return jobStatus;
     }
 
     @Override

@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef.mail;
+package com.norconex.jef4.mail;
 
 import java.io.IOException;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.norconex.commons.lang.io.IOUtil;
-import com.norconex.jef.suite.JobSuiteOLD;
+import com.norconex.jef4.suite.JobSuite;
 
 /**
  * Convenience base class for sending email notifications.
@@ -84,11 +84,11 @@ public abstract class AbstractMailNotifier {
      * @throws IOException problem getting lines
      */
     @SuppressWarnings("nls")
-    protected final String getLogTail(final JobSuiteOLD suite, final int lineQty)
+    protected final String getLogTail(final JobSuite suite, final int lineQty)
             throws IOException {
         StringBuffer logTail = new StringBuffer();
         String[] lines = IOUtil.tail(
-                suite.getLogManager().getLog(suite.getNamespace()), lineQty);
+                suite.getLogManager().getLog(suite.getName()), lineQty);
         if (lines.length == 0) {
             logTail.append("*** No log found. ***\n");
         } else {

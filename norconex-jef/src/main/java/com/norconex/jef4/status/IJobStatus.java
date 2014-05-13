@@ -7,6 +7,7 @@ import com.norconex.commons.lang.map.Properties;
 
 public interface IJobStatus extends Serializable {
 
+
     String getJobName();
     JobState getState();
     double getProgress();
@@ -15,4 +16,15 @@ public interface IJobStatus extends Serializable {
     JobDuration getDuration();
     Date getLastActivity();
     Properties getProperties();
+    
+    //--- State-related methods ---
+    boolean isStarted();
+    boolean isResumed();
+    boolean isAborted();
+    boolean isStopped();
+    boolean isStopping();
+    boolean isCompleted();
+    boolean isPrematurlyEnded();
+    boolean isRunning();
+    boolean isState(JobState... states);
 }

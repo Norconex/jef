@@ -28,6 +28,7 @@ import com.norconex.jef4.job.IJobLifeCycleListener;
 import com.norconex.jef4.job.IJobVisitor;
 import com.norconex.jef4.status.IJobStatus;
 import com.norconex.jef4.status.JobState;
+import com.norconex.jef4.status.MutableJobStatus;
 
 /**
  * Listens for STOP requests using a stop file.  The stop file
@@ -103,6 +104,7 @@ public class StopRequestMonitor extends Thread {
         });
     }
     private void stopJob(final IJob job, final IJobStatus status) {
+        ((MutableJobStatus) status).setStopRequested(true);
         job.stop(status, suite);
         while (status.getState() == JobState.RUNNING) {
             Sleeper.sleepSeconds(STOP_WAIT_DELAY);
@@ -121,21 +123,4 @@ public class StopRequestMonitor extends Thread {
         }
     }
 
-//    @Override
-//    public void stopListening() {
-//        monitoring = false;
-//    }
-//    
-//    /**
-//     * Fires a stop request.  It will write a stop file where it normally
-//     * expects it.  This method conveniently create a stop file for a running
-//     * instance of a suite to pick it up.
-//     */
-//    public void fireStopRequest() {
-//        try {
-//            stopFile.createNewFile();
-//        } catch (IOException e) {
-//            throw new JobException("Cannot fire stop request." , e);
-//        }
-//    }
 }

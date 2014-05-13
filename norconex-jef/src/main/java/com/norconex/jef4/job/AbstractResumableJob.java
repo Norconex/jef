@@ -15,11 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef;
+package com.norconex.jef4.job;
 
-import com.norconex.jef.progress.IJobStatus;
-import com.norconex.jef.progress.JobProgress;
-import com.norconex.jef.suite.JobSuiteOLD;
+import com.norconex.jef4.status.IJobStatus;
+import com.norconex.jef4.status.JobStatusUpdater;
+import com.norconex.jef4.suite.JobSuite;
+
 
 /**
  * <p>Convenience class separating normal execution from recovery.  If the job
@@ -45,28 +46,27 @@ public abstract class AbstractResumableJob implements IJob {
     }
 
     @Override
-    public final void execute(
-            final JobProgress progress, final JobSuiteOLD suite) {
-        
-        if (!progress.isRecovery()) {
-            startExecution(progress, suite);
-        } else if (progress.getStatus() != IJobStatus.Status.COMPLETED) {
-            resumeExecution(progress, suite);
+    public void execute(JobStatusUpdater statusUpdater, JobSuite suite) {
+        IJobStatus status = suite.getJobStatus(statusUpdater.getJobName());
+        if (!status.isResumed()) {
+            startExecution(statusUpdater, suite);
+        } else if (!status.isCompleted()) {
+            resumeExecution(statusUpdater, suite);
         }
     }
 
     /**
      * Starts the execution of a job.
-     * @param progress job progress
+     * @param statusUpdater job progress
      * @param suite job suite
      */
     protected abstract void startExecution(
-            JobProgress progress, JobSuiteOLD suite);
+            JobStatusUpdater statusUpdater, JobSuite suite);
     /**
      * Resumes the execution of a job.
-     * @param progress job progress
+     * @param statusUpdater job progress
      * @param suite job suite
      */
     protected abstract void resumeExecution(
-            JobProgress progress, JobSuiteOLD suite);
+            JobStatusUpdater statusUpdater, JobSuite suite);
 }

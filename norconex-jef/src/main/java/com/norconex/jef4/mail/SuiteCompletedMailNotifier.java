@@ -15,75 +15,67 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef.mail;
+package com.norconex.jef4.mail;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
-import com.norconex.jef.JobException;
-import com.norconex.jef.error.IErrorEvent;
-import com.norconex.jef.error.IErrorHandler;
-import com.norconex.jef.suite.JobSuiteOLD;
+import com.norconex.jef4.job.JobException;
+import com.norconex.jef4.suite.ISuiteLifeCycleListener;
+import com.norconex.jef4.suite.JobSuite;
+
 
 /**
- * Simple error handler notifying email recipients when exceptions occur.
+ * Simple suite life-cycle listener notifying email recipients when a job suite
+ * completes.
  * @author Pascal Essiembre
  */
-public class ErrorMailNotifier
-        extends AbstractMailNotifier implements IErrorHandler {
+public class SuiteCompletedMailNotifier
+        extends AbstractMailNotifier implements ISuiteLifeCycleListener {
 
     /** Number of log lines to return. */
-    private static final int LOG_LINE_QTY = 50;
-    /** Progress ratio. */
-    private static final int PROGRESS_RATIO = 100;
+    private static final int LOG_LINE_QTY = 20;
 
     /**
      * @see AbstractMailNotifier#AbstractMailNotifier(String, String, String)
      */
-    public ErrorMailNotifier(
+    public SuiteCompletedMailNotifier(
             final String host, final String sender, final String recipient) {
         super(host, sender, recipient);
     }
     /**
      * @see AbstractMailNotifier#AbstractMailNotifier(String, String, String[])
      */
-    public ErrorMailNotifier(
+    public SuiteCompletedMailNotifier(
             final String host, final String sender, final String[] recipients) {
         super(host, sender, recipients);
     }
 
-    @SuppressWarnings("nls")
     @Override
-    public final void handleError(final IErrorEvent event) {
-        JobSuiteOLD suite = event.getJobSuite();
+    public void suiteAborted(final JobSuite suite) {
+        //do nothing
+    }
+    @Override
+    public void suiteStarted(final JobSuite suite) {
+        //do nothing
+    }
+    @Override
+    @SuppressWarnings("nls")
+    public final void suiteCompleted(final JobSuite suite) {
         ResourceBundle bundle =
-                ResourceBundle.getBundle(this.getClass().getName());
+            ResourceBundle.getBundle(this.getClass().getName());
         String subject = MessageFormat.format(
                 bundle.getString("subject"),
-                new Object[]{suite.getNamespace()});
-        String jobId = "N/A";
-        String percent = "N/A";
-
-        if (event.getProgress() != null) {
-            jobId = event.getProgress().getJobId();
-            percent = Double.toString(
-                    event.getProgress().getCompletionRatio() * PROGRESS_RATIO);
-        }
-
+                new Object[]{suite.getName()});
         try {
             String body = MessageFormat.format(
                     bundle.getString("body"),
                     new Object[] {
-                        jobId,
-                        suite.getNamespace(),
-                        percent,
-                        getStackTrace(event.getException()),
+                        suite.getName(),
                         Integer.toString(LOG_LINE_QTY),
                         getLogTail(suite, LOG_LINE_QTY)
                     });
@@ -96,10 +88,16 @@ public class ErrorMailNotifier
             throw new JobException("Cannot send email.", e);
         }
     }
-
-    protected final String getStackTrace(final Throwable t) {
-        StringWriter sw = new StringWriter();
-        t.printStackTrace(new PrintWriter(sw));
-        return sw.toString();
+    @Override
+    public void suiteTerminatedPrematuraly(final JobSuite suite) {
+        // do nothing
+    }
+    @Override
+    public void suiteStopped(JobSuite suite) {
+        // do nothing
+    }
+    @Override
+    public void suiteStopping(JobSuite suite) {
+        // do nothing
     }
 }

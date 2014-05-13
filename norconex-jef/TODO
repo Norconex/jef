@@ -1,11 +1,7 @@
 
-- Use Apache Commons Exec wherever appropriate.
-
-- Add dynamic jobs
-- Add state jobs (e.g. OK, WARN, ERROR, CRITICAL)
-- Allow for jobs without expected end value?
 
 To consider maybe one day:
+- Have dynamic jobs
 - Have a thread utility method that split a job array in X number of threads
 - Support for I18N in descriptions and else.
 - In the backing up of Log + Progress, consider optional argument to delete

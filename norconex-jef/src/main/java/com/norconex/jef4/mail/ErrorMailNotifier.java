@@ -15,66 +15,74 @@
  * You should have received a copy of the GNU General Public License
  * along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.norconex.jef.mail;
+package com.norconex.jef4.mail;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
-import com.norconex.jef.JobException;
-import com.norconex.jef.suite.ISuiteLifeCycleListener;
-import com.norconex.jef.suite.JobSuiteOLD;
+import com.norconex.jef4.job.IJobErrorListener;
+import com.norconex.jef4.job.JobErrorEvent;
+import com.norconex.jef4.job.JobException;
+import com.norconex.jef4.suite.JobSuite;
 
 /**
- * Simple suite life-cycle listener notifying email recipients when a job suite
- * completes.
+ * Simple error handler notifying email recipients when exceptions occur.
  * @author Pascal Essiembre
  */
-public class SuiteCompletedMailNotifier
-        extends AbstractMailNotifier implements ISuiteLifeCycleListener {
+public class ErrorMailNotifier
+        extends AbstractMailNotifier implements IJobErrorListener {
 
     /** Number of log lines to return. */
-    private static final int LOG_LINE_QTY = 20;
+    private static final int LOG_LINE_QTY = 50;
+    /** Progress ratio. */
+    private static final int PROGRESS_RATIO = 100;
 
     /**
      * @see AbstractMailNotifier#AbstractMailNotifier(String, String, String)
      */
-    public SuiteCompletedMailNotifier(
+    public ErrorMailNotifier(
             final String host, final String sender, final String recipient) {
         super(host, sender, recipient);
     }
     /**
      * @see AbstractMailNotifier#AbstractMailNotifier(String, String, String[])
      */
-    public SuiteCompletedMailNotifier(
+    public ErrorMailNotifier(
             final String host, final String sender, final String[] recipients) {
         super(host, sender, recipients);
     }
 
     @Override
-    public void suiteAborted(final JobSuiteOLD suite) {
-        //do nothing
-    }
-    @Override
-    public void suiteStarted(final JobSuiteOLD suite) {
-        //do nothing
-    }
-    @Override
-    @SuppressWarnings("nls")
-    public final void suiteCompleted(final JobSuiteOLD suite) {
+    public void jobError(JobErrorEvent event) {
+        JobSuite suite = event.getSuite();
         ResourceBundle bundle =
-            ResourceBundle.getBundle(this.getClass().getName());
+                ResourceBundle.getBundle(this.getClass().getName());
         String subject = MessageFormat.format(
                 bundle.getString("subject"),
-                new Object[]{suite.getNamespace()});
+                new Object[]{suite.getName()});
+        String jobId = "N/A";
+        String percent = "N/A";
+
+        if (event.getStatus() != null) {
+            jobId = event.getStatus().getJobName();
+            percent = Double.toString(
+                    event.getStatus().getProgress() * PROGRESS_RATIO);
+        }
+
         try {
             String body = MessageFormat.format(
                     bundle.getString("body"),
                     new Object[] {
-                        suite.getNamespace(),
+                        jobId,
+                        suite.getName(),
+                        percent,
+                        getStackTrace(event.getException()),
                         Integer.toString(LOG_LINE_QTY),
                         getLogTail(suite, LOG_LINE_QTY)
                     });
@@ -87,16 +95,10 @@ public class SuiteCompletedMailNotifier
             throw new JobException("Cannot send email.", e);
         }
     }
-    @Override
-    public void suiteTerminatedPrematuraly(final JobSuiteOLD suite) {
-        // do nothing
-    }
-    @Override
-    public void suiteStopped(JobSuiteOLD suite) {
-        // do nothing
-    }
-    @Override
-    public void suiteStopping(JobSuiteOLD suite) {
-        // do nothing
+
+    protected final String getStackTrace(final Throwable t) {
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
     }
 }
