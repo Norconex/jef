@@ -20,14 +20,14 @@ import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.job.group.IJobGroup;
 
-public class JobStatuses implements Serializable {
+public class JobSuiteStatuses implements Serializable {
     private static final long serialVersionUID = 74258557029725685L;
 
     private final JobStatusTreeNode rootNode;
     private Map<String, JobStatusTreeNode> flattenNodes = 
             new ListOrderedMap<>();
     
-    public JobStatuses(JobStatusTreeNode rootNode) {
+    public JobSuiteStatuses(JobStatusTreeNode rootNode) {
         this.rootNode = rootNode;
         flattenNode(rootNode);
     }
@@ -101,11 +101,11 @@ public class JobStatuses implements Serializable {
         }
     }
     
-    public static JobStatuses create(IJob rootJob) {
+    public static JobSuiteStatuses create(IJob rootJob) {
         if (rootJob == null) {
             throw new IllegalArgumentException("Root job cannot be null.");
         }
-        return new JobStatuses(createTreeNode(null, rootJob));
+        return new JobSuiteStatuses(createTreeNode(null, rootJob));
     }
     private static JobStatusTreeNode createTreeNode(
             IJobStatus parentStatus, IJob job) {
@@ -124,7 +124,7 @@ public class JobStatuses implements Serializable {
     }
     
     
-    public static JobStatuses snapshot(File suiteIndex)
+    public static JobSuiteStatuses snapshot(File suiteIndex)
             throws IOException {
         //--- Ensure file looks good ---
         if (suiteIndex == null) {
@@ -154,7 +154,7 @@ public class JobStatuses implements Serializable {
         //--- Load status tree ---
         IJobStatusStore serial = 
                 ConfigurationUtil.newInstance(xml, "jobStatusSerializer");
-        return new JobStatuses(loadTreeNode(
+        return new JobSuiteStatuses(loadTreeNode(
                 null, xml.configurationAt("job"), suiteName, serial));
     }
     
@@ -222,7 +222,7 @@ public class JobStatuses implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        JobStatuses other = (JobStatuses) obj;
+        JobSuiteStatuses other = (JobSuiteStatuses) obj;
         if (flattenNodes == null) {
             if (other.flattenNodes != null) {
                 return false;

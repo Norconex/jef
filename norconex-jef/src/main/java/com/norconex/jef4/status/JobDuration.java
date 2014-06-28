@@ -17,14 +17,17 @@
  */
 package com.norconex.jef4.status;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Holds time-related information about a job execution.
  * @author Pascal Essiembre
  */
-public class JobDuration {
+public class JobDuration implements Serializable {
 
+    private static final long serialVersionUID = -4511429912030790897L;
+    
     private Date resumedStartTime;
     private Date resumedLastActivity;
     

@@ -54,7 +54,7 @@ import com.norconex.jef4.status.IJobStatusStore;
 import com.norconex.jef4.status.IJobStatusVisitor;
 import com.norconex.jef4.status.JobState;
 import com.norconex.jef4.status.JobStatusUpdater;
-import com.norconex.jef4.status.JobStatuses;
+import com.norconex.jef4.status.JobSuiteStatuses;
 import com.norconex.jef4.status.MutableJobStatus;
 
 
@@ -86,7 +86,7 @@ public final class JobSuite {
     private final String workdir;
     private final ILogManager logManager;
     private final IJobStatusStore jobStatusStore;
-    private JobStatuses jobStatuses;
+    private JobSuiteStatuses jobSuiteStatuses;
     private final List<IJobLifeCycleListener> jobLifeCycleListeners;
     private final List<IJobErrorListener> jobErrorListeners;
     private final List<ISuiteLifeCycleListener> suiteLifeCycleListeners;
@@ -135,7 +135,7 @@ public final class JobSuite {
         return getJobStatus(job.getName());
     }
     public IJobStatus getJobStatus(String jobName) {
-        return jobStatuses.getJobStatus(jobName);
+        return jobSuiteStatuses.getJobStatus(jobName);
     }
     
     public boolean execute() {
@@ -158,7 +158,7 @@ public final class JobSuite {
     
     
     public void accept(IJobStatusVisitor visitor) {
-        jobStatuses.accept(visitor);
+        jobSuiteStatuses.accept(visitor);
     }
     
     /**
@@ -268,7 +268,7 @@ public final class JobSuite {
         } finally {
             stopMonitor.stopMonitoring();
             if (success 
-                    && jobStatuses.getRoot().getState() == JobState.COMPLETED) {
+                    && jobSuiteStatuses.getRoot().getState() == JobState.COMPLETED) {
                 fire(suiteLifeCycleListeners, "suiteCompleted", this);
             }
             // Remove appender
@@ -286,7 +286,7 @@ public final class JobSuite {
         setCurrentJobId(job.getName());
         
         MutableJobStatus status = 
-                (MutableJobStatus) jobStatuses.getJobStatus(job);
+                (MutableJobStatus) jobSuiteStatuses.getJobStatus(job);
         if (status.getState() == JobState.COMPLETED) {
             LOG.info("Job skipped: " + job.getName() + " (already completed)");
             fire(jobLifeCycleListeners, "jobSkipped", status);
@@ -320,7 +320,7 @@ public final class JobSuite {
                                         + status.getJobName(), e);
                     }
                     fire(jobLifeCycleListeners, "jobProgressed", status);
-                    IJobStatus parentStatus = jobStatuses.getParent(status);
+                    IJobStatus parentStatus = jobSuiteStatuses.getParent(status);
                     if (parentStatus != null) {
                         IJobGroup jobGroup = 
                                 (IJobGroup) jobs.get(parentStatus.getJobName());
@@ -381,8 +381,8 @@ public final class JobSuite {
         }
         if (jobClassFilter == null || jobClassFilter.isInstance(job)) {
             IJobStatus status = null;
-            if (jobStatuses != null) {
-                status = jobStatuses.getJobStatus(job);
+            if (jobSuiteStatuses != null) {
+                status = jobSuiteStatuses.getJobStatus(job);
             }
             visitor.visitJob(job, status);
         }
@@ -395,7 +395,7 @@ public final class JobSuite {
     
     private void initialize(boolean resumeIfIncomplete)
             throws IOException {
-        JobStatuses statusTree = JobStatuses.snapshot(getSuiteIndexFile());
+        JobSuiteStatuses statusTree = JobSuiteStatuses.snapshot(getSuiteIndexFile());
         
         if (statusTree != null) {
             LOG.info("Previous execution detected.");
@@ -416,10 +416,10 @@ public final class JobSuite {
             LOG.info("No previous execution detected.");
         }
         if (statusTree == null) {
-            statusTree = JobStatuses.create(getRootJob());
+            statusTree = JobSuiteStatuses.create(getRootJob());
             writeJobSuiteIndex(statusTree);
         }
-        this.jobStatuses = statusTree;
+        this.jobSuiteStatuses = statusTree;
     }
     
     
@@ -437,7 +437,7 @@ public final class JobSuite {
         }
     }
     
-    private void backupSuite(JobStatuses statusTree) throws IOException {
+    private void backupSuite(JobSuiteStatuses statusTree) throws IOException {
         IJobStatus suiteStatus = statusTree.getRoot();
         Date backupDate = suiteStatus.getDuration().getEndTime();
         if (backupDate == null) {
@@ -471,7 +471,7 @@ public final class JobSuite {
         indexFile.renameTo(backupFile);
     }
     
-    private void writeJobSuiteIndex(JobStatuses statusTree) 
+    private void writeJobSuiteIndex(JobSuiteStatuses statusTree) 
             throws IOException {
         Writer out = new FileWriter(getSuiteIndexFile());
         out.write("<?xml version=\"1.0\" ?><suite-index>");
@@ -494,7 +494,7 @@ public final class JobSuite {
     }
     
     private void writeJobId(Writer out, 
-            JobStatuses statusTree, IJobStatus status) throws IOException {
+            JobSuiteStatuses statusTree, IJobStatus status) throws IOException {
         out.write("<job name=\"");
         out.write(StringEscapeUtils.escapeXml(status.getJobName()));
         out.write("\">");

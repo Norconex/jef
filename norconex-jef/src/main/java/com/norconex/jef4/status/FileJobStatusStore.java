@@ -92,7 +92,7 @@ public class FileJobStatusStore implements IJobStatusStore {
             LOG.info("No status directory specified.");
             path = JEFUtil.FALLBACK_WORKDIR.getAbsolutePath();
         }
-        LOG.info("Status serialization directory: " + path); 
+        LOG.debug("Status serialization directory: " + path); 
         jobdirLatest = path + File.separatorChar 
                 + "latest" + File.separatorChar + "status";
         jobdirBackupBase = path + "/backup";

@@ -9,7 +9,7 @@ import org.junit.Test;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.jobs.SleepyJob;
-import com.norconex.jef4.status.JobStatuses;
+import com.norconex.jef4.status.JobSuiteStatuses;
 
 public class JobSuiteStatusIndexSerializerTest {
 
@@ -22,8 +22,8 @@ public class JobSuiteStatusIndexSerializerTest {
         JobSuite suite = new JobSuite(job, config);
         Assert.assertTrue("Execution returned false.", suite.execute());
 
-        JobStatuses tree = 
-                JobStatuses.snapshot(
+        JobSuiteStatuses tree = 
+                JobSuiteStatuses.snapshot(
                         new File("c:\\temp\\jef-tests\\latest\\"
                         + FileUtil.toSafeFileName(job.getName()) + ".index"));
         System.out.println("TREE: " + tree);
