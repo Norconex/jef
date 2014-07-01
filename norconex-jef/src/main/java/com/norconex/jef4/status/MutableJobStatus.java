@@ -86,13 +86,13 @@ public class MutableJobStatus implements IJobStatus {
         return duration.getStartTime() != null;
     }
     /**
-     * Checks whether the job has finished.  This is not an indication
+     * Checks whether the job has before its time.  This is not an indication
      * that a job was completed or that there were no errors.
      * @return <code>true</code> if job finished
      */
     @Override
     public boolean isPrematurlyEnded() {
-        return duration.getEndTime() != null;
+        return duration.getEndTime() != null && !isCompleted();
     }
     /**
      * Checks whether the job execution has completed.
@@ -104,7 +104,7 @@ public class MutableJobStatus implements IJobStatus {
     }
     /**
      * Checks whether the job was aborted or not (i.e. killed).  That is, if
-     * the job started and is no longer running, while it never never
+     * the job started and is no longer running, while it never
      * marked as finished.  Remember that under normal conditions, a job
      * should always finish, whether it failed or not.  An aborted progress
      * is usually the results of a job suite which got "killed" in the middle
@@ -114,7 +114,9 @@ public class MutableJobStatus implements IJobStatus {
      */
     @Override
     public boolean isAborted() {
-        return isStarted() && !isRunning() && !isPrematurlyEnded();
+        return isStarted() && !isRunning() 
+                && duration.getEndTime() == null 
+                && !isCompleted();
     }
     
     /**
@@ -128,9 +130,9 @@ public class MutableJobStatus implements IJobStatus {
         if (date == null) {
             return false;
         }
-        if (isPrematurlyEnded()) {
-                return false;
-        }
+//        if (isPrematurlyEnded()) {
+//                return false;
+//        }
         return (System.currentTimeMillis() - date.getTime())
                 < ACTIVITY_TIMEOUT;
     }

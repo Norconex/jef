@@ -345,6 +345,11 @@ public final class JobSuite {
         } finally {
             heartbeatGenerator.unregister(status);
             status.getDuration().setEndTime(new Date());
+            try {
+                getJobStatusStore().write(getName(), status);
+            } catch (IOException e) {
+                LOG.error("Cannot save final status.", e);
+            }
             if (!success && !errorHandled) {
                 LOG.fatal("Fatal error occured in job: " + job.getName());
             }

@@ -168,6 +168,8 @@ public class FileJobStatusStore implements IJobStatusStore {
             LOG.debug(jobName + " last active time: "
                     + new Date(file.lastModified()));
         }
+        jobStatus.setLastActivity(new Date(file.lastModified()));
+        
         jobStatus.setProgress(config.getDouble("progress", 0d));
         jobStatus.setNote(config.getString("note", null));
         jobStatus.setResumeAttempts(config.getInt("resumeAttempts", 0));
