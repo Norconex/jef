@@ -19,6 +19,7 @@ package com.norconex.jef4.log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.log4j.Appender;
@@ -32,7 +33,7 @@ import com.norconex.commons.lang.config.IXMLConfigurable;
  * When saving as XML, the tag name must be called "logManager".
  * @author Pascal Essiembre
  */
-public interface ILogManager extends IXMLConfigurable {
+public interface ILogManager extends IXMLConfigurable, Serializable {
 
     /**
      * Creates a Log4J appender for the given name space.

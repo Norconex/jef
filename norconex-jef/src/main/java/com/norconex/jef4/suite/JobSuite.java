@@ -54,7 +54,7 @@ import com.norconex.jef4.status.IJobStatusStore;
 import com.norconex.jef4.status.IJobStatusVisitor;
 import com.norconex.jef4.status.JobState;
 import com.norconex.jef4.status.JobStatusUpdater;
-import com.norconex.jef4.status.JobSuiteStatuses;
+import com.norconex.jef4.status.JobSuiteStatusSnapshot;
 import com.norconex.jef4.status.MutableJobStatus;
 
 
@@ -86,7 +86,7 @@ public final class JobSuite {
     private final String workdir;
     private final ILogManager logManager;
     private final IJobStatusStore jobStatusStore;
-    private JobSuiteStatuses jobSuiteStatuses;
+    private JobSuiteStatusSnapshot jobSuiteStatusSnapshot;
     private final List<IJobLifeCycleListener> jobLifeCycleListeners;
     private final List<IJobErrorListener> jobErrorListeners;
     private final List<ISuiteLifeCycleListener> suiteLifeCycleListeners;
@@ -135,7 +135,7 @@ public final class JobSuite {
         return getJobStatus(job.getName());
     }
     public IJobStatus getJobStatus(String jobName) {
-        return jobSuiteStatuses.getJobStatus(jobName);
+        return jobSuiteStatusSnapshot.getJobStatus(jobName);
     }
     
     public boolean execute() {
@@ -158,7 +158,7 @@ public final class JobSuite {
     
     
     public void accept(IJobStatusVisitor visitor) {
-        jobSuiteStatuses.accept(visitor);
+        jobSuiteStatusSnapshot.accept(visitor);
     }
     
     /**
@@ -215,9 +215,6 @@ public final class JobSuite {
     public ILogManager getLogManager() {
         return logManager;
     }
-    /*default*/ IJobStatusStore getJobStatusSerializer() {
-        return jobStatusStore;
-    }
     /*default*/ File getSuiteIndexFile() {
         File indexDir = new File(getWorkdir() + File.separator + "latest");
         if (!indexDir.exists()) {
@@ -268,7 +265,7 @@ public final class JobSuite {
         } finally {
             stopMonitor.stopMonitoring();
             if (success 
-                    && jobSuiteStatuses.getRoot().getState() == JobState.COMPLETED) {
+                    && jobSuiteStatusSnapshot.getRoot().getState() == JobState.COMPLETED) {
                 fire(suiteLifeCycleListeners, "suiteCompleted", this);
             }
             // Remove appender
@@ -286,7 +283,7 @@ public final class JobSuite {
         setCurrentJobId(job.getName());
         
         MutableJobStatus status = 
-                (MutableJobStatus) jobSuiteStatuses.getJobStatus(job);
+                (MutableJobStatus) jobSuiteStatusSnapshot.getJobStatus(job);
         if (status.getState() == JobState.COMPLETED) {
             LOG.info("Job skipped: " + job.getName() + " (already completed)");
             fire(jobLifeCycleListeners, "jobSkipped", status);
@@ -320,7 +317,7 @@ public final class JobSuite {
                                         + status.getJobName(), e);
                     }
                     fire(jobLifeCycleListeners, "jobProgressed", status);
-                    IJobStatus parentStatus = jobSuiteStatuses.getParent(status);
+                    IJobStatus parentStatus = jobSuiteStatusSnapshot.getParent(status);
                     if (parentStatus != null) {
                         IJobGroup jobGroup = 
                                 (IJobGroup) jobs.get(parentStatus.getJobName());
@@ -386,8 +383,8 @@ public final class JobSuite {
         }
         if (jobClassFilter == null || jobClassFilter.isInstance(job)) {
             IJobStatus status = null;
-            if (jobSuiteStatuses != null) {
-                status = jobSuiteStatuses.getJobStatus(job);
+            if (jobSuiteStatusSnapshot != null) {
+                status = jobSuiteStatusSnapshot.getJobStatus(job);
             }
             visitor.visitJob(job, status);
         }
@@ -400,7 +397,8 @@ public final class JobSuite {
     
     private void initialize(boolean resumeIfIncomplete)
             throws IOException {
-        JobSuiteStatuses statusTree = JobSuiteStatuses.snapshot(getSuiteIndexFile());
+        JobSuiteStatusSnapshot statusTree = 
+                JobSuiteStatusSnapshot.newSnapshot(getSuiteIndexFile());
         
         if (statusTree != null) {
             LOG.info("Previous execution detected.");
@@ -421,10 +419,11 @@ public final class JobSuite {
             LOG.info("No previous execution detected.");
         }
         if (statusTree == null) {
-            statusTree = JobSuiteStatuses.create(getRootJob());
+            statusTree = JobSuiteStatusSnapshot.create(
+                    getRootJob(), getLogManager());
             writeJobSuiteIndex(statusTree);
         }
-        this.jobSuiteStatuses = statusTree;
+        this.jobSuiteStatusSnapshot = statusTree;
     }
     
     
@@ -442,7 +441,7 @@ public final class JobSuite {
         }
     }
     
-    private void backupSuite(JobSuiteStatuses statusTree) throws IOException {
+    private void backupSuite(JobSuiteStatusSnapshot statusTree) throws IOException {
         IJobStatus suiteStatus = statusTree.getRoot();
         Date backupDate = suiteStatus.getDuration().getEndTime();
         if (backupDate == null) {
@@ -454,7 +453,7 @@ public final class JobSuite {
         // Backup status files
         List<IJobStatus> statuses = statusTree.getJobStatusList();
         for (IJobStatus jobStatus : statuses) {
-            getJobStatusSerializer().backup(
+            getJobStatusStore().backup(
                     getName(), jobStatus.getJobName(), backupDate);
         }
         // Backup log
@@ -476,7 +475,7 @@ public final class JobSuite {
         indexFile.renameTo(backupFile);
     }
     
-    private void writeJobSuiteIndex(JobSuiteStatuses statusTree) 
+    private void writeJobSuiteIndex(JobSuiteStatusSnapshot statusTree) 
             throws IOException {
         Writer out = new FileWriter(getSuiteIndexFile());
         out.write("<?xml version=\"1.0\" ?><suite-index>");
@@ -487,7 +486,7 @@ public final class JobSuite {
 
         //--- JobStatusSerializer ---
         out.flush();
-        getJobStatusSerializer().saveToXML(out);
+        getJobStatusStore().saveToXML(out);
         
         //--- Job Status ---
         writeJobId(out, statusTree, statusTree.getRoot());
@@ -499,7 +498,7 @@ public final class JobSuite {
     }
     
     private void writeJobId(Writer out, 
-            JobSuiteStatuses statusTree, IJobStatus status) throws IOException {
+            JobSuiteStatusSnapshot statusTree, IJobStatus status) throws IOException {
         out.write("<job name=\"");
         out.write(StringEscapeUtils.escapeXml(status.getJobName()));
         out.write("\">");

@@ -26,14 +26,24 @@ import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Layout;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
+import com.norconex.commons.lang.config.ConfigurationLoader;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.commons.lang.io.FilteredInputStream;
 import com.norconex.commons.lang.io.IInputStreamFilter;
+import com.norconex.jef4.JEFUtil;
 
 /**
  * Log manager using the file system to store its logs.
@@ -44,23 +54,40 @@ public class FileLogManager implements ILogManager {
 
     private static final long serialVersionUID = 422457693976262267L;
     
+    private static final Logger LOG =
+            LogManager.getLogger(FileLogManager.class);
+    
+    private static final String LAYOUT_PATTERN = 
+            "%d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %p %30.30c %x - %m\n";
+    
     /** Directory where to store the file. */
-    private final String logdirLatest;
+    private String logdirLatest;
     /** Directory where to backup the file. */
-    private final String logdirBackupBase;
-    /** Log4J layout to use for the generated log. */
-    private final ThreadSafeLayout layout;
+    private String logdirBackupBase;
+    /** Base parent log directory. */
+    private String logdir;
+    
+    
+//    /** Log4J layout to use for the generated log. */
+//    private final ThreadSafeLayout layout;
     
     private static final String LOG_SUFFIX = ".log";
     
+
+    /**
+     * Constructor using default log directory location.
+     */
+    public FileLogManager() {
+        this(null);
+    }
+
     
     /**
      * Constructor.
      * @param logdir base directory where the log should be stored
      */
     public FileLogManager(final String logdir) {
-        this(logdir, new PatternLayout(
-                "%d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %p %30.30c %x - %m\n"));
+        this(logdir, new PatternLayout(LAYOUT_PATTERN));
               
     }
 
@@ -70,22 +97,43 @@ public class FileLogManager implements ILogManager {
      * @param logdir base directory where the log should be stored
      * @param layout Log4J layout for rendering the logs
      */
-    public FileLogManager(final String logdir, final Layout layout) {
+    private FileLogManager(final String logdir, final Layout layout) {
         super();
-        logdirLatest = logdir + "/latest/logs";
-        logdirBackupBase = logdir + "/backup";
-        this.layout = new ThreadSafeLayout(layout);
-        File latestDir = new File(logdirLatest);
-        if (!latestDir.exists()) {
-            latestDir.mkdirs();
-        }
+        this.logdir = logdir;
+//        this.layout = new ThreadSafeLayout(layout);
+        resolveDirs();
     }
 
+    public String getLogDirectory() {
+        return logdir;
+    }
+    public void setLogDirectory(String logdir) {
+        this.logdir = logdir;
+        resolveDirs();
+    }
+    
+    private void resolveDirs() {
+        String path = logdir;
+        if (StringUtils.isBlank(logdir)) {
+            path = JEFUtil.FALLBACK_WORKDIR.getAbsolutePath();
+        }
+        LOG.debug("Log directory: " + path); 
+        logdirLatest = path + File.separatorChar 
+                + "latest" + File.separatorChar + "logs";
+        logdirBackupBase = path + "/backup";
+        File dir = new File(logdirLatest);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+    }
+    
     @Override
     public final Appender createAppender(final String namespace)
             throws IOException {
+        
         return new FileAppender(
-                layout, logdirLatest + "/" + namespace + LOG_SUFFIX);
+                new PatternLayout(LAYOUT_PATTERN),
+                logdirLatest + "/" + namespace + LOG_SUFFIX);
     }
     
     @Override
@@ -145,14 +193,26 @@ public class FileLogManager implements ILogManager {
     
     @Override
     public void loadFromXML(Reader in) throws IOException {
-        // TODO Auto-generated method stub
-        
+        XMLConfiguration xml = ConfigurationLoader.loadXML(in);
+        setLogDirectory(xml.getString("logDir", logdir));
     }
 
     @Override
     public void saveToXML(Writer out) throws IOException {
-        // TODO Auto-generated method stub
-        
+        XMLOutputFactory factory = XMLOutputFactory.newInstance();
+        try {
+            XMLStreamWriter writer = factory.createXMLStreamWriter(out);
+            writer.writeStartElement("logManager");
+            writer.writeAttribute("class", getClass().getCanonicalName());
+            writer.writeStartElement("logDir");
+            writer.writeCharacters(logdir);
+            writer.writeEndElement();
+            writer.writeEndElement();
+            writer.flush();
+            writer.close();
+        } catch (XMLStreamException e) {
+            throw new IOException("Cannot save as XML.", e);
+        }       
     }
 
     private class StartWithFilter implements IInputStreamFilter {

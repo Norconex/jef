@@ -19,15 +19,19 @@ import com.norconex.commons.lang.config.ConfigurationUtil;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.job.group.IJobGroup;
+import com.norconex.jef4.log.ILogManager;
 
-public class JobSuiteStatuses implements Serializable {
+public final class JobSuiteStatusSnapshot implements Serializable {
     private static final long serialVersionUID = 74258557029725685L;
 
+    private final ILogManager logManager;
     private final JobStatusTreeNode rootNode;
     private Map<String, JobStatusTreeNode> flattenNodes = 
             new ListOrderedMap<>();
     
-    public JobSuiteStatuses(JobStatusTreeNode rootNode) {
+    private JobSuiteStatusSnapshot(
+            JobStatusTreeNode rootNode, ILogManager logManager) {
+        this.logManager = logManager;
         this.rootNode = rootNode;
         flattenNode(rootNode);
     }
@@ -44,6 +48,10 @@ public class JobSuiteStatuses implements Serializable {
             return node.jobStatus;
         }
         return null;
+    }
+    
+    public ILogManager getLogManager() {
+        return logManager;
     }
     
     public List<IJobStatus> getJobStatusList() {
@@ -101,11 +109,13 @@ public class JobSuiteStatuses implements Serializable {
         }
     }
     
-    public static JobSuiteStatuses create(IJob rootJob) {
+    public static JobSuiteStatusSnapshot create(
+            IJob rootJob, ILogManager logManager) {
         if (rootJob == null) {
             throw new IllegalArgumentException("Root job cannot be null.");
         }
-        return new JobSuiteStatuses(createTreeNode(null, rootJob));
+        return new JobSuiteStatusSnapshot(
+                createTreeNode(null, rootJob), logManager);
     }
     private static JobStatusTreeNode createTreeNode(
             IJobStatus parentStatus, IJob job) {
@@ -124,7 +134,7 @@ public class JobSuiteStatuses implements Serializable {
     }
     
     
-    public static JobSuiteStatuses snapshot(File suiteIndex)
+    public static JobSuiteStatusSnapshot newSnapshot(File suiteIndex)
             throws IOException {
         //--- Ensure file looks good ---
         if (suiteIndex == null) {
@@ -151,28 +161,33 @@ public class JobSuiteStatuses implements Serializable {
                     "Could not load suite index: " + suiteIndex, e);
         }
 
+        //--- LogManager ---
+        ILogManager logManager = 
+                ConfigurationUtil.newInstance(xml, "logManager");
+        
         //--- Load status tree ---
         IJobStatusStore serial = 
-                ConfigurationUtil.newInstance(xml, "jobStatusSerializer");
-        return new JobSuiteStatuses(loadTreeNode(
-                null, xml.configurationAt("job"), suiteName, serial));
+                ConfigurationUtil.newInstance(xml, "statusStore");
+        return new JobSuiteStatusSnapshot(loadTreeNode(
+                null, xml.configurationAt("job"), suiteName, serial),
+                        logManager);
     }
     
     private static JobStatusTreeNode loadTreeNode(
             IJobStatus parentStatus,
             HierarchicalConfiguration jobXML, String suiteName, 
-            IJobStatusStore serial) throws IOException {
+            IJobStatusStore store) throws IOException {
         if (jobXML == null) {
             return null;
         }
         String jobName = jobXML.getString("[@name]");
-        IJobStatus jobStatus = serial.read(suiteName, jobName);
+        IJobStatus jobStatus = store.read(suiteName, jobName);
         List<HierarchicalConfiguration> xmls = jobXML.configurationsAt("job");
         List<JobStatusTreeNode> childNodes = new ArrayList<JobStatusTreeNode>();
         if (xmls != null) {
             for (HierarchicalConfiguration xml : xmls) {
                 JobStatusTreeNode child = loadTreeNode(
-                        jobStatus, xml, suiteName, serial);
+                        jobStatus, xml, suiteName, store);
                 if (child != null) {
                     childNodes.add(child);
                 }
@@ -222,7 +237,7 @@ public class JobSuiteStatuses implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        JobSuiteStatuses other = (JobSuiteStatuses) obj;
+        JobSuiteStatusSnapshot other = (JobSuiteStatusSnapshot) obj;
         if (flattenNodes == null) {
             if (other.flattenNodes != null) {
                 return false;

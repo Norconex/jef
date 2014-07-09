@@ -271,7 +271,7 @@ public class FileJobStatusStore implements IJobStatusStore {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         try {
             XMLStreamWriter writer = factory.createXMLStreamWriter(out);
-            writer.writeStartElement("jobStatusSerializer");
+            writer.writeStartElement("statusStore");
             writer.writeAttribute("class", getClass().getCanonicalName());
             writer.writeStartElement("statusDir");
             writer.writeCharacters(statusDir);
