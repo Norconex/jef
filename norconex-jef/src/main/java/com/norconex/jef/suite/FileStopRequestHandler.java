@@ -51,6 +51,7 @@ public class FileStopRequestHandler
     /**
      * Creates a file-based job stop request advisor storing files in the given
      * job directory.
+     * @param namespace suite namespace
      * @param jobDir the base directory where to store/read the stop file
      */
     public FileStopRequestHandler(

@@ -145,10 +145,6 @@ public class FileLogManager implements ILogManager {
         private InputStream lineStream;
         private boolean closed = false;
     
-        /**
-         * Constructor.
-         * @throws IOException
-         */
         public FilteredInputStream(InputStream is, String startsWith)
                 throws IOException {
             super();

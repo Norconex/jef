@@ -49,7 +49,10 @@ public class JobElapsedTime {
     }
     
     /**
-     * Creates a job elapsed time, initialised.
+     * Creates a job elapsed time, initialized.
+     * @param startTime start time
+     * @param endTime end time
+     * @param lastActivity last job activity
      * @since 1.1.1
      */
     public JobElapsedTime(Date startTime, Date endTime, Date lastActivity) {
@@ -68,7 +71,7 @@ public class JobElapsedTime {
     }
     /**
      * Sets the end time.
-     * @param endTime
+     * @param endTime end time
      */
     public final void setEndTime(final Date endTime) {
         this.endTime = endTime;
@@ -83,7 +86,7 @@ public class JobElapsedTime {
     }
     /**
      * Sets the start time.
-     * @param startTime
+     * @param startTime start time
      */
     public final void setStartTime(final Date startTime) {
         this.startTime = startTime;

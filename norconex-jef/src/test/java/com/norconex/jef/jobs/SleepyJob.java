@@ -22,9 +22,6 @@ public class SleepyJob implements IJob {
 
     private final int reportSeconds;
 
-    /**
-     * Constructor.
-     */
     public SleepyJob(int sleepSeconds, int reportSeconds) {
         super();
         this.sleepSeconds = sleepSeconds;
@@ -41,24 +38,14 @@ public class SleepyJob implements IJob {
                 + reportSeconds + " seconds.";
     }
 
-    /**
-     * @see com.norconex.jef.IJob#getProgressMinimum()
-     */
     public long getProgressMinimum() {
         return 0;
     }
 
-    /**
-     * @see com.norconex.jef.IJob#getProgressMaximum()
-     */
     public long getProgressMaximum() {
         return sleepSeconds;
     }
 
-    /**
-     * @see com.norconex.jef.IJob#execute(com.norconex.jef.progress.JobProgress,
-     *      com.norconex.jef.JobContext)
-     */
     @Override
     public void execute(JobProgress progress, JobSuite suite)
             throws JobException {

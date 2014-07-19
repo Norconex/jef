@@ -50,9 +50,9 @@ public class JobContext implements IJobContext {
         this.progressMaximum = progressMaximum;
     }
     /**
-     * Constructor. Initialise this job context with values from another job
+     * Constructor. Initialize this job context with values from another job
      * context.
-     * @param context
+     * @param context job context
      */
     public JobContext(IJobContext context) {
         super();

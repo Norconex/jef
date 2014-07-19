@@ -55,6 +55,7 @@ public class AsyncLimitedJobGroup extends AsyncJobGroup {
     /**
      * Constructor.
      * @param id unique identifier for this job group
+     * @param maxNumberOfRunningJobs maximum number of running jobs at once
      * @param jobs jobs making up this group
      */
     public AsyncLimitedJobGroup(
@@ -65,6 +66,8 @@ public class AsyncLimitedJobGroup extends AsyncJobGroup {
     /**
      * Constructor.
      * @param id unique identifier for this job group
+     * @param maxNumberOfRunningJobs maximum number of running jobs at once
+     * @param description this group description
      * @param jobs jobs making up this group
      */
     public AsyncLimitedJobGroup(
