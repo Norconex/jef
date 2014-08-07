@@ -25,9 +25,7 @@ public class ProcessWatcherJob implements IJob {
     private final String id;
     private final File dir;
     
-    /**
-     * Constructor.
-     */
+
     public ProcessWatcherJob(String id, String dir) {
         super();
         this.id = id;

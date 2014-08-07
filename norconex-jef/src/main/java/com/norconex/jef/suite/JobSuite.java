@@ -150,6 +150,7 @@ public final class JobSuite {
      * @param job root job for the suite
      * @param progressSerializer job progress serializer
      * @param logManager Log4J log manager
+     * @param stopRequestAdviser stop request adviser
      */
     public JobSuite(
             final IJob job,

@@ -22,9 +22,6 @@ public class RecoverableSleepyJob extends AbstractResumableJob {
 
     private final int reportSeconds;
 
-    /**
-     * Constructor.
-     */
     public RecoverableSleepyJob(int sleepSeconds, int reportSeconds) {
         super();
         this.sleepSeconds = sleepSeconds;
@@ -39,24 +36,13 @@ public class RecoverableSleepyJob extends AbstractResumableJob {
         return "job.sleep." + sleepSeconds + "-" + reportSeconds;
     }
 
-    /**
-     * @see com.norconex.jef.IJob#getDescription()
-     */
     public String getDescription() {
         return "Sleep " + sleepSeconds + " seconds and report every "
                 + reportSeconds + " seconds.";
     }
-
-    /**
-     * @see com.norconex.jef.IJob#getProgressMinimum()
-     */
     public long getProgressMinimum() {
         return 0;
     }
-
-    /**
-     * @see com.norconex.jef.IJob#getProgressMaximum()
-     */
     public long getProgressMaximum() {
         return sleepSeconds;
     }

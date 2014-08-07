@@ -1,5 +1,5 @@
 #*
- Copyright 2010-2013 Norconex Inc.
+ Copyright 2010-2014 Norconex Inc.
  
  This file is part of Norconex JEF.
  
@@ -16,6 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
 *#
+#set($releasePath = "http://norconex.s3.amazonaws.com/repo/release/com/norconex/jef/norconex-jef")
 <head><title>Download</title><meta name="Author" content="Norconex Inc." /></head> 
 
 #parse("adsense.html")
@@ -23,13 +24,17 @@
 Download
 ========
 
-Latest stable release
+**[Download Latest Release ${currentStableVersion}]($releasePath/${currentStableVersion}/norconex-jef-${currentStableVersion}.zip)**
+
+**Release Overview:**
    
-  * [${currentStableVersion}](http://norconex.s3.amazonaws.com/repo/release/com/norconex/jef/norconex-jef/${currentStableVersion}/norconex-jef-${currentStableVersion}.zip)
+  * Fix of runtime classpath resolution.
+  * [View full list of changes]((changes-report.html))
 
 Older releases:
   
-  * None yet.
+  * [3.0.0]($releasePath/3.0.0/norconex-jef-3.0.0.zip)<small>
+    [[Release Notes](changes-report.html#a3.0.0)]</small>
 
 <h3>Source</h3>
   

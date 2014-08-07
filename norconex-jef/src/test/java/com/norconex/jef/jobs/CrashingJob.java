@@ -25,9 +25,6 @@ public class CrashingJob implements IJob {
     private int seconds;
     private Class exceptionClass;
 
-    /**
-     * Constructor.
-     */
     public CrashingJob(int seconds, Class exceptionClass) {
         super();
         this.seconds = seconds;

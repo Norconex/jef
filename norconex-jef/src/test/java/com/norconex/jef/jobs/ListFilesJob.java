@@ -29,9 +29,6 @@ public class ListFilesJob implements IJob {
     private final boolean recursive;
     private String indent = "";
     
-    /**
-     * Constructor.
-     */
     public ListFilesJob(String id, String dir, boolean recursive) {
         super();
         this.id = id;

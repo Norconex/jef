@@ -39,6 +39,7 @@ public final class JobProgressUtils {
      * convenience method for treating the meta data string as properties.
      * It calls {@link JobProgress#getMetadata()} and parses it assuming it
      * follows {@link Properties} syntax.
+     * @param progress job progress
      * @return configuration properties
      */
     public static Properties getMetaDataProperties(JobProgress progress) {

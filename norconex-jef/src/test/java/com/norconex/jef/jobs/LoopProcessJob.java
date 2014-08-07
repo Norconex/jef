@@ -24,9 +24,6 @@ public class LoopProcessJob implements IJob {
     private final String id;
     private final String cmd;
     
-    /**
-     * Constructor.
-     */
     public LoopProcessJob(String id, String cmd) {
         super();
         this.id = id;

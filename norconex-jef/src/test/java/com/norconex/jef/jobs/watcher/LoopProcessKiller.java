@@ -26,10 +26,6 @@ public class LoopProcessKiller implements IStreamListener {
         }
     }
 
-    /**
-     * Gets the .
-     * @return 
-     */
     public boolean isKilled() {
         return killed;
     }
