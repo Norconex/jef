@@ -7,7 +7,7 @@
   </properties>
   <body>
 
-    <release version="3.0.1" date="2014-??-??" description="Open Source release">
+    <release version="3.0.1" date="2014-08-07" description="Open Source release">
       <action dev="essiembp" type="update">
         Upgraded Norconex Commons Lang to 1.3.2 to fix runtime class
         resolution errors.
