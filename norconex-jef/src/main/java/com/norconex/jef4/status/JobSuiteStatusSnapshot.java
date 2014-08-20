@@ -40,10 +40,10 @@ public final class JobSuiteStatusSnapshot implements Serializable {
         return rootNode.jobStatus;
     }
     public IJobStatus getJobStatus(IJob job) {
-        return getJobStatus(job.getName());
+        return getJobStatus(job.getId());
     }
-    public IJobStatus getJobStatus(String jobName) {
-        JobStatusTreeNode node = flattenNodes.get(jobName);
+    public IJobStatus getJobStatus(String jobId) {
+        JobStatusTreeNode node = flattenNodes.get(jobId);
         if (node != null) {
             return node.jobStatus;
         }
@@ -63,10 +63,10 @@ public final class JobSuiteStatusSnapshot implements Serializable {
     }
     
     public List<IJobStatus> getChildren(IJobStatus jobStatus) {
-        return getChildren(jobStatus.getJobName());
+        return getChildren(jobStatus.getJobId());
     }
-    public List<IJobStatus> getChildren(String jobName) {
-        JobStatusTreeNode node = flattenNodes.get(jobName);
+    public List<IJobStatus> getChildren(String jobId) {
+        JobStatusTreeNode node = flattenNodes.get(jobId);
         if (node == null) {
             return new ArrayList<IJobStatus>(0);
         }
@@ -79,10 +79,10 @@ public final class JobSuiteStatusSnapshot implements Serializable {
     }
 
     public IJobStatus getParent(IJobStatus jobStatus) {
-        return getParent(jobStatus.getJobName());
+        return getParent(jobStatus.getJobId());
     }
-    public IJobStatus getParent(String jobName) {
-        JobStatusTreeNode node = flattenNodes.get(jobName);
+    public IJobStatus getParent(String jobId) {
+        JobStatusTreeNode node = flattenNodes.get(jobId);
         if (node == null) {
             return null;
         }
@@ -90,20 +90,20 @@ public final class JobSuiteStatusSnapshot implements Serializable {
     }
     
     public void accept(IJobStatusVisitor visitor) {
-        accept(visitor, getRoot().getJobName());
+        accept(visitor, getRoot().getJobId());
     }
-    private void accept(IJobStatusVisitor visitor, String jobName) {
+    private void accept(IJobStatusVisitor visitor, String jobId) {
         if (visitor != null) {
-            IJobStatus status = getJobStatus(jobName);
-            visitor.visitJobStatus(getJobStatus(jobName));
+            IJobStatus status = getJobStatus(jobId);
+            visitor.visitJobStatus(getJobStatus(jobId));
             for (IJobStatus child : getChildren(status)) {
-                accept(visitor, child.getJobName());
+                accept(visitor, child.getJobId());
             }
         }
     }
     
     private void flattenNode(JobStatusTreeNode node) {
-        flattenNodes.put(node.jobStatus.getJobName(), node);
+        flattenNodes.put(node.jobStatus.getJobId(), node);
         for (JobStatusTreeNode childNode : node.children) {
             flattenNode(childNode);
         }
@@ -119,7 +119,7 @@ public final class JobSuiteStatusSnapshot implements Serializable {
     }
     private static JobStatusTreeNode createTreeNode(
             IJobStatus parentStatus, IJob job) {
-        IJobStatus status = new MutableJobStatus(job.getName());
+        IJobStatus status = new MutableJobStatus(job.getId());
         List<JobStatusTreeNode> childNodes = new ArrayList<>();
         if (job instanceof IJobGroup) {
             IJob[] jobs = ((IJobGroup) job).getJobs();
@@ -180,8 +180,8 @@ public final class JobSuiteStatusSnapshot implements Serializable {
         if (jobXML == null) {
             return null;
         }
-        String jobName = jobXML.getString("[@name]");
-        IJobStatus jobStatus = store.read(suiteName, jobName);
+        String jobId = jobXML.getString("[@name]");
+        IJobStatus jobStatus = store.read(suiteName, jobId);
         List<HierarchicalConfiguration> xmls = jobXML.configurationsAt("job");
         List<JobStatusTreeNode> childNodes = new ArrayList<JobStatusTreeNode>();
         if (xmls != null) {
@@ -251,18 +251,18 @@ public final class JobSuiteStatusSnapshot implements Serializable {
     @Override
     public String toString() {
         final StringBuilder b = new StringBuilder();
-        toString(b, getRoot().getJobName(), 0);
+        toString(b, getRoot().getJobId(), 0);
         return b.toString();
     }
-    private void toString(StringBuilder b, String jobName, int depth) {
-        IJobStatus status = getJobStatus(jobName);
+    private void toString(StringBuilder b, String jobId, int depth) {
+        IJobStatus status = getJobStatus(jobId);
         b.append(StringUtils.repeat(' ', depth * 4));
         b.append(StringUtils.leftPad(new PercentFormatter().format(
                 status.getProgress()), 4));
-        b.append("  ").append(status.getJobName());
+        b.append("  ").append(status.getJobId());
         b.append(System.lineSeparator());
         for (IJobStatus child : getChildren(status)) {
-            toString(b, child.getJobName(), depth + 1);
+            toString(b, child.getJobId(), depth + 1);
         }
     }
 }

@@ -114,7 +114,7 @@ public class StopRequestMonitor extends Thread {
                     suite.getJobLifeCycleListeners()) {
                 l.jobStopped(status);
             }
-            if (job.getName().equals(suite.getRootJob().getName())) {
+            if (job.getId().equals(suite.getRootJob().getId())) {
                 for (ISuiteLifeCycleListener l : 
                         suite.getSuiteLifeCycleListeners()) {
                     l.suiteStopped(suite);

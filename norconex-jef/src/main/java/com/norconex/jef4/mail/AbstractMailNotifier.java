@@ -88,7 +88,7 @@ public abstract class AbstractMailNotifier {
             throws IOException {
         StringBuffer logTail = new StringBuffer();
         String[] lines = IOUtil.tail(
-                suite.getLogManager().getLog(suite.getName()), lineQty);
+                suite.getLogManager().getLog(suite.getId()), lineQty);
         if (lines.length == 0) {
             logTail.append("*** No log found. ***\n");
         } else {

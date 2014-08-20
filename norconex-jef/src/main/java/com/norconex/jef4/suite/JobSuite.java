@@ -116,7 +116,7 @@ public final class JobSuite {
         accept(new IJobVisitor() {
             @Override
             public void visitJob(IJob job, IJobStatus jobStatus) {
-                jobs.put(job.getName(), job);
+                jobs.put(job.getId(), job);
             }
         });
     }
@@ -132,10 +132,10 @@ public final class JobSuite {
         if (job == null) {
             return null;
         }
-        return getJobStatus(job.getName());
+        return getJobStatus(job.getId());
     }
-    public IJobStatus getJobStatus(String jobName) {
-        return jobSuiteStatusSnapshot.getJobStatus(jobName);
+    public IJobStatus getJobStatus(String jobId) {
+        return jobSuiteStatusSnapshot.getJobStatus(jobId);
     }
     
     public boolean execute() {
@@ -146,7 +146,7 @@ public final class JobSuite {
         try {
             success = doExecute(resumeIfIncomplete);
         } catch (Throwable e) {
-            LOG.fatal("Job suite execution failed: " + getName(), e);
+            LOG.fatal("Job suite execution failed: " + getId(), e);
         } finally {
             fire(suiteLifeCycleListeners, "suiteFinished", this);
         }
@@ -206,8 +206,8 @@ public final class JobSuite {
     /*default*/ IJobStatusStore getJobStatusStore() {
         return jobStatusStore;
     }
-    public String getName() {
-        return getRootJob().getName();
+    public String getId() {
+        return getRootJob().getId();
     }
     public String getWorkdir() {
         return workdir;
@@ -221,12 +221,12 @@ public final class JobSuite {
             indexDir.mkdirs();
         }
         return new File(indexDir, 
-                FileUtil.toSafeFileName(getName()) + ".index");
+                FileUtil.toSafeFileName(getId()) + ".index");
     }
     /*default*/ File getSuiteStopFile() {
         return new File(getWorkdir() + File.separator 
                 + "latest" + File.separator 
-                + FileUtil.toSafeFileName(getName()) + ".stop");
+                + FileUtil.toSafeFileName(getId()) + ".stop");
     }
     /*default*/ List<IJobLifeCycleListener> getJobLifeCycleListeners() {
         return jobLifeCycleListeners;
@@ -247,7 +247,7 @@ public final class JobSuite {
         initialize(resumeIfIncomplete);
 
         //--- Add Log Appender ---
-        Appender appender = getLogManager().createAppender(getName());
+        Appender appender = getLogManager().createAppender(getId());
         Logger.getRootLogger().addAppender(appender);        
 
         heartbeatGenerator.start();
@@ -280,12 +280,12 @@ public final class JobSuite {
     //TODO document this is not a public method?
     public boolean runJob(final IJob job) {
         boolean success = false;
-        setCurrentJobId(job.getName());
+        setCurrentJobId(job.getId());
         
         MutableJobStatus status = 
                 (MutableJobStatus) jobSuiteStatusSnapshot.getJobStatus(job);
         if (status.getState() == JobState.COMPLETED) {
-            LOG.info("Job skipped: " + job.getName() + " (already completed)");
+            LOG.info("Job skipped: " + job.getId() + " (already completed)");
             fire(jobLifeCycleListeners, "jobSkipped", status);
             return true;
         }
@@ -294,11 +294,11 @@ public final class JobSuite {
         try {
             if (status.getResumeAttempts() == 0) {
                 status.getDuration().setStartTime(new Date());
-                LOG.info("Running " + job.getName() + ": BEGIN (" 
+                LOG.info("Running " + job.getId() + ": BEGIN (" 
                         + status.getDuration().getStartTime() + ")");  
                 fire(jobLifeCycleListeners, "jobStarted", status);
             } else {
-                LOG.info("Running " + job.getName()  
+                LOG.info("Running " + job.getId()  
                         + ": RESUME (" + new Date() + ")");  
                 fire(jobLifeCycleListeners, "jobResumed", status);
                 status.getDuration().setEndTime(null);
@@ -310,17 +310,17 @@ public final class JobSuite {
             job.execute(new JobStatusUpdater(status) {
                 protected void statusUpdated(MutableJobStatus status) {
                     try {
-                        getJobStatusStore().write(getName(), status);
+                        getJobStatusStore().write(getId(), status);
                     } catch (IOException e) {
                         throw new JEFException(
                                 "Cannot persist status update for job: "
-                                        + status.getJobName(), e);
+                                        + status.getJobId(), e);
                     }
                     fire(jobLifeCycleListeners, "jobProgressed", status);
                     IJobStatus parentStatus = jobSuiteStatusSnapshot.getParent(status);
                     if (parentStatus != null) {
                         IJobGroup jobGroup = 
-                                (IJobGroup) jobs.get(parentStatus.getJobName());
+                                (IJobGroup) jobs.get(parentStatus.getJobId());
                         if (jobGroup != null) {
                             jobGroup.groupProgressed(status);
                         }
@@ -331,7 +331,7 @@ public final class JobSuite {
             success = true;
         } catch (Exception e) {
             success = false;
-            LOG.error("Execution failed for job: " + job.getName(), e);
+            LOG.error("Execution failed for job: " + job.getId(), e);
             fire(jobErrorListeners, "jobError", 
                     new JobErrorEvent(e, this, status));
             if (status != null) {
@@ -343,14 +343,14 @@ public final class JobSuite {
             heartbeatGenerator.unregister(status);
             status.getDuration().setEndTime(new Date());
             try {
-                getJobStatusStore().write(getName(), status);
+                getJobStatusStore().write(getId(), status);
             } catch (IOException e) {
                 LOG.error("Cannot save final status.", e);
             }
             if (!success && !errorHandled) {
-                LOG.fatal("Fatal error occured in job: " + job.getName());
+                LOG.fatal("Fatal error occured in job: " + job.getId());
             }
-            LOG.info("Running " + job.getName()  
+            LOG.info("Running " + job.getId()  
                     + ": END (" + status.getDuration().getStartTime() + ")");  
             if (success) {
                 fire(jobLifeCycleListeners, "jobCompleted", status);
@@ -454,10 +454,10 @@ public final class JobSuite {
         List<IJobStatus> statuses = statusTree.getJobStatusList();
         for (IJobStatus jobStatus : statuses) {
             getJobStatusStore().backup(
-                    getName(), jobStatus.getJobName(), backupDate);
+                    getId(), jobStatus.getJobId(), backupDate);
         }
         // Backup log
-        getLogManager().backup(getName(), backupDate);
+        getLogManager().backup(getId(), backupDate);
 
         // Backup suite index
         String date = new SimpleDateFormat(
@@ -471,7 +471,7 @@ public final class JobSuite {
                     + "suite index.");
         }
         File backupFile = new File(backupDir.getAbsolutePath() + "/" 
-                + date + "__"  + FileUtil.toSafeFileName(getName()) + ".index");
+                + date + "__"  + FileUtil.toSafeFileName(getId()) + ".index");
         indexFile.renameTo(backupFile);
     }
     
@@ -500,7 +500,7 @@ public final class JobSuite {
     private void writeJobId(Writer out, 
             JobSuiteStatusSnapshot statusTree, IJobStatus status) throws IOException {
         out.write("<job name=\"");
-        out.write(StringEscapeUtils.escapeXml(status.getJobName()));
+        out.write(StringEscapeUtils.escapeXml(status.getJobId()));
         out.write("\">");
         for (IJobStatus child : statusTree.getChildren(status)) {
             writeJobId(out, statusTree, child);

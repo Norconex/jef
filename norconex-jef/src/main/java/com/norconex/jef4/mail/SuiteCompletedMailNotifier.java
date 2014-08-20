@@ -70,12 +70,12 @@ public class SuiteCompletedMailNotifier
             ResourceBundle.getBundle(this.getClass().getName());
         String subject = MessageFormat.format(
                 bundle.getString("subject"),
-                new Object[]{suite.getName()});
+                new Object[]{suite.getId()});
         try {
             String body = MessageFormat.format(
                     bundle.getString("body"),
                     new Object[] {
-                        suite.getName(),
+                        suite.getId(),
                         Integer.toString(LOG_LINE_QTY),
                         getLogTail(suite, LOG_LINE_QTY)
                     });

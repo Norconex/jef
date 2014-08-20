@@ -38,7 +38,7 @@ public abstract class AbstractJob implements IJob {
     }
 
     @Override
-    public final String getName() {
+    public final String getId() {
         return name;
     }
 }

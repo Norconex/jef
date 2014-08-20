@@ -46,8 +46,8 @@ public class SystemCommandJob implements IJob {
     private static final Logger LOG =
             LogManager.getLogger(SystemCommandJob.class);
 
-    /** Job unique name. */
-    private final String name;
+    /** Job unique id. */
+    private final String id;
     /** Commands to be executed. */
     private final SystemCommand[] systemCommands;
 
@@ -57,18 +57,18 @@ public class SystemCommandJob implements IJob {
      * constructor for taking multiple systems commands as string, every
      * commands supplied are converted to {@link SystemCommand} instances
      * internally.
-     * @param name job name
+     * @param id job id
      * @param commands array of individual commands to be executed
      * @see SystemCommandJob#SystemCommandJob(String, SystemCommand[])
      */
     @SuppressWarnings("nls")
-    public SystemCommandJob(String name, String... commands) {
+    public SystemCommandJob(String id, String... commands) {
         super();
         if (commands == null) {
             throw new IllegalArgumentException(
                     "\"commands\" argument cannot be null.");
         }
-        this.name = name;
+        this.id = id;
         this.systemCommands = new SystemCommand[commands.length];
         for (int i = 0; i < commands.length; i++) {
             this.systemCommands[i] = new SystemCommand(commands[i]);
@@ -77,19 +77,19 @@ public class SystemCommandJob implements IJob {
     
     /**
      * Creates a JEF job for executing system commands.
-     * @param name job name
+     * @param id job id
      * @param commands commands to be executed
      */
     public SystemCommandJob(
-            String name, SystemCommand... commands) {
+            String id, SystemCommand... commands) {
         super();
-        this.name = name;
+        this.id = id;
         this.systemCommands = ArrayUtils.clone(commands);
     }
     
     @Override
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
     
     @Override

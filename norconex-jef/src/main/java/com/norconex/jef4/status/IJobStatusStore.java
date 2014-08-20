@@ -42,21 +42,21 @@ public interface IJobStatusStore extends IXMLConfigurable {
      * Reads a job progress.  Implementors are required to always
      * return a job progress (<code>null</code> is not allowed).
      * @param suiteName name space given to the job progress
-     * @param jobName job unique identifier
+     * @param jobId job unique identifier
      * @param jobContext job context for which to obtain job progress
      * @return job progress
      * @throws IOException problem deserializing job progress
      */
-    IJobStatus read(String suiteName, String jobName)
+    IJobStatus read(String suiteName, String jobId)
             throws IOException;
     /**
      * Removes job progress.  A removed job progress can no longer be
      * obtained using the {@link #read(String, String)} method.
      * @param suiteName name space given to the job progress
-     * @param jobName unique identifier of job we want to remove status
+     * @param jobId unique identifier of job we want to remove status
      * @throws IOException problem removing job progress
      */
-    void remove(String suiteName, String jobName) throws IOException;
+    void remove(String suiteName, String jobId) throws IOException;
     /**
      * Backups job progress.  A backed-up job progress can no longer be
      * obtained using the {@link #read(String, String)} method.
@@ -71,9 +71,9 @@ public interface IJobStatusStore extends IXMLConfigurable {
     /**
      * Marks the status with the current date so it shows as being active.
      * @param suiteName suite name
-     * @param jobName job name
+     * @param jobId job name
      * @return new file timestamp as an EPOC long value
      * @throws IOException problem touching the file
      */
-    long touch(String suiteName, String jobName) throws IOException;
+    long touch(String suiteName, String jobId) throws IOException;
 }

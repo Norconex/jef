@@ -56,22 +56,22 @@ public class SyncJobGroup extends AbstractJobGroup {
         String failedJob = null;
         for (int i = 0; i < jobs.length; i++) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Synchronous group \"" + getName() + "\" "
+                LOG.debug("Synchronous group \"" + getId() + "\" "
                         + "about to run synchronous job \""
-                        + jobs[i].getName() + "\".");
+                        + jobs[i].getId() + "\".");
             }
             if (!suite.runJob(jobs[i])) {
-                LOG.error("\"" + jobs[i].getName() + "\" failed.");
-                failedJob = jobs[i].getName();
+                LOG.error("\"" + jobs[i].getId() + "\" failed.");
+                failedJob = jobs[i].getId();
                 break;
             }
             if (LOG.isDebugEnabled()) {
-                LOG.debug("\"" + jobs[i].getName() + "\" succeeded.");
+                LOG.debug("\"" + jobs[i].getId() + "\" succeeded.");
             }
         }
         if (failedJob != null) {
             throw new JobException(
-                    "\"" + failedJob + "\" failed in sync group " + getName());
+                    "\"" + failedJob + "\" failed in sync group " + getId());
         }
         //JobSuite.setCurrentJobId(getName());
     }

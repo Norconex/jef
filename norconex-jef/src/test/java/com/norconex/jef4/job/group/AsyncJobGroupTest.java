@@ -29,7 +29,7 @@ public class AsyncJobGroupTest {
     }
 
     private void assertStatus(IJobStatus status) {
-        System.out.println("Status of \"" + status.getJobName() + "\": "
+        System.out.println("Status of \"" + status.getJobId() + "\": "
                 + status.getState() + " (" + status.getProgress() + ")");
         assertTrue(status.getProgress() == 1d);
 //        assertTrue(status.getState() == JobState.COMPLETED);

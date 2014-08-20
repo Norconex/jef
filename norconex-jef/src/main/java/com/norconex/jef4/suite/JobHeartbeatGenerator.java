@@ -31,7 +31,7 @@ public class JobHeartbeatGenerator extends Thread {
                 for (MutableJobStatus status : statuses) {
                     status.setLastActivity(
                             new Date(suite.getJobStatusStore().touch(
-                                    suite.getName(), status.getJobName())));
+                                    suite.getId(), status.getJobId())));
                 }
                 Sleeper.sleepMillis(HEARTBEAT_INTERVAL);
             }

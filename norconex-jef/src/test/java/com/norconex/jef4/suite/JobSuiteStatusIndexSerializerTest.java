@@ -25,7 +25,7 @@ public class JobSuiteStatusIndexSerializerTest {
         JobSuiteStatusSnapshot tree = 
                 JobSuiteStatusSnapshot.newSnapshot(
                         new File("c:\\temp\\jef-tests\\latest\\"
-                        + FileUtil.toSafeFileName(job.getName()) + ".index"));
+                        + FileUtil.toSafeFileName(job.getId()) + ".index"));
         System.out.println("TREE: " + tree);
         Assert.assertEquals(1d, tree.getRoot().getProgress(), 0d);
     }

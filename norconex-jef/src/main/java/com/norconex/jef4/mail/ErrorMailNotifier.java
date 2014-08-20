@@ -65,12 +65,12 @@ public class ErrorMailNotifier
                 ResourceBundle.getBundle(this.getClass().getName());
         String subject = MessageFormat.format(
                 bundle.getString("subject"),
-                new Object[]{suite.getName()});
+                new Object[]{suite.getId()});
         String jobId = "N/A";
         String percent = "N/A";
 
         if (event.getStatus() != null) {
-            jobId = event.getStatus().getJobName();
+            jobId = event.getStatus().getJobId();
             percent = Double.toString(
                     event.getStatus().getProgress() * PROGRESS_RATIO);
         }
@@ -80,7 +80,7 @@ public class ErrorMailNotifier
                     bundle.getString("body"),
                     new Object[] {
                         jobId,
-                        suite.getName(),
+                        suite.getId(),
                         percent,
                         getStackTrace(event.getException()),
                         Integer.toString(LOG_LINE_QTY),

@@ -29,7 +29,7 @@ public abstract class JobStatusUpdater {
     }
 
     public String getJobName() {
-        return status.getJobName();
+        return status.getJobId();
     }
     
     public Properties getProperties() {

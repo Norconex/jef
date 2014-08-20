@@ -49,10 +49,11 @@ public interface IJob {//<S extends IJobStatus> {
 
     
     /**
-     * Gets the job unique name.
-     * @return job unique name
+     * Gets the job unique identifier. All characters are valid and regular
+     * words can be used, as long as the returned string is unique.
+     * @return job unique identifier
      */
-    String getName();
+    String getId();
 
 //    IJobStatus createInitialStatus(IJobStatus resumingStatus);
 

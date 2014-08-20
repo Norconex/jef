@@ -99,13 +99,13 @@ public class AsyncJobGroup extends AbstractJobGroup {
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("All threads finished for async group\"" 
-                    + getName() + "\".");
+                    + getId() + "\".");
         }
 
         if (!failedJobs.isEmpty()) {
             throw new JobException(
                     failedJobs.size() + " out of " + jobs.length
-                  + " jobs failed in async group \"" + getName() + "\"");
+                  + " jobs failed in async group \"" + getId() + "\"");
         }
     }
     
@@ -113,21 +113,21 @@ public class AsyncJobGroup extends AbstractJobGroup {
             CountDownLatch latch) {
         try {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Thread from " + AsyncJobGroup.this.getName()
-                    + " started and about to run: " + job.getName());
+                LOG.debug("Thread from " + AsyncJobGroup.this.getId()
+                    + " started and about to run: " + job.getId());
             }
             if (!suite.runJob(job)) {
                 synchronized (failedJobs) {
-                    LOG.error(job.getName() + " failed.");
+                    LOG.error(job.getId() + " failed.");
                     failedJobs.add(job);
                 }
             } else if (LOG.isDebugEnabled()) {
-                LOG.debug(job.getName() + " succeeded.");
+                LOG.debug(job.getId() + " succeeded.");
             }
-            JobSuite.setCurrentJobId(AsyncJobGroup.this.getName());
+            JobSuite.setCurrentJobId(AsyncJobGroup.this.getId());
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Thread from " + AsyncJobGroup.this.getName()
-                    + " finished to run: " + job.getName());
+                LOG.debug("Thread from " + AsyncJobGroup.this.getId()
+                    + " finished to run: " + job.getId());
             }
         } finally {
             latch.countDown();

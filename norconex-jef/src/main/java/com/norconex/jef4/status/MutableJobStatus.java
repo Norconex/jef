@@ -11,7 +11,7 @@ public class MutableJobStatus implements IJobStatus {
     /** Activity timeout. */
     private static final long ACTIVITY_TIMEOUT = 10 * 1000;
     
-    private final String jobName;
+    private final String jobId;
     private double progress;
     private String note;
     private int resumeAttempts;
@@ -20,13 +20,13 @@ public class MutableJobStatus implements IJobStatus {
     private Date lastActivity;
     private boolean stopRequested;
 
-    public MutableJobStatus(String jobName) {
-        this.jobName = jobName;
+    public MutableJobStatus(String jobId) {
+        this.jobId = jobId;
     }
 
     @Override
-    public String getJobName() {
-        return jobName;
+    public String getJobId() {
+        return jobId;
     }
 
 

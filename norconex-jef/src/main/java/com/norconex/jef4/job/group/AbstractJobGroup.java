@@ -36,33 +36,33 @@ public abstract class AbstractJobGroup implements IJobGroup {
     /** Jobs that make up the group. */
     private final IJob[] jobs;
     /** For faster references caches the job ids. */
-    private final List<String> jobNames;
+    private final List<String> jobIds;
 
     /** Job group unique identifier. */
-    private String name;
+    private String id;
     
     private GroupStatusUpdater groupUpdater;
     
     /**
      * Constructor.
-     * @param name job unique identifier
+     * @param id job unique identifier
      * @param jobs jobs to be run by the group
      */
     public AbstractJobGroup(
-            final String name, final IJob... jobs) {
+            final String id, final IJob... jobs) {
         super();
-        if (name == null) {
-            throw new IllegalArgumentException("Job name cannot be null");
+        if (id == null) {
+            throw new IllegalArgumentException("Job id cannot be null");
         }
-        this.name = name;
+        this.id = id;
         if (jobs == null) {
             this.jobs = new IJob[] {};
         } else {
             this.jobs = jobs;
         }
-        this.jobNames = new ArrayList<String>(jobs.length);
+        this.jobIds = new ArrayList<String>(jobs.length);
         for (int i = 0; i < jobs.length; i++) {
-            jobNames.add(jobs[i].getName());
+            jobIds.add(jobs[i].getId());
         }
     }
 
@@ -71,8 +71,8 @@ public abstract class AbstractJobGroup implements IJobGroup {
         return jobs;
     }
     @Override
-    public final String getName() {
-        return name;
+    public final String getId() {
+        return id;
     }
     
     @Override
@@ -104,7 +104,7 @@ public abstract class AbstractJobGroup implements IJobGroup {
             this.statusUpdater = statusUpdater;
         }
         public synchronized void childStatusChanged(IJobStatus status) {
-            int jobIndex = jobNames.indexOf(status.getJobName());
+            int jobIndex = jobIds.indexOf(status.getJobId());
             if (jobIndex >= 0) {
                 completionRatios[jobIndex] = status.getProgress();
             }

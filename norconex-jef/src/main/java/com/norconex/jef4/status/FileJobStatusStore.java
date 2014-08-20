@@ -107,7 +107,7 @@ public class FileJobStatusStore implements IJobStatusStore {
             String suiteName, final IJobStatus jobStatus)
             throws IOException {
 
-        File file = getStatusFile(suiteName, jobStatus.getJobName());
+        File file = getStatusFile(suiteName, jobStatus.getJobId());
         if (!file.exists()) {
             file.createNewFile();
         }
@@ -115,7 +115,7 @@ public class FileJobStatusStore implements IJobStatusStore {
             LOG.debug("Writing status file: " + file);
         }
         Properties config = new Properties();
-        config.setString("jobName", jobStatus.getJobName());
+        config.setString("jobId", jobStatus.getJobId());
         config.setDouble("progress", jobStatus.getProgress());
         if (jobStatus.getNote() != null) {
             config.setString("note", jobStatus.getNote());
@@ -142,16 +142,16 @@ public class FileJobStatusStore implements IJobStatusStore {
         }
         
         OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
-        config.store(os, "Status for job: " + jobStatus.getJobName());
+        config.store(os, "Status for job: " + jobStatus.getJobId());
         os.close();
     }
 
     @Override
     public final IJobStatus read(
-            String suiteName, final String jobName)
+            String suiteName, final String jobId)
             throws IOException {
-        MutableJobStatus jobStatus = new MutableJobStatus(jobName);
-        File file = getStatusFile(suiteName, jobName);
+        MutableJobStatus jobStatus = new MutableJobStatus(jobId);
+        File file = getStatusFile(suiteName, jobId);
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Reading status file: " + file);
@@ -165,7 +165,7 @@ public class FileJobStatusStore implements IJobStatusStore {
         InputStream is = new FileInputStream(file);
         config.load(is);
         if (LOG.isDebugEnabled()) {
-            LOG.debug(jobName + " last active time: "
+            LOG.debug(jobId + " last active time: "
                     + new Date(file.lastModified()));
         }
         jobStatus.setLastActivity(new Date(file.lastModified()));
@@ -215,8 +215,8 @@ public class FileJobStatusStore implements IJobStatusStore {
     }
 
     @Override
-    public long touch(String suiteName, String jobName) throws IOException {
-        File file = getStatusFile(suiteName, jobName);
+    public long touch(String suiteName, String jobId) throws IOException {
+        File file = getStatusFile(suiteName, jobId);
         FileUtils.touch(file);
         return file.lastModified();
     }
@@ -224,22 +224,22 @@ public class FileJobStatusStore implements IJobStatusStore {
     /**
      * Gets the file used to store the job progress.
      * @param suiteName name space given to the job progress
-     * @param jobName the job unique name
+     * @param jobId the job unique name
      * @return file used to store the job process
      */
-    private File getStatusFile(final String suiteName, final String jobName) {
+    private File getStatusFile(final String suiteName, final String jobId) {
         return new File(jobdirLatest 
                 + "/" + FileUtil.toSafeFileName(suiteName)
-                + "__" + FileUtil.toSafeFileName(jobName) + ".job");
+                + "__" + FileUtil.toSafeFileName(jobId) + ".job");
     }
     /**
      * Gets the file used to store the job progress backup.
      * @param suiteName name space given to the job progress
-     * @param jobName the id of the job
+     * @param jobId the id of the job
      * @param backupDate date used to timestamp to backup
      * @return file used to store the job process
      */
-    private File getBackupFile(final String suiteName, final String jobName, 
+    private File getBackupFile(final String suiteName, final String jobId, 
             final Date backupDate) {
         String date = new SimpleDateFormat(
                 "yyyyMMddHHmmssSSSS").format(backupDate);
@@ -249,7 +249,7 @@ public class FileJobStatusStore implements IJobStatusStore {
                     new File(jobdirBackupBase), backupDate);
         } catch (IOException e) {
             throw new JobException("Could not create backup directory for "
-                    + "job \"" + jobName + "\".");
+                    + "job \"" + jobId + "\".");
         }
         backupDir = new File(backupDir, "status");
         if (!backupDir.exists()) {
@@ -257,7 +257,7 @@ public class FileJobStatusStore implements IJobStatusStore {
         }
         return new File(backupDir + "/" + date + "__" 
                 + FileUtil.toSafeFileName(suiteName)
-                + "__" + FileUtil.toSafeFileName(jobName) + ".job");
+                + "__" + FileUtil.toSafeFileName(jobId) + ".job");
     }
 
     @Override

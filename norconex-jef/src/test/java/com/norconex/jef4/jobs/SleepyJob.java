@@ -30,7 +30,7 @@ public class SleepyJob implements IJob {
     }
 
     @Override
-    public String getName() {
+    public String getId() {
         return "Sleepy Job " + sleepSeconds + "-" + reportSeconds;
     }
 
@@ -98,7 +98,7 @@ public class SleepyJob implements IJob {
 //              LOG.info("[" + getId() + "] Slept for "
 //                    + (elapsedTime / 1000) + " seconds.");
 
-              System.out.println("[" + getName() + "] Slept for "
+              System.out.println("[" + getId() + "] Slept for "
                       + elapsedSeconds + " seconds.");
           }
           statusUpdater.setProgress(elapsedSeconds / sleepSeconds);
