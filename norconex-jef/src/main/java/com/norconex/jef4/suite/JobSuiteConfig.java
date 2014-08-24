@@ -32,17 +32,17 @@ public class JobSuiteConfig implements Serializable {
         super();
     }
 
-    /**
-     * Gets the job status serializer.
-     * @return job status serializer
-     */
-    public IJobStatusStore getJobStatusSerializer() {
-        return jobStatusStore;
-    }
-    public void setJobStatusSerializer(
-            IJobStatusStore jobStatusStore) {
-        this.jobStatusStore = jobStatusStore;
-    }
+//    /**
+//     * Gets the job status serializer.
+//     * @return job status serializer
+//     */
+//    public IJobStatusStore getJobStatusSerializer() {
+//        return jobStatusStore;
+//    }
+//    public void setJobStatusSerializer(
+//            IJobStatusStore jobStatusStore) {
+//        this.jobStatusStore = jobStatusStore;
+//    }
 
     /**
      * Gets the Log4J log manager.

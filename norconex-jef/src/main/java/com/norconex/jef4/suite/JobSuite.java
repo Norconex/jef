@@ -104,7 +104,7 @@ public final class JobSuite {
         this.workdir = resolveWorkdir(config.getWorkdir());
         this.logManager = resolveLogManager(config.getLogManager());
         this.jobStatusStore = 
-                resolveJobStatusStore(config.getJobStatusSerializer());
+                resolveJobStatusStore(config.getJobStatusStore());
         this.jobLifeCycleListeners = 
                 Collections.unmodifiableList(config.getJobLifeCycleListeners());
         this.suiteLifeCycleListeners = Collections.unmodifiableList(

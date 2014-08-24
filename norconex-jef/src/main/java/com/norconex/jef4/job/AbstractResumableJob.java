@@ -47,7 +47,7 @@ public abstract class AbstractResumableJob implements IJob {
 
     @Override
     public void execute(JobStatusUpdater statusUpdater, JobSuite suite) {
-        IJobStatus status = suite.getJobStatus(statusUpdater.getJobName());
+        IJobStatus status = suite.getJobStatus(statusUpdater.getJobId());
         if (!status.isResumed()) {
             startExecution(statusUpdater, suite);
         } else if (!status.isCompleted()) {

@@ -28,7 +28,7 @@ public abstract class JobStatusUpdater {
         });
     }
 
-    public String getJobName() {
+    public String getJobId() {
         return status.getJobId();
     }
     

@@ -54,23 +54,23 @@ public class AsyncJobGroup extends AbstractJobGroup {
     
     /**
      * Constructor.
-     * @param name unique name for this job group
+     * @param id unique identifier for this job group
      * @param jobs jobs making up this group
      */
-    public AsyncJobGroup(final String name, final IJob... jobs) {
-        this(name, jobs.length, jobs);
+    public AsyncJobGroup(final String id, final IJob... jobs) {
+        this(id, jobs.length, jobs);
     }
     
     /**
      * Constructor.
-     * @param name unique name for this job group
+     * @param id unique identifier for this job group
      * @param maxThreads maximum number of threads (jobs) executing at the
      *        same time
      * @param jobs jobs making up this group
      */
     public AsyncJobGroup(
-            final String name, int maxThreads, final IJob... jobs) {
-        super(name, jobs);
+            final String id, int maxThreads, final IJob... jobs) {
+        super(id, jobs);
         this.maxThread = maxThreads;
     }
 
