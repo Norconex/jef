@@ -39,7 +39,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
-import com.norconex.commons.lang.config.ConfigurationLoader;
+import com.norconex.commons.lang.config.ConfigurationUtil;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.commons.lang.io.FilteredInputStream;
 import com.norconex.commons.lang.io.IInputStreamFilter;
@@ -193,7 +193,7 @@ public class FileLogManager implements ILogManager {
     
     @Override
     public void loadFromXML(Reader in) throws IOException {
-        XMLConfiguration xml = ConfigurationLoader.loadXML(in);
+        XMLConfiguration xml = ConfigurationUtil.newXMLConfiguration(in);
         setLogDirectory(xml.getString("logDir", logdir));
     }
 

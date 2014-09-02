@@ -50,7 +50,7 @@ public class JobDuration implements Serializable {
     }
     /**
      * Sets the end time.
-     * @param endTime
+     * @param endTime end time
      */
     public final void setEndTime(final Date endTime) {
         this.endTime = endTime;
@@ -65,7 +65,7 @@ public class JobDuration implements Serializable {
     }
     /**
      * Sets the start time.
-     * @param startTime
+     * @param startTime start time
      */
     public final void setStartTime(final Date startTime) {
         this.startTime = startTime;

@@ -20,9 +20,6 @@ public class SleepyJob implements IJob {
 
     private final int reportSeconds;
 
-    /**
-     * Constructor.
-     */
     public SleepyJob(int sleepSeconds, int reportSeconds) {
         super();
         this.sleepSeconds = sleepSeconds;

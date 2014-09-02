@@ -39,7 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import com.norconex.commons.lang.config.ConfigurationLoader;
+import com.norconex.commons.lang.config.ConfigurationUtil;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.commons.lang.map.Properties;
 import com.norconex.jef4.JEFUtil;
@@ -262,7 +262,7 @@ public class FileJobStatusStore implements IJobStatusStore {
 
     @Override
     public void loadFromXML(Reader in) throws IOException {
-        XMLConfiguration xml = ConfigurationLoader.loadXML(in);
+        XMLConfiguration xml = ConfigurationUtil.newXMLConfiguration(in);
         setStatusDirectory(xml.getString("statusDir", statusDir));
     }
 
