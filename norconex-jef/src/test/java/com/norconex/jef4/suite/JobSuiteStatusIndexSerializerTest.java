@@ -3,6 +3,7 @@ package com.norconex.jef4.suite;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,16 +17,19 @@ public class JobSuiteStatusIndexSerializerTest {
     @Test
     public void testWriteJobSuiteIndex() throws IOException {
         
+        File tempDirectory = new File(FileUtils.getTempDirectory(), "jef-test");
+        
         JobSuiteConfig config = new JobSuiteConfig();
-        config.setWorkdir("c:\\temp\\jef-tests");
+        
+        config.setWorkdir(tempDirectory.getCanonicalPath());
         IJob job = new SleepyJob(5, 1);
         JobSuite suite = new JobSuite(job, config);
         Assert.assertTrue("Execution returned false.", suite.execute());
 
         JobSuiteStatusSnapshot tree = 
                 JobSuiteStatusSnapshot.newSnapshot(
-                        new File("c:\\temp\\jef-tests\\latest\\"
-                        + FileUtil.toSafeFileName(job.getId()) + ".index"));
+                        new File(tempDirectory, "latest/"
+                      + FileUtil.toSafeFileName(job.getId()) + ".index"));
         System.out.println("TREE: " + tree);
         Assert.assertEquals(1d, tree.getRoot().getProgress(), 0d);
     }
