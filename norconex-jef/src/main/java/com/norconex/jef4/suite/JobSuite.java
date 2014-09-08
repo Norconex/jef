@@ -417,6 +417,8 @@ public final class JobSuite {
             }
         } else {
             LOG.info("No previous execution detected.");
+        }
+        if (statusTree == null) {
             statusTree = JobSuiteStatusSnapshot.create(
                     getRootJob(), getLogManager());
             writeJobSuiteIndex(statusTree);
