@@ -207,7 +207,11 @@ public final class JobSuite {
         return jobStatusStore;
     }
     public String getId() {
-        return getRootJob().getId();
+        IJob job = getRootJob();
+        if (job != null) {
+            return job.getId();
+        }
+        return null;
     }
     public String getWorkdir() {
         return workdir;
