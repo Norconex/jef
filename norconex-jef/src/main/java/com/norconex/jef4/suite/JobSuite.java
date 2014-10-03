@@ -128,6 +128,15 @@ public final class JobSuite {
         return config;
     }
 
+    /**
+     * Gets the job status for the root job.  Has the same effect as invoking
+     * <code>getJobStatus(getRootJob())</code>.
+     * @return root job status
+     */
+    public IJobStatus getStatus() {
+        return getJobStatus(getRootJob());
+    }
+    
     public IJobStatus getJobStatus(IJob job) {
         if (job == null) {
             return null;
