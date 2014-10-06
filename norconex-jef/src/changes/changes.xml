@@ -6,6 +6,9 @@
     <author email="info@norconex.com">Norconex Inc.</author>
   </properties>
   <body>
+    <release version="4.0.0" date="201?-??-??" description="Major release">
+    </release>
+
     <release version="3.0.0" date="2013-06-04" description="Open Source release">
       <action dev="essiembp" type="update">
         Starting with this release, JEF is open-source under GPL.

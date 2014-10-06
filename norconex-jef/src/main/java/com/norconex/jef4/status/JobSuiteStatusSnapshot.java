@@ -153,7 +153,7 @@ public final class JobSuiteStatusSnapshot implements Serializable {
         String suiteName = FileUtil.fromSafeFileName(
                 FilenameUtils.getBaseName(suiteIndex.getPath()));
         XMLConfiguration xml = new XMLConfiguration();
-        xml.setDelimiterParsingDisabled(false);
+        ConfigurationUtil.disableDelimiterParsing(xml);
         try {
             xml.load(suiteIndex);
         } catch (ConfigurationException e) {
