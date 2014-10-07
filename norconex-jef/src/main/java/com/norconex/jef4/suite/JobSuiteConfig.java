@@ -1,6 +1,5 @@
 package com.norconex.jef4.suite;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,9 +9,7 @@ import com.norconex.jef4.job.IJobLifeCycleListener;
 import com.norconex.jef4.log.ILogManager;
 import com.norconex.jef4.status.IJobStatusStore;
 
-public class JobSuiteConfig implements Serializable {
-
-    private static final long serialVersionUID = 5521879402369478461L;
+public class JobSuiteConfig {
 
     private IJobStatusStore jobStatusStore;
     private ILogManager logManager;

@@ -55,8 +55,6 @@ import com.norconex.jef4.job.JobException;
 @SuppressWarnings("nls")
 public class FileJobStatusStore implements IJobStatusStore {
 
-    private static final long serialVersionUID = 132626905287944939L;
-
     private static final Logger LOG =
             LogManager.getLogger(FileJobStatusStore.class);
 
