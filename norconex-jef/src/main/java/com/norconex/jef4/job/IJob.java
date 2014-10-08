@@ -45,7 +45,7 @@ import com.norconex.jef4.status.JobStatusUpdater;
  *
  * @author Pascal Essiembre
  */
-public interface IJob {//<S extends IJobStatus> {
+public interface IJob {
 
     
     /**
@@ -55,9 +55,6 @@ public interface IJob {//<S extends IJobStatus> {
      */
     String getId();
 
-//    IJobStatus createInitialStatus(IJobStatus resumingStatus);
-
-    
     /**
      * Executes this job.  Implementors are responsible for updating
      * execution progress on the given <code>JobProgress</code>.

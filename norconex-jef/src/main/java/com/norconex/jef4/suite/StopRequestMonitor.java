@@ -18,11 +18,14 @@
 package com.norconex.jef4.suite;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.norconex.commons.lang.Sleeper;
+import com.norconex.commons.lang.file.FileUtil;
+import com.norconex.jef4.JEFException;
 import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.job.IJobLifeCycleListener;
 import com.norconex.jef4.job.IJobVisitor;
@@ -72,7 +75,12 @@ public class StopRequestMonitor extends Thread {
     public synchronized void stopMonitoring() {
         monitoring = false;
         if (stopFile.exists()) {
-            stopFile.delete();
+            try {
+                FileUtil.delete(stopFile);
+            } catch (IOException e) {
+                throw new JEFException(
+                        "Cannot delete stop file: " + stopFile, e);
+            }
         }
     }
 

@@ -2,11 +2,11 @@ package com.norconex.jef4.status;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 import com.norconex.commons.lang.map.Properties;
 
 public class MutableJobStatus implements IJobStatus {
-
-    private static final long serialVersionUID = -3106380316055356588L;
 
     /** Activity timeout. */
     private static final long ACTIVITY_TIMEOUT = 10 * 1000;
@@ -130,9 +130,6 @@ public class MutableJobStatus implements IJobStatus {
         if (date == null) {
             return false;
         }
-//        if (isPrematurlyEnded()) {
-//                return false;
-//        }
         return (System.currentTimeMillis() - date.getTime())
                 < ACTIVITY_TIMEOUT;
     }
@@ -192,14 +189,14 @@ public class MutableJobStatus implements IJobStatus {
      * @return last activity
      */
     public Date getLastActivity() {
-        return lastActivity;
+        return ObjectUtils.clone(lastActivity);
     }
     /**
      * Sets the last activity.
      * @param lastActivity last activity
      */
     public void setLastActivity(final Date lastActivity) {
-        this.lastActivity = lastActivity;
+        this.lastActivity = ObjectUtils.clone(lastActivity);
     }
     
     @Override

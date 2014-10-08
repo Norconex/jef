@@ -17,17 +17,16 @@
  */
 package com.norconex.jef4.status;
 
-import java.io.Serializable;
 import java.util.Date;
+
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Holds time-related information about a job execution.
  * @author Pascal Essiembre
  */
-public class JobDuration implements Serializable {
+public class JobDuration {
 
-    private static final long serialVersionUID = -4511429912030790897L;
-    
     private Date resumedStartTime;
     private Date resumedLastActivity;
     
@@ -46,14 +45,14 @@ public class JobDuration implements Serializable {
      * @return end time
      */
     public final Date getEndTime() {
-        return endTime;
+        return ObjectUtils.clone(endTime);
     }
     /**
      * Sets the end time.
      * @param endTime end time
      */
     public final void setEndTime(final Date endTime) {
-        this.endTime = endTime;
+        this.endTime = ObjectUtils.clone(endTime);
     }
 
     /**
@@ -61,14 +60,14 @@ public class JobDuration implements Serializable {
      * @return start time
      */
     public final Date getStartTime() {
-        return startTime;
+        return ObjectUtils.clone(startTime);
     }
     /**
      * Sets the start time.
      * @param startTime start time
      */
     public final void setStartTime(final Date startTime) {
-        this.startTime = startTime;
+        this.startTime = ObjectUtils.clone(startTime);
     }
 
     /**
@@ -95,19 +94,19 @@ public class JobDuration implements Serializable {
     }
 
     public Date getResumedStartTime() {
-        return resumedStartTime;
+        return ObjectUtils.clone(resumedStartTime);
     }
 
     public void setResumedStartTime(Date resumedStartTime) {
-        this.resumedStartTime = resumedStartTime;
+        this.resumedStartTime = ObjectUtils.clone(resumedStartTime);
     }
 
     public Date getResumedLastActivity() {
-        return resumedLastActivity;
+        return ObjectUtils.clone(resumedLastActivity);
     }
 
     public void setResumedLastActivity(Date resumedLastActivity) {
-        this.resumedLastActivity = resumedLastActivity;
+        this.resumedLastActivity = ObjectUtils.clone(resumedLastActivity);
     }
 
     public long getResumedDuration() {
@@ -116,70 +115,4 @@ public class JobDuration implements Serializable {
         }
         return 0;
     }
-
-    
-    
-//    public class TimeRange implements Serializable {
-//        private static final long serialVersionUID = -4230903051960691337L;
-//        private Date start;
-//        private Date end;
-//        public Date getStart() {
-//            return start;
-//        }
-//        public void setStart(Date fromDate) {
-//            this.start = fromDate;
-//        }
-//        public Date getEnd() {
-//            return end;
-//        }
-//        public void setEnd(Date toDate) {
-//            this.end = toDate;
-//        }
-//        public long getDuration() {
-//            if (start == null || end == null) {
-//                return -1;
-//            }
-//            return end.getTime() - start.getTime();
-//        }
-//    }
-    
-//    /**
-//     * Gets the elapsed time as a string, in a human readable format.
-//     * @return elapsed time
-//     */
-//    @SuppressWarnings("nls")
-//    public final String getElapsedTimeAsString() {
-//        long time = getDuration();
-//        if (time < 0) {
-//            return "";
-//        }
-//        String str = ""; 
-//        int days = (int) time / DAY;
-//        time -= days * DAY;
-//        if (days > 0) {
-//            str += days + "d"; 
-//        }
-//        int hours = (int) time / HOUR;
-//        time -= hours * HOUR;
-//        if (hours > 0) {
-//            str += hours + "h"; 
-//        }
-//        int minutes = (int) time / MINUTE;
-//        time -= minutes * MINUTE;
-//        if (minutes > 0) {
-//            str += minutes + "m"; 
-//        }
-//        int seconds = (int) time / SECOND;
-//        time -= seconds * SECOND;
-//        if (seconds > 0) {
-//            str += seconds + "s"; 
-//        }
-//        if (str.equals("")) { 
-//            str += time + "ms"; 
-//        }
-//        return str;
-//    }
-//    
-
-
 }

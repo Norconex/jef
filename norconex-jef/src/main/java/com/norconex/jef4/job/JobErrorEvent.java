@@ -17,8 +17,6 @@
  */
 package com.norconex.jef4.job;
 
-import java.io.Serializable;
-
 import com.norconex.jef4.status.IJobStatus;
 import com.norconex.jef4.suite.JobSuite;
 
@@ -27,9 +25,8 @@ import com.norconex.jef4.suite.JobSuite;
  * instances.
  * @author Pascal Essiembre
  */
-public class JobErrorEvent implements Serializable {
+public class JobErrorEvent {
 
-    private static final long serialVersionUID = 3751532918788425961L;
     private final Throwable t;
     private final JobSuite suite;
     private final IJobStatus status;

@@ -78,13 +78,4 @@ public interface IJobLifeCycleListener {
      * @since 2.0
      */
     void jobCompleted(IJobStatus status);
-    
-//    /**
-//     * Invoked at regular intervals to confirm the job is still running.
-//     * This is separate than checking for a change of status.  The status
-//     * may not have changed between invocation, or may have changed multiple
-//     * times.
-//     * @param status job status
-//     */
-//    void jobRunningVerified(IJobStatus status);
 }

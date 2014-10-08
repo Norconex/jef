@@ -1,11 +1,10 @@
 package com.norconex.jef4.status;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import com.norconex.commons.lang.map.Properties;
 
-public interface IJobStatus extends Serializable {
+public interface IJobStatus {
 
 
     String getJobId();

@@ -2,7 +2,6 @@ package com.norconex.jef4.status;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,9 +20,10 @@ import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.job.group.IJobGroup;
 import com.norconex.jef4.log.ILogManager;
 
-public final class JobSuiteStatusSnapshot implements Serializable {
-    private static final long serialVersionUID = 74258557029725685L;
+public final class JobSuiteStatusSnapshot {
 
+    private static final int TO_STRING_INDENT = 4;
+    
     private final ILogManager logManager;
     private final JobStatusTreeNode rootNode;
     private Map<String, JobStatusTreeNode> flattenNodes = 
@@ -138,8 +138,8 @@ public final class JobSuiteStatusSnapshot implements Serializable {
             throws IOException {
         //--- Ensure file looks good ---
         if (suiteIndex == null) {
-            throw new NullPointerException(
-                    "\"suiteIndex\" argument cannot be null.");
+            throw new IllegalArgumentException(
+                    "Suite index file cannot be null.");
         }
         if (!suiteIndex.exists()) {
             return null;
@@ -197,8 +197,7 @@ public final class JobSuiteStatusSnapshot implements Serializable {
     }
     
     //--- Class: JobStatusTreeNode ---------------------------------------------
-    public static class JobStatusTreeNode implements Serializable {
-        private static final long serialVersionUID = 5605697815222704629L;
+    public static class JobStatusTreeNode {
         private final IJobStatus parentStatus;
         private final IJobStatus jobStatus;
         private final List<JobStatusTreeNode> children;
@@ -256,9 +255,9 @@ public final class JobSuiteStatusSnapshot implements Serializable {
     }
     private void toString(StringBuilder b, String jobId, int depth) {
         IJobStatus status = getJobStatus(jobId);
-        b.append(StringUtils.repeat(' ', depth * 4));
+        b.append(StringUtils.repeat(' ', depth * TO_STRING_INDENT));
         b.append(StringUtils.leftPad(new PercentFormatter().format(
-                status.getProgress()), 4));
+                status.getProgress()), TO_STRING_INDENT));
         b.append("  ").append(status.getJobId());
         b.append(System.lineSeparator());
         for (IJobStatus child : getChildren(status)) {

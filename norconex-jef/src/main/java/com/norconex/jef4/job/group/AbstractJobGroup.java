@@ -20,6 +20,8 @@ package com.norconex.jef4.job.group;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.status.IJobStatus;
 import com.norconex.jef4.status.JobStatusUpdater;
@@ -60,15 +62,15 @@ public abstract class AbstractJobGroup implements IJobGroup {
         } else {
             this.jobs = jobs;
         }
-        this.jobIds = new ArrayList<String>(jobs.length);
-        for (int i = 0; i < jobs.length; i++) {
-            jobIds.add(jobs[i].getId());
+        this.jobIds = new ArrayList<String>(this.jobs.length);
+        for (int i = 0; i < this.jobs.length; i++) {
+            jobIds.add(this.jobs[i].getId());
         }
     }
 
     @Override
     public final IJob[] getJobs() {
-        return jobs;
+        return ArrayUtils.clone(jobs);
     }
     @Override
     public final String getId() {

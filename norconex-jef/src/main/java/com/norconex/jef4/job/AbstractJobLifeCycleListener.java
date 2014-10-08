@@ -62,11 +62,7 @@ public abstract class AbstractJobLifeCycleListener
     public void jobStopping(final IJobStatus progress) {
         // do nothing
     }
-    
-//    @Override
-//    public void jobRunningVerified(final IJobStatus progress) {
-//        // do nothing
-//    }
+
     @Override
     public void jobCompleted(IJobStatus progress) {
         // do nothing

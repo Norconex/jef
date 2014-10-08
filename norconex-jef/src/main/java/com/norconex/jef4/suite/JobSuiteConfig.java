@@ -21,25 +21,10 @@ public class JobSuiteConfig {
             new ArrayList<IJobErrorListener>();
     private final List<ISuiteLifeCycleListener> suiteLifeCycleListeners =
             new ArrayList<ISuiteLifeCycleListener>();
-//    private final List<ISuiteStopRequestListener> stopListeners =
-//            new ArrayList<ISuiteStopRequestListener>();
-
     
     public JobSuiteConfig() {
         super();
     }
-
-//    /**
-//     * Gets the job status serializer.
-//     * @return job status serializer
-//     */
-//    public IJobStatusStore getJobStatusSerializer() {
-//        return jobStatusStore;
-//    }
-//    public void setJobStatusSerializer(
-//            IJobStatusStore jobStatusStore) {
-//        this.jobStatusStore = jobStatusStore;
-//    }
 
     /**
      * Gets the Log4J log manager.

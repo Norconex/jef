@@ -18,8 +18,9 @@
 package com.norconex.jef4.suite;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
@@ -29,6 +30,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -231,7 +235,12 @@ public final class JobSuite {
     /*default*/ File getSuiteIndexFile() {
         File indexDir = new File(getWorkdir() + File.separator + "latest");
         if (!indexDir.exists()) {
-            indexDir.mkdirs();
+            try {
+                FileUtils.forceMkdir(indexDir);
+            } catch (IOException e) {
+                throw new JEFException("Cannot create index directory: " 
+                        + indexDir, e);
+            }
         }
         return new File(indexDir, 
                 FileUtil.toSafeFileName(getId()) + ".index");
@@ -292,6 +301,9 @@ public final class JobSuite {
     //TODO make public, to allow to start a specific job??
     //TODO document this is not a public method?
     public boolean runJob(final IJob job) {
+        if (job == null) {
+            throw new IllegalArgumentException("Job cannot be null.");
+        }
         boolean success = false;
         setCurrentJobId(job.getId());
         
@@ -376,7 +388,10 @@ public final class JobSuite {
     }
     
     public void stop() throws IOException {
-        getSuiteStopFile().createNewFile();
+        if (!getSuiteStopFile().createNewFile()) {
+            throw new IOException(
+                    "Could not create stop file: " + getSuiteStopFile());
+        }
     }
     
     public static void stop(File indexFile) throws IOException {
@@ -386,7 +401,10 @@ public final class JobSuite {
         String stopPath = 
                 StringUtils.removeEnd(indexFile.getAbsolutePath(), "index");
         stopPath += ".stop";
-        new File(stopPath).createNewFile();
+        if (!new File(stopPath).createNewFile()) {
+            throw new IOException(
+                    "Could not create stop file: " + stopPath);
+        }        
     }
     
     private void accept(
@@ -485,29 +503,38 @@ public final class JobSuite {
         }
         File backupFile = new File(backupDir.getAbsolutePath() + "/" 
                 + date + "__"  + FileUtil.toSafeFileName(getId()) + ".index");
-        indexFile.renameTo(backupFile);
+        if (!indexFile.renameTo(backupFile)) {
+            throw new IOException("Could not create backup file: "
+                    + backupFile);
+        }
     }
     
     private void writeJobSuiteIndex(JobSuiteStatusSnapshot statusTree) 
             throws IOException {
-        Writer out = new FileWriter(getSuiteIndexFile());
-        out.write("<?xml version=\"1.0\" ?><suite-index>");
-        
-        //--- Log Manager ---
-        out.flush();
-        getLogManager().saveToXML(out);
+        Writer out = null;
+        try {
+            out = new OutputStreamWriter(
+                    new FileOutputStream(getSuiteIndexFile()), 
+                    CharEncoding.UTF_8);
+            out.write("<?xml version=\"1.0\" ?><suite-index>");
+            
+            //--- Log Manager ---
+            out.flush();
+            getLogManager().saveToXML(out);
 
-        //--- JobStatusSerializer ---
-        out.flush();
-        getJobStatusStore().saveToXML(out);
-        
-        //--- Job Status ---
-        writeJobId(out, statusTree, statusTree.getRoot());
-        
-        out.write("</suite-index>");
+            //--- JobStatusSerializer ---
+            out.flush();
+            getJobStatusStore().saveToXML(out);
+            
+            //--- Job Status ---
+            writeJobId(out, statusTree, statusTree.getRoot());
+            
+            out.write("</suite-index>");
 
-        out.flush();
-        out.close();
+            out.flush();
+        } finally {
+            IOUtils.closeQuietly(out);
+        }
     }
     
     private void writeJobId(Writer out, 
@@ -532,7 +559,12 @@ public final class JobSuite {
             }
         }
         if (!dir.exists()) {
-            dir.mkdirs();
+            try {
+                FileUtils.forceMkdir(dir);
+            } catch (IOException e) {
+                throw new JEFException("Cannot create work directory: " 
+                        + dir, e);
+            }
         }
         LOG.info("JEF work directory is: " + dir);
         return dir.getAbsolutePath();

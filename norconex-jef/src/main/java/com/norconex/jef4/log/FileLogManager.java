@@ -31,10 +31,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
-import org.apache.log4j.Layout;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -43,6 +43,7 @@ import com.norconex.commons.lang.config.ConfigurationUtil;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.commons.lang.io.FilteredInputStream;
 import com.norconex.commons.lang.io.IInputStreamFilter;
+import com.norconex.jef4.JEFException;
 import com.norconex.jef4.JEFUtil;
 
 /**
@@ -52,8 +53,6 @@ import com.norconex.jef4.JEFUtil;
 @SuppressWarnings("nls")
 public class FileLogManager implements ILogManager {
 
-    private static final long serialVersionUID = 422457693976262267L;
-    
     private static final Logger LOG =
             LogManager.getLogger(FileLogManager.class);
     
@@ -68,9 +67,6 @@ public class FileLogManager implements ILogManager {
     private String logdir;
     
     
-//    /** Log4J layout to use for the generated log. */
-//    private final ThreadSafeLayout layout;
-    
     private static final String LOG_SUFFIX = ".log";
     
 
@@ -81,26 +77,14 @@ public class FileLogManager implements ILogManager {
         this(null);
     }
 
-    
-    /**
-     * Constructor.
-     * @param logdir base directory where the log should be stored
-     */
-    public FileLogManager(final String logdir) {
-        this(logdir, new PatternLayout(LAYOUT_PATTERN));
-              
-    }
-
     /**
      * Creates a new <code>FileLogManager</code>, wrapping the given
      * layout into a <code>ThreadSafeLayout</code>.
      * @param logdir base directory where the log should be stored
-     * @param layout Log4J layout for rendering the logs
      */
-    private FileLogManager(final String logdir, final Layout layout) {
+    public FileLogManager(final String logdir) {
         super();
         this.logdir = logdir;
-//        this.layout = new ThreadSafeLayout(layout);
         resolveDirs();
     }
 
@@ -123,7 +107,14 @@ public class FileLogManager implements ILogManager {
         logdirBackupBase = path + "/backup";
         File dir = new File(logdirLatest);
         if (!dir.exists()) {
-            dir.mkdirs();
+            if (!dir.exists()) {
+                try {
+                    FileUtils.forceMkdir(dir);
+                } catch (IOException e) {
+                    throw new JEFException("Cannot create log directory: "
+                            + logdirLatest, e);
+                }
+            }  
         }
     }
     
@@ -148,9 +139,13 @@ public class FileLogManager implements ILogManager {
                 new File(logdirBackupBase), backupDate);
         backupDir = new File(backupDir, "logs");
         if (!backupDir.exists()) {
-            backupDir.mkdirs();
+            try {
+                FileUtils.forceMkdir(backupDir);
+            } catch (IOException e) {
+                throw new JEFException("Cannot create backup directory: "
+                        + backupDir, e);
+            }
         }        
-        
         File backupFile = new File(
                 backupDir + "/" + date + "__" + namespace + LOG_SUFFIX);
 
@@ -215,7 +210,7 @@ public class FileLogManager implements ILogManager {
         }       
     }
 
-    private class StartWithFilter implements IInputStreamFilter {
+    private static class StartWithFilter implements IInputStreamFilter {
         private final String startsWith;
         public StartWithFilter(String startsWith) {
             super();

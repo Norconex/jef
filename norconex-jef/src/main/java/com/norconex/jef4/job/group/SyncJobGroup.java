@@ -73,6 +73,5 @@ public class SyncJobGroup extends AbstractJobGroup {
             throw new JobException(
                     "\"" + failedJob + "\" failed in sync group " + getId());
         }
-        //JobSuite.setCurrentJobId(getName());
     }
 }

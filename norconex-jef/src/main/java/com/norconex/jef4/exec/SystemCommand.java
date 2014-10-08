@@ -103,7 +103,7 @@ public class SystemCommand {
      * @return the command
      */
     public String[] getCommand() {
-        return command;
+        return ArrayUtils.clone(command);
     }
 
     /**

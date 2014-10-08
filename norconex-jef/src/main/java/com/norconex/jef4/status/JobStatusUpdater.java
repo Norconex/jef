@@ -8,16 +8,9 @@ import com.norconex.commons.lang.map.Properties;
 
 public abstract class JobStatusUpdater {
 
-//    private final String suiteName;
     private final MutableJobStatus status;
-//    private final IJobStatusStore store;
     
-    public JobStatusUpdater(
-//            String suiteName,
-//            IJobStatusStore store,
-            final MutableJobStatus status) {
-//        this.suiteName = suiteName;
-//        this.store = store;
+    public JobStatusUpdater(final MutableJobStatus status) {
         this.status = status;
         status.getProperties().addMapChangeListener(
                 new IMapChangeListener<String, List<String>>() {

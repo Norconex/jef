@@ -35,6 +35,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -42,6 +43,7 @@ import org.apache.log4j.Logger;
 import com.norconex.commons.lang.config.ConfigurationUtil;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.commons.lang.map.Properties;
+import com.norconex.jef4.JEFException;
 import com.norconex.jef4.JEFUtil;
 import com.norconex.jef4.job.JobException;
 
@@ -96,7 +98,12 @@ public class FileJobStatusStore implements IJobStatusStore {
         jobdirBackupBase = path + "/backup";
         File dir = new File(jobdirLatest);
         if (!dir.exists()) {
-            dir.mkdirs();
+            try {
+                FileUtils.forceMkdir(dir);
+            } catch (IOException e) {
+                throw new JEFException("Cannot create status directory: "
+                        + dir, e);
+            }
         }
     }
 
@@ -107,7 +114,9 @@ public class FileJobStatusStore implements IJobStatusStore {
 
         File file = getStatusFile(suiteName, jobStatus.getJobId());
         if (!file.exists()) {
-            file.createNewFile();
+            if (!file.createNewFile()) {
+                throw new IOException("Cannot create status file: " + file);
+            }
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Writing status file: " + file);
@@ -160,36 +169,41 @@ public class FileJobStatusStore implements IJobStatusStore {
         
 
         Properties config = new Properties();
-        InputStream is = new FileInputStream(file);
-        config.load(is);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(jobId + " last active time: "
-                    + new Date(file.lastModified()));
-        }
-        jobStatus.setLastActivity(new Date(file.lastModified()));
-        
-        jobStatus.setProgress(config.getDouble("progress", 0d));
-        jobStatus.setNote(config.getString("note", null));
-        jobStatus.setResumeAttempts(config.getInt("resumeAttempts", 0));
-        
-        JobDuration duration = new JobDuration();
-        duration.setResumedStartTime(config.getDate("resumedStartTime", null));
-        duration.setResumedLastActivity(
-                config.getDate("resumedLastActivity", null));
-        duration.setStartTime(config.getDate("startTime", null));
-        duration.setEndTime(config.getDate("endTime", null));
-        jobStatus.setDuration(duration);
-
-        jobStatus.setStopRequested(config.getBoolean("stopped", false));
-        
-        Properties props = jobStatus.getProperties();
-        for (String key : config.keySet()) {
-            if (key.startsWith("prop.")) {
-                props.put(StringUtils.removeStart(
-                        "prop.", key), props.get(key));
+        InputStream is = null;
+        try {
+            is = new FileInputStream(file);
+            config.load(is);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(jobId + " last active time: "
+                        + new Date(file.lastModified()));
             }
+            jobStatus.setLastActivity(new Date(file.lastModified()));
+            
+            jobStatus.setProgress(config.getDouble("progress", 0d));
+            jobStatus.setNote(config.getString("note", null));
+            jobStatus.setResumeAttempts(config.getInt("resumeAttempts", 0));
+            
+            JobDuration duration = new JobDuration();
+            duration.setResumedStartTime(
+                    config.getDate("resumedStartTime", null));
+            duration.setResumedLastActivity(
+                    config.getDate("resumedLastActivity", null));
+            duration.setStartTime(config.getDate("startTime", null));
+            duration.setEndTime(config.getDate("endTime", null));
+            jobStatus.setDuration(duration);
+
+            jobStatus.setStopRequested(config.getBoolean("stopped", false));
+            
+            Properties props = jobStatus.getProperties();
+            for (String key : config.keySet()) {
+                if (key.startsWith("prop.")) {
+                    props.put(StringUtils.removeStart(
+                            "prop.", key), props.get(key));
+                }
+            }
+        } finally {
+            IOUtils.closeQuietly(is);
         }
-        is.close();
         return jobStatus;
     }
 
@@ -197,10 +211,7 @@ public class FileJobStatusStore implements IJobStatusStore {
     public final void remove(final String suiteName, final String jobId)
             throws IOException {
         File file = getStatusFile(suiteName, jobId);
-        file.delete();
-        if (file.exists()) {
-            throw new IOException("Unable to delete file: " + file);
-        }
+        FileUtil.delete(file);
     }
 
     @Override
@@ -209,7 +220,9 @@ public class FileJobStatusStore implements IJobStatusStore {
             throws IOException {
         File progressFile = getStatusFile(suiteName, jobId);
         File backupFile = getBackupFile(suiteName, jobId, backupDate);
-        progressFile.renameTo(backupFile);
+        if (!progressFile.renameTo(backupFile)) {
+            throw new IOException("Cannot create backup file: " + backupFile);
+        }
     }
 
     @Override
@@ -251,7 +264,12 @@ public class FileJobStatusStore implements IJobStatusStore {
         }
         backupDir = new File(backupDir, "status");
         if (!backupDir.exists()) {
-            backupDir.mkdirs();
+            try {
+                FileUtils.forceMkdir(backupDir);
+            } catch (IOException e) {
+                throw new JEFException("Cannot create backup directory: "
+                        + backupDir, e);
+            }
         }
         return new File(backupDir + "/" + date + "__" 
                 + FileUtil.toSafeFileName(suiteName)
