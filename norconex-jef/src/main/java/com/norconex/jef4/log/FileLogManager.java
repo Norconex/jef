@@ -119,21 +119,22 @@ public class FileLogManager implements ILogManager {
     }
     
     @Override
-    public final Appender createAppender(final String namespace)
+    public final Appender createAppender(final String suiteId)
             throws IOException {
         
         return new FileAppender(
                 new PatternLayout(LAYOUT_PATTERN),
-                logdirLatest + "/" + namespace + LOG_SUFFIX);
+                logdirLatest + "/" + 
+                        FileUtil.toSafeFileName(suiteId) + LOG_SUFFIX);
     }
     
     @Override
-    public final void backup(final String namespace, final Date backupDate)
+    public final void backup(final String suiteId, final Date backupDate)
             throws IOException {
         String date = new SimpleDateFormat(
                 "yyyyMMddHHmmssSSSS").format(backupDate);
-        File progressFile = new File(
-                logdirLatest + "/" + namespace + LOG_SUFFIX);
+        File progressFile = getLogFile(suiteId);
+        
 
         File backupDir = FileUtil.createDateDirs(
                 new File(logdirBackupBase), backupDate);
@@ -147,43 +148,44 @@ public class FileLogManager implements ILogManager {
             }
         }        
         File backupFile = new File(
-                backupDir + "/" + date + "__" + namespace + LOG_SUFFIX);
+                backupDir + "/" + date + "__" 
+                        + FileUtil.toSafeFileName(suiteId) + LOG_SUFFIX);
 
         FileUtil.moveFile(progressFile, backupFile);
     }
 
     @Override
-    public final InputStream getLog(final String namespace) throws IOException {
-        File logFile = getLogFile(namespace);
+    public final InputStream getLog(final String suiteId) throws IOException {
+        File logFile = getLogFile(suiteId);
         if (logFile != null && logFile.exists()) {
             return new FileInputStream(logFile);
         }
         return null;
     }
     @Override
-    public InputStream getLog(String namespace,
-            String jobId) throws IOException {
+    public InputStream getLog(String suiteId, String jobId) throws IOException {
         if (jobId == null) {
-            return getLog(namespace);
+            return getLog(suiteId);
         }
-        InputStream fullLog = getLog(namespace);
+        InputStream fullLog = getLog(suiteId);
         if (fullLog != null) {
             return new FilteredInputStream(
-                    getLog(namespace), new StartWithFilter(jobId));
+                    getLog(suiteId), new StartWithFilter(jobId));
         }
         return null;
     }
 
     /**
      * Gets the log file used by this log manager.
-     * @param namespace log file namespace
+     * @param suiteId log file suiteId
      * @return log file
      */
-    public File getLogFile(final String namespace) {
-        if (namespace == null) {
+    public File getLogFile(final String suiteId) {
+        if (suiteId == null) {
             return null;
         }
-        return new File(logdirLatest + "/" + namespace + LOG_SUFFIX);
+        return new File(logdirLatest + "/" 
+                + FileUtil.toSafeFileName(suiteId) + LOG_SUFFIX);
     }
     
     @Override

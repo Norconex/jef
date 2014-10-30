@@ -220,8 +220,8 @@ public class FileJobStatusStore implements IJobStatusStore {
             throws IOException {
         File progressFile = getStatusFile(suiteName, jobId);
         File backupFile = getBackupFile(suiteName, jobId, backupDate);
-        if (!progressFile.renameTo(backupFile)) {
-            throw new IOException("Cannot create backup file: " + backupFile);
+        if (progressFile.exists()) {
+            FileUtil.moveFile(progressFile, backupFile);
         }
     }
 

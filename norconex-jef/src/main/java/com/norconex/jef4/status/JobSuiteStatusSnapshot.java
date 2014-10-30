@@ -94,9 +94,9 @@ public final class JobSuiteStatusSnapshot {
     }
     private void accept(IJobStatusVisitor visitor, String jobId) {
         if (visitor != null) {
-            IJobStatus status = getJobStatus(jobId);
+//            IJobStatus status = getJobStatus(jobId);
             visitor.visitJobStatus(getJobStatus(jobId));
-            for (IJobStatus child : getChildren(status)) {
+            for (IJobStatus child : getChildren(jobId)) {
                 accept(visitor, child.getJobId());
             }
         }
@@ -260,7 +260,7 @@ public final class JobSuiteStatusSnapshot {
                 status.getProgress()), TO_STRING_INDENT));
         b.append("  ").append(status.getJobId());
         b.append(System.lineSeparator());
-        for (IJobStatus child : getChildren(status)) {
+        for (IJobStatus child : getChildren(jobId)) {
             toString(b, child.getJobId(), depth + 1);
         }
     }
