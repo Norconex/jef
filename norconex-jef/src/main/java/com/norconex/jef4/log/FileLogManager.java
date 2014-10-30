@@ -150,8 +150,9 @@ public class FileLogManager implements ILogManager {
         File backupFile = new File(
                 backupDir + "/" + date + "__" 
                         + FileUtil.toSafeFileName(suiteId) + LOG_SUFFIX);
-
-        FileUtil.moveFile(progressFile, backupFile);
+        if (progressFile.exists()) {
+            FileUtil.moveFile(progressFile, backupFile);
+        }
     }
 
     @Override
