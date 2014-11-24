@@ -6,14 +6,30 @@
     <author email="info@norconex.com">Norconex Inc.</author>
   </properties>
   <body>
-    <release version="4.0.0" date="201?-??-??" description="Major release">
+    <release version="4.0.0" date="2014-??-??" description="Major release">
+      <action dev="essiembre" type="update">
+        Rewriting of many areas to simplify usage and interoperability.
+        Too different from 3.x to be considered
+        a drop-in replacement (hence renaming jef package to jef4).
+      </action>
+      <action dev="essiembre" type="update">
+        Now a job suite progress can be read without the suite classes
+        to be available in class path. 
+      </action>             
+      <action dev="essiembre" type="update">
+        Job progress is now summarized in a job suite index file. 
+      </action>             
+      <action dev="essiembre" type="update">
+        Job progress is now tracked as double value from 0 to 1.
+      </action>             
+      
     </release>
 
     <release version="3.0.0" date="2013-06-04" description="Open Source release">
-      <action dev="essiembp" type="update">
+      <action dev="essiembre" type="update">
         Starting with this release, JEF is open-source under GPL.
       </action>
-      <action dev="essiembp" type="update">
+      <action dev="essiembre" type="update">
         Now depends on Norconex Commons Lang whenever possible. Some
         of JEF classes were merged into Norconex Commons Lang.
       </action>
