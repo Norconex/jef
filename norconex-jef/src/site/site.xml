@@ -125,8 +125,8 @@
     </menu>
 
     <menu name="Contribute">
-      <item name="Issues" href="https://github.com/norconex/commons-lang/issues"/>
-      <item name="Fork on GitHub"  href="https://github.com/Norconex/commons-lang"/>
+      <item name="Issues" href="https://github.com/Norconex/jef/issues"/>
+      <item name="Fork on GitHub"  href="https://github.com/Norconex/jef"/>
     </menu>
 
     <menu name="Main">
@@ -150,24 +150,3 @@
   <googleAnalyticsAccountId>UA-23162620-1</googleAnalyticsAccountId>
 
 </project>
-<!-- 
-
-    <menu name="Overview">
-      <item name="Introduction" href="index.html"/>
-      <item name="Getting Started" href="usage.html"/>
-      <item name="Javadoc (Latest release)" href="apidocs/index.html"/>
-      <item name="License" href="license.html"/>
-      <item name="Download" href="download.html"/>
-      <item name="Support" href="support.html"/>
-    </menu>
-
-    <menu ref="reports"/>
-
-    <menu name="Norconex Products">
-      <item name="HTTP Collector"  href="http://www.norconex.com/product/collector-http"/>
-      <item name="Search Analytics" href="http://www.norconex.com/analytics"/>
-      <item name="Importer" href="http://www.norconex.com/product/importer"/>
-      <item name="Commons Lang" href="http://www.norconex.com/product/commons-lang"/>
-      <item name="Committer" href="http://www.norconex.com/product/committer"/>
-    </menu>
- -->
