@@ -6,7 +6,7 @@
     <author email="info@norconex.com">Norconex Inc.</author>
   </properties>
   <body>
-    <release version="4.0.0" date="2014-11-24" description="Major release">
+    <release version="4.0.0" date="2014-11-25" description="Major release">
       <action dev="essiembre" type="update">
         Now licensed under The Apache License, Version 2.0.
       </action>
