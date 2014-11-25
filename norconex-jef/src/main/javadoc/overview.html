@@ -1,0 +1,75 @@
+<!-- 
+   Copyright 2013-2014 Norconex Inc.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<body>
+<p>
+This library constitutes the Norconex Java Execution Framework.
+</p>
+<p>
+Simple steps to get started:
+</p>
+<ul>
+  <li>Create one or more jobs ({@link com.norconex.jef.job.IJob}) to accomplish
+      the required tasks.</li>
+  <li>If you have more than one job, assemble/group them together using one or
+      a combination of
+      {@link com.norconex.jef.group.AsyncJobGroup} and
+      {@link com.norconex.jef.group.SyncJobGroup}.</li>
+  <li>Create and configure a job suite ({@link com.norconex.jef.suite.JobSuite})
+      with your created jobs (it is recommended you use 
+      {@link com.norconex.jef.suite.IJobSuiteFactory} for the suite creation
+       process).</li>
+  <li>Run your job suite by passing it to 
+      {@link com.norconex.jef.suite.JobSuite#execute()}.</li>
+</ul>
+
+
+<p>
+The creation of a job suite may look like this:
+</p>
+<pre>
+    public class MyJobSuiteFactory implements IJobSuiteFactory {
+    
+        public JobSuite createJobSuite() {
+            IJob rootJob = new AsyncJobGroup("asyncGroupSample", new IJob[] {
+                    new MyJobA(),
+                    new SyncJobGroup("syncGroupSample", new IJob[] {
+                            new MyJobB(),
+                            new MyJobC()
+                    }),    
+                    new MyJobD(),
+                    new MyJobE()),
+            });
+            JobSuite suite = new JobSuite(rootJob);
+            
+            // add any listners/handlers to the suite
+
+            return suite;
+        }
+    }
+</pre>
+
+<p>
+In the end, launching a job suite may look like this:
+</p>
+
+<pre>
+    IJobSuiteFactory factory = new MyJobSuiteFactory();
+    JobSuite suite = factory.createJobSuite();
+    suite.execute();
+</pre>
+
+
+</body>

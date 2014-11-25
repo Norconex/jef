@@ -1,83 +1,45 @@
 <!-- 
-Copyright 2010-2013 Norconex Inc.
+   Copyright 2010-2014 Norconex Inc.
 
-This file is part of Norconex JEF.
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
 
-Norconex JEF is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+       http://www.apache.org/licenses/LICENSE-2.0
 
-Norconex JEF is distributed in the hope that it will be useful, 
-but WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.norconex.jef</groupId>
   <artifactId>norconex-jef</artifactId>
-  <version>3.0.1</version>
+  <version>4.0.0</version>
   <name>Norconex JEF</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <site.baseurl/>
-    <currentStableVersion>3.0.1</currentStableVersion>
+    <currentStableVersion>4.0.0</currentStableVersion>
   </properties>
   <inceptionYear>2007</inceptionYear>
 
   <licenses>
     <license>
-      <name>GNU GENERAL PUBLIC LICENSE, Version 3</name>
-      <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
-    </license>
-    <license>
-      <comments>
-        Norconex provides commercial licenses for all its open-source
-        products, designed to meet the development and distribution 
-        needs of commercial distributors
-        (such as OEMs, ISVs and VARs).  Please contact Norconex
-        for a commercial license at sales@norconex.com.
-      </comments>
-      <name>Commercial License</name>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
 
-  <repositories>
-    <repository>
-      <id>norconex-release-repo</id>
-      <url>http://norconex.s3.amazonaws.com/repo/release</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>daily</updatePolicy>
-        <checksumPolicy>fail</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>norconex-snapshot-repo</id>
-      <url>http://norconex.s3.amazonaws.com/repo/snapshot</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>daily</updatePolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>log4j</groupId>
@@ -85,18 +47,36 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
         <version>1.2.17</version>
     </dependency>
     <dependency>
+        <groupId>com.norconex.commons</groupId>
+        <artifactId>norconex-commons-lang</artifactId>
+        <version>1.5.0</version>
+    </dependency>
+    <dependency>
         <groupId>org.apache.geronimo.javamail</groupId>
         <artifactId>geronimo-javamail_1.4_mail</artifactId>
         <version>1.7</version>
     </dependency>
-    <dependency>
-      <groupId>com.norconex.commons</groupId>
-      <artifactId>norconex-commons-lang</artifactId>
-      <version>1.3.2</version>
-    </dependency>
   </dependencies>
   
   <build>
+    <resources>
+        <resource>
+            <directory>${project.build.testSourceDirectory}</directory>
+            <includes>
+                <include>**/*.html</include>
+            </includes>
+        </resource>
+        <resource>
+            <filtering>false</filtering>
+            <directory>${project.build.sourceDirectory}</directory>
+            <includes>
+                <include>**</include>
+            </includes>
+            <excludes>
+                <exclude>**/*.java</exclude>
+            </excludes>
+        </resource>
+    </resources>  
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
@@ -114,19 +94,36 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.3</version>
+                <configuration>
+                    <generateReports>true</generateReports>
+                    <templateFile>
+                        ${basedir}/src/site/resources/skin/reflow-modified.vm
+                    </templateFile>
+                </configuration>
                 <dependencies>
+                  <dependency>
+                    <groupId>lt.velykis.maven.skins</groupId>
+                    <artifactId>reflow-velocity-tools</artifactId>
+                    <version>1.1.0</version>
+                  </dependency>
+                  <!-- Reflow skin requires Velocity >= 1.7  -->
+                  <dependency>
+                    <groupId>org.apache.velocity</groupId>
+                    <artifactId>velocity</artifactId>
+                    <version>1.7</version>
+                  </dependency>
                   <dependency>
                     <groupId>org.apache.maven.doxia</groupId>
                     <artifactId>doxia-site-renderer</artifactId>
-                    <version>1.3</version>
+                    <version>1.4</version>
                   </dependency>
-	              <dependency>
-	                <groupId>org.apache.maven.doxia</groupId>
-	                <artifactId>doxia-module-markdown</artifactId>
-	                <version>1.3</version>
-	              </dependency>
-                </dependencies>   
+                  <dependency>
+                    <groupId>org.apache.maven.doxia</groupId>
+                    <artifactId>doxia-module-markdown</artifactId>
+                    <version>1.4</version>
+                  </dependency>
+                </dependencies>                
             </plugin>
         </plugins>
     </pluginManagement>
@@ -136,9 +133,29 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.7</source>
+          <target>1.7</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>download-licenses</id>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>create-license-list</id>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <phase>generate-resources</phase>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -163,9 +180,8 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9</version>
         <configuration>
-          <stylesheetfile>${basedir}/src/main/resources/javadoc.css</stylesheetfile>
+          <overview>src/main/javadoc/overview.html</overview>
           <show>protected</show>
-          <overview>src/main/java/overview.html</overview>
           <detectLinks>true</detectLinks>
         </configuration>
         <executions>
@@ -174,6 +190,25 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
             <phase>prepare-package</phase>
             <goals>
               <goal>javadoc</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
@@ -192,6 +227,31 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.3</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>false</autoReleaseAfterClose>
+        </configuration>
+      </plugin>    
     </plugins>
   </build>
 
@@ -200,17 +260,16 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
       <id>norconex-site-deployment</id>
       <url>${site.baseurl}/jef</url>
     </site>
-    <repository>  
-      <id>norconex-release-repo</id>
-      <name>Norconex Release Repository</name>  
-      <url>s3://norconex/repo/release</url>  
-    </repository>  
-    <snapshotRepository>  
-      <id>norconex-snapshot-repo</id>  
-      <name>S3 Snapshot Repository</name>  
-      <url>s3://norconex/repo/snapshot/</url>  
-    </snapshotRepository>  
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>    
   </distributionManagement>
+  
   <reporting>
     <plugins>
       <plugin>
@@ -235,9 +294,32 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9</version>
         <configuration>
-          <stylesheetfile>${basedir}/src/main/resources/javadoc.css</stylesheetfile>
+          <overview>src/main/javadoc/overview.html</overview>
+          <header><![CDATA[
+            <style>div.aboutLanguage .siteLink {font-size: 2em;}</style>
+            <span class="siteLink">
+              <a href="http://www.norconex.com/product/jef">Norconex JE</a>
+            </span>
+            ]]>
+          </header>
+          <footer><![CDATA[
+            <script type="text/javascript">
+              var _gaq = _gaq || [];
+              _gaq.push(['_setAccount', 'UA-23162620-1']);
+              _gaq.push(['_setDomainName', 'norconex.com']);
+              _gaq.push(['_trackPageview']);
+              (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+              })();
+            </script>
+            <a style="font-size: 1.4em;" href="https://github.com/norconex/jef/issues">Submit an Issue</a>
+            &nbsp;&nbsp;|&nbsp;&nbsp; 
+            <a style="font-size: 1.4em;" href="http://www.norconex.com">www.norconex.com</a>
+            ]]>
+          </footer>
           <show>protected</show>
-          <overview>src/main/java/overview.html</overview>
           <detectLinks>true</detectLinks>
         </configuration>
         <reportSets>
@@ -278,12 +360,14 @@ along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
     <url>https://github.com/Norconex/jef/issues</url>
   </issueManagement>
   <scm>
-    <url>https://github.com/Norconex/jef/tree/master/norconex-jef</url>
+    <url>https://github.com/Norconex/jef</url>
+    <connection>scm:git:git@github.com:Norconex/jef.git</connection>
+    <developerConnection>scm:git:git@github.com:Norconex/jef.git</developerConnection>
   </scm>
   
   <developers>
     <developer>
-        <id>essiembp</id>
+        <id>essiembre</id>
         <name>Pascal Essiembre</name>
         <email>pascal.essiembre@norconex.com</email>
         <organization>Norconex Inc.</organization>
