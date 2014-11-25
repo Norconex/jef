@@ -6,7 +6,10 @@
     <author email="info@norconex.com">Norconex Inc.</author>
   </properties>
   <body>
-    <release version="4.0.0" date="2014-??-??" description="Major release">
+    <release version="4.0.0" date="2014-11-24" description="Major release">
+      <action dev="essiembre" type="update">
+        Now licensed under The Apache License, Version 2.0.
+      </action>
       <action dev="essiembre" type="update">
         Rewriting of many areas to simplify usage and interoperability.
         Too different from 3.x to be considered
@@ -22,7 +25,6 @@
       <action dev="essiembre" type="update">
         Job progress is now tracked as double value from 0 to 1.
       </action>             
-      
     </release>
 
     <release version="3.0.0" date="2013-06-04" description="Open Source release">
