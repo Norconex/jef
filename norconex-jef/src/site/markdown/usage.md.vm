@@ -1,20 +1,17 @@
 #*
- Copyright 2010-2014 Norconex Inc.
- 
- This file is part of Norconex JEF.
- 
- Norconex JEF is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
- 
- Norconex JEF is distributed in the hope that it will be useful, 
- but WITHOUT ANY WARRANTY; without even the implied warranty of 
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License
- along with Norconex JEF. If not, see <http://www.gnu.org/licenses/>.
+   Copyright 2010-2014 Norconex Inc.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 *#
 <head><title>Getting Started</title><meta name="Author" content="Norconex Inc." /></head> 
 
@@ -27,11 +24,11 @@ are refered to as "jobs".  Jobs are assembled together to obtain the desired
 workflow, refered to as a "Job Suite".    
   
 First wrap your existing jobs, or create new ones implementing the 
-[IJob](./apidocs/com/norconex/jef/IJob.html) interface to accomplish the 
+[IJob](./apidocs/com/norconex/jef/job/IJob.html) interface to accomplish the 
 required tasks.  Whenever you have more than one job, assemble/group them 
 together using one or a combination of 
-[AsyncJobGroup](./apidocs/com/norconex/jef/AsyncJobGroup.html) and 
-[SyncJobGroup](./apidocs/com/norconex/jef/SyncJobGroup.html).
+[AsyncJobGroup](./apidocs/com/norconex/jef/group/AsyncJobGroup.html) and 
+[SyncJobGroup](./apidocs/com/norconex/jef/group/SyncJobGroup.html).
   
 Create and configure a 
 [IJobSuite](./apidocs/com/norconex/jef/suite/JobSuite.html) with your created
@@ -40,8 +37,8 @@ jobs. It is highly recommended you job suite creation logic is implemented using
 Using this factory is the preferred way to load and initialize your 
 job suites by external processes such as *JEF Monitor*.
   
-When you are done, run your job suite by passing it to 
-[JobRunner.runSuite(com.norconex.jef.suite.JobSuite)](./apidocs/com/norconex/jef/JobRunner.html). 
+When you are done, you can execute it by calling the "execute" method on 
+your JobSuite instance.
 
 Optionally, you can attach listeners to get notified of every 
 job-related events.  Listners and other useful classes can be found
@@ -77,7 +74,6 @@ Then to launch the execution of a the job suite:
   
     IJobSuiteFactory factory = new MyJobSuiteFactory();
     JobSuite suite = factory.createJobSuite();
-    JobRunner jobRunner = new JobRunner();
-    jobRunner.runSuite(suite);
+    suite.execute();
 
 
