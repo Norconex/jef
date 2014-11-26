@@ -25,7 +25,7 @@ import com.norconex.commons.lang.config.IXMLConfigurable;
 /**
  * Class responsible for everything that relates to the underlying logging
  * mechanism.
- * <p/>
+ * <br><br>
  * When saving as XML, the tag name must be called "logManager".
  * @author Pascal Essiembre
  */

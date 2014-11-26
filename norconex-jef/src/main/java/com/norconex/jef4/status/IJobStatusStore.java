@@ -21,7 +21,7 @@ import com.norconex.commons.lang.config.IXMLConfigurable;
 
 /**
  * Responsible for serializing and deserializing a job status.
- * <p/>
+ * <br><br>
  * When saving as XML, the tag name must be called "statusStore".
  * @author Pascal Essiembre
  */
