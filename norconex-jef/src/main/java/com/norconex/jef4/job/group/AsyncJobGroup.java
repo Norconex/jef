@@ -109,6 +109,9 @@ public class AsyncJobGroup extends AbstractJobGroup {
     private void runJob(IJob job, JobSuite suite, Collection<IJob> failedJobs,
             CountDownLatch latch) {
         Thread.currentThread().setName(job.getId());
+        JobSuite.setCurrentJobId(job.getId());
+
+        //Thread.currentThread().setName(job.getId());
         try {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Thread from " + AsyncJobGroup.this.getId()

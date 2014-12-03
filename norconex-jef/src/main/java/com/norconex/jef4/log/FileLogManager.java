@@ -54,7 +54,7 @@ public class FileLogManager implements ILogManager {
             LogManager.getLogger(FileLogManager.class);
     
     private static final String LAYOUT_PATTERN = 
-            "%d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %p %30.30c %x - %m\n";
+            "%d{yyyy-MM-dd HH:mm:ss} %p - %m\n";
     
     /** Directory where to store the file. */
     private String logdirLatest;
@@ -97,7 +97,10 @@ public class FileLogManager implements ILogManager {
         String path = logdir;
         if (StringUtils.isBlank(logdir)) {
             path = JEFUtil.FALLBACK_WORKDIR.getAbsolutePath();
+        } else {
+            path = new File(path).getAbsolutePath();
         }
+        
         LOG.debug("Log directory: " + path); 
         logdirLatest = path + File.separatorChar 
                 + "latest" + File.separatorChar + "logs";
@@ -119,8 +122,7 @@ public class FileLogManager implements ILogManager {
     public final Appender createAppender(final String suiteId)
             throws IOException {
         
-        return new FileAppender(
-                new PatternLayout(LAYOUT_PATTERN),
+        return new FileAppender(new PatternLayout(LAYOUT_PATTERN),
                 logdirLatest + "/" + 
                         FileUtil.toSafeFileName(suiteId) + LOG_SUFFIX);
     }
@@ -200,7 +202,7 @@ public class FileLogManager implements ILogManager {
             writer.writeStartElement("logManager");
             writer.writeAttribute("class", getClass().getCanonicalName());
             writer.writeStartElement("logDir");
-            writer.writeCharacters(logdir);
+            writer.writeCharacters(new File(logdir).getAbsolutePath());
             writer.writeEndElement();
             writer.writeEndElement();
             writer.flush();

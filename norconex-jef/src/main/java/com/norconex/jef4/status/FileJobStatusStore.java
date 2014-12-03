@@ -88,6 +88,8 @@ public class FileJobStatusStore implements IJobStatusStore {
         if (StringUtils.isBlank(statusDir)) {
             LOG.info("No status directory specified.");
             path = JEFUtil.FALLBACK_WORKDIR.getAbsolutePath();
+        } else {
+            path = new File(path).getAbsolutePath();
         }
         LOG.debug("Status serialization directory: " + path); 
         jobdirLatest = path + File.separatorChar 
@@ -287,7 +289,7 @@ public class FileJobStatusStore implements IJobStatusStore {
             writer.writeStartElement("statusStore");
             writer.writeAttribute("class", getClass().getCanonicalName());
             writer.writeStartElement("statusDir");
-            writer.writeCharacters(statusDir);
+            writer.writeCharacters(new File(statusDir).getAbsolutePath());
             writer.writeEndElement();
             writer.writeEndElement();
             writer.flush();

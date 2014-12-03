@@ -49,6 +49,7 @@ import com.norconex.jef4.job.JobException;
 import com.norconex.jef4.job.group.IJobGroup;
 import com.norconex.jef4.log.FileLogManager;
 import com.norconex.jef4.log.ILogManager;
+import com.norconex.jef4.log.ThreadSafeLayout;
 import com.norconex.jef4.status.FileJobStatusStore;
 import com.norconex.jef4.status.IJobStatus;
 import com.norconex.jef4.status.IJobStatusStore;
@@ -267,6 +268,8 @@ public final class JobSuite {
 
         //--- Add Log Appender ---
         Appender appender = getLogManager().createAppender(getId());
+        appender.setLayout(new ThreadSafeLayout(appender.getLayout()));
+        
         Logger.getRootLogger().addAppender(appender);        
 
         heartbeatGenerator.start();
@@ -302,6 +305,7 @@ public final class JobSuite {
             throw new IllegalArgumentException("Job cannot be null.");
         }
         boolean success = false;
+        Thread.currentThread().setName(job.getId());
         setCurrentJobId(job.getId());
         
         MutableJobStatus status = 
@@ -513,7 +517,8 @@ public final class JobSuite {
             out = new OutputStreamWriter(
                     new FileOutputStream(getSuiteIndexFile()), 
                     CharEncoding.UTF_8);
-            out.write("<?xml version=\"1.0\" ?><suite-index>");
+            out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+            out.write("<suite-index>");
             
             //--- Log Manager ---
             out.flush();
