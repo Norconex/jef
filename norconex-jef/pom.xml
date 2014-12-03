@@ -23,7 +23,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <site.baseurl/>
-    <currentStableVersion>4.0.0</currentStableVersion>
+    <currentStableVersion>4.0.1</currentStableVersion>
   </properties>
   <inceptionYear>2007</inceptionYear>
 

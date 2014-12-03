@@ -25,13 +25,14 @@ Latest stable release
 
 **Release Overview:**
 
-  * Now licensed under The Apache License, Version 2.0.
-  * Rewriting of many areas to simplify usage and interoperability.
-  * Now a job suite progress can be read without the suite classes to be available in class path. 
+  * Make sure to convert relative paths to absolute ones when writing suite index.
+  * Improved file logging.
   * [View full list of changes]((changes-report.html))
   
 Older releases:
 
+  * [4.0.0]($nexusPath/4.0.0/norconex-jef-4.0.0.zip)<small>
+    [[Release Notes](changes-report.html#a4.0.0)]</small>
   * [3.0.1]($releasePath/3.0.1/norconex-jef-3.0.1.zip)<small>
     [[Release Notes](changes-report.html#a3.0.1)]</small>
   * [3.0.0]($releasePath/3.0.0/norconex-jef-3.0.0.zip)<small>
