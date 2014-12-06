@@ -266,7 +266,7 @@
   <distributionManagement>
     <site>
       <id>norconex-site-deployment</id>
-      <url>${site.baseurl}/api/latest</url>
+      <url>${site.baseurl}/jef/api/latest</url>
     </site>
     <snapshotRepository>
       <id>ossrh</id>
