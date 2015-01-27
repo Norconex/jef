@@ -16,6 +16,8 @@ package com.norconex.jef4;
 
 import java.io.File;
 
+import com.norconex.commons.lang.file.FileUtil;
+
 public final class JEFUtil {
 
     public static final File FALLBACK_WORKDIR = 
@@ -23,5 +25,17 @@ public final class JEFUtil {
 
     private JEFUtil() {
         super();
+    }
+    
+    /**
+     * Gets the latest index file created for a job suite (if one exists).
+     * @param suiteWorkdir suite working directory
+     * @param suiteId suite unique ID (ID of the root job)
+     * @return file the index file
+     */
+    public static File getSuiteIndexFile(
+            String suiteWorkdir, String suiteId) {
+        return new File(suiteWorkdir + File.separator + "latest"
+                + File.separator + FileUtil.toSafeFileName(suiteId) + ".index");
     }
 }

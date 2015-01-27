@@ -146,7 +146,20 @@ public final class JobSuite {
         return getJobStatus(job.getId());
     }
     public IJobStatus getJobStatus(String jobId) {
-        return jobSuiteStatusSnapshot.getJobStatus(jobId);
+        if (jobSuiteStatusSnapshot != null) {
+            return jobSuiteStatusSnapshot.getJobStatus(jobId);
+        }
+        try {
+            File indexFile = JEFUtil.getSuiteIndexFile(getWorkdir(), getId());
+            JobSuiteStatusSnapshot snapshot = 
+                    JobSuiteStatusSnapshot.newSnapshot(indexFile);
+            if (snapshot != null) {
+                return snapshot.getJobStatus(jobId);
+            }
+            return null;
+        } catch (IOException e) {
+            throw new JEFException("Cannot obtain suite status.", e);
+        }
     }
     
     public boolean execute() {
@@ -231,17 +244,19 @@ public final class JobSuite {
         return logManager;
     }
     /*default*/ File getSuiteIndexFile() {
-        File indexDir = new File(getWorkdir() + File.separator + "latest");
-        if (!indexDir.exists()) {
-            try {
-                FileUtils.forceMkdir(indexDir);
-            } catch (IOException e) {
-                throw new JEFException("Cannot create index directory: " 
-                        + indexDir, e);
+        File indexFile = JEFUtil.getSuiteIndexFile(getWorkdir(), getId());
+        if (!indexFile.exists()) {
+            File indexDir = indexFile.getParentFile();
+            if (!indexDir.exists()) {
+                try {
+                    FileUtils.forceMkdir(indexDir);
+                } catch (IOException e) {
+                    throw new JEFException("Cannot create index directory: " 
+                            + indexDir, e);
+                }
             }
         }
-        return new File(indexDir, 
-                FileUtil.toSafeFileName(getId()) + ".index");
+        return indexFile;
     }
     /*default*/ File getSuiteStopFile() {
         return new File(getWorkdir() + File.separator 

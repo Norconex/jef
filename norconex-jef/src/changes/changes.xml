@@ -7,6 +7,17 @@
   </properties>
   <body>
 
+    <release version="4.0.2-SNAPSHOT" date="2015-??-??" description="Bug fix release">
+      <action dev="essiembre" type="add">
+        New JEFUtil#getSuiteIndexFile(...) method to obtain a job suite 
+        index file.
+      </action>
+      <action dev="essiembre" type="fix">
+        Fixed obtaining a suite status using JobSuite#getJobStatus(...) from
+        a different instance than the one currently running (github #49).
+      </action>
+    </release>  
+
     <release version="4.0.1" date="2014-12-03" description="Maintenance release">
       <action dev="essiembre" type="fix">
         Make sure to convert relative paths to absolute ones when writing
