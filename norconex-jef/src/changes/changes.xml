@@ -14,7 +14,7 @@
       </action>
       <action dev="essiembre" type="fix">
         Fixed obtaining a suite status using JobSuite#getJobStatus(...) from
-        a different instance than the one currently running (github #49).
+        a different instance than the one currently running.
       </action>
     </release>  
 
