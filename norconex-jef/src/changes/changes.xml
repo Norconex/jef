@@ -7,7 +7,7 @@
   </properties>
   <body>
 
-    <release version="4.0.2-SNAPSHOT" date="2015-??-??" description="Bug fix release">
+    <release version="4.0.2" date="2015-02-04" description="Bug fix release">
       <action dev="essiembre" type="add">
         New JEFUtil#getSuiteIndexFile(...) method to obtain a job suite 
         index file.
