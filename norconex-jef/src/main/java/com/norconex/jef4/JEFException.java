@@ -27,20 +27,24 @@ public class JEFException extends RuntimeException {
 
     /**
      * @see Exception#Exception(java.lang.String)
+     * @param message exception message
      */
-    public JEFException(final String arg0) {
-        super(arg0);
+    public JEFException(final String message) {
+        super(message);
     }
     /**
      * @see Exception#Exception(java.lang.Throwable)
+     * @param cause exception cause
      */
-    public JEFException(final Throwable arg0) {
-        super(arg0);
+    public JEFException(final Throwable cause) {
+        super(cause);
     }
     /**
      * @see Exception#Exception(java.lang.String, java.lang.Throwable)
+     * @param message exception message
+     * @param cause exception cause
      */
-    public JEFException(final String arg0, final Throwable arg1) {
-        super(arg0, arg1);
+    public JEFException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 }

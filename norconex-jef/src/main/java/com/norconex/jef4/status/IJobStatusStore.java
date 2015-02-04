@@ -40,7 +40,6 @@ public interface IJobStatusStore extends IXMLConfigurable {
      * return a job progress (<code>null</code> is not allowed).
      * @param suiteName name space given to the job progress
      * @param jobId job unique identifier
-     * @param jobContext job context for which to obtain job progress
      * @return job progress
      * @throws IOException problem deserializing job progress
      */

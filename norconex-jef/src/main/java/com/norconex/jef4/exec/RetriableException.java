@@ -30,18 +30,22 @@ public class RetriableException extends Exception {
 
     /**
      * @see Exception#Exception(java.lang.String)
+     * @param message exception message
      */
     public RetriableException(final String message) {
         super(message);
     }
     /**
      * @see Exception#Exception(java.lang.Throwable)
+     * @param cause exception cause
      */
     public RetriableException(final Throwable cause) {
         super(cause);
     }
     /**
      * @see Exception#Exception(java.lang.String, java.lang.Throwable)
+     * @param message exception message
+     * @param cause exception cause
      */
     public RetriableException(final String message, final Throwable cause) {
         super(message, cause);

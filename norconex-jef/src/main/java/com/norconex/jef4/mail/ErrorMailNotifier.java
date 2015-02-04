@@ -42,6 +42,9 @@ public class ErrorMailNotifier
 
     /**
      * @see AbstractMailNotifier#AbstractMailNotifier(String, String, String)
+     * @param host mail server host
+     * @param sender email address of sender ("From" field)
+     * @param recipient email address of recipient ("To" field)
      */
     public ErrorMailNotifier(
             final String host, final String sender, final String recipient) {
@@ -49,6 +52,9 @@ public class ErrorMailNotifier
     }
     /**
      * @see AbstractMailNotifier#AbstractMailNotifier(String, String, String[])
+     * @param host mail server host
+     * @param sender email address of sender ("From" field)
+     * @param recipients email address of recipients ("To" field)
      */
     public ErrorMailNotifier(
             final String host, final String sender, final String[] recipients) {

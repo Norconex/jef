@@ -16,6 +16,9 @@
         Fixed obtaining a suite status using JobSuite#getJobStatus(...) from
         a different instance than the one currently running.
       </action>
+      <action dev="essiembre" type="update">
+        Javadoc improvements.
+      </action>
     </release>  
 
     <release version="4.0.1" date="2014-12-03" description="Maintenance release">
