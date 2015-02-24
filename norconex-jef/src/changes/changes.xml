@@ -7,6 +7,15 @@
   </properties>
   <body>
 
+    <release version="4.0.3-SNAPSHOT" date="????-??-??" description="Maintenance release">
+      <action dev="essiembre" type="update">
+        Added Sonatype repository to pom.xml for snapshot releases.
+      </action>
+      <action dev="essiembre" type="update">
+        Upgraded Norconex Commons Lang to 1.6.0.
+      </action>
+    </release>
+
     <release version="4.0.2" date="2015-02-04" description="Bug fix release">
       <action dev="essiembre" type="add">
         New JEFUtil#getSuiteIndexFile(...) method to obtain a job suite 
