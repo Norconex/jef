@@ -27,21 +27,12 @@ public class JobException extends JEFException {
     /** For serialisation. */
     private static final long serialVersionUID = 5236102272021889018L;
 
-    /**
-     * @see Exception#Exception(java.lang.String)
-     */
     public JobException(final String message) {
         super(message);
     }
-    /**
-     * @see Exception#Exception(java.lang.Throwable)
-     */
     public JobException(final Throwable exception) {
         super(exception);
     }
-    /**
-     * @see Exception#Exception(java.lang.String, java.lang.Throwable)
-     */
     public JobException(final String message, final Throwable exception) {
         super(message, exception);
     }
