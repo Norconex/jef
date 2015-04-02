@@ -108,7 +108,6 @@ public final class JobSuiteStatusSnapshot {
     }
     private void accept(IJobStatusVisitor visitor, String jobId) {
         if (visitor != null) {
-//            IJobStatus status = getJobStatus(jobId);
             visitor.visitJobStatus(getJobStatus(jobId));
             for (IJobStatus child : getChildren(jobId)) {
                 accept(visitor, child.getJobId());

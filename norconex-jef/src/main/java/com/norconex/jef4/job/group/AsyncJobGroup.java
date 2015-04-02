@@ -111,7 +111,6 @@ public class AsyncJobGroup extends AbstractJobGroup {
         Thread.currentThread().setName(job.getId());
         JobSuite.setCurrentJobId(job.getId());
 
-        //Thread.currentThread().setName(job.getId());
         try {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Thread from " + AsyncJobGroup.this.getId()
