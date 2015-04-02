@@ -557,7 +557,7 @@ public final class JobSuite {
     private void writeJobId(Writer out, 
             JobSuiteStatusSnapshot statusTree, IJobStatus status) throws IOException {
         out.write("<job name=\"");
-        out.write(StringEscapeUtils.escapeXml(status.getJobId()));
+        out.write(StringEscapeUtils.escapeXml10(status.getJobId()));
         out.write("\">");
         for (IJobStatus child : statusTree.getChildren(status)) {
             writeJobId(out, statusTree, child);
