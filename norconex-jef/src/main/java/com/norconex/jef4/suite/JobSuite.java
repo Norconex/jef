@@ -54,6 +54,7 @@ import com.norconex.jef4.status.FileJobStatusStore;
 import com.norconex.jef4.status.IJobStatus;
 import com.norconex.jef4.status.IJobStatusStore;
 import com.norconex.jef4.status.IJobStatusVisitor;
+import com.norconex.jef4.status.JobDuration;
 import com.norconex.jef4.status.JobState;
 import com.norconex.jef4.status.JobStatusUpdater;
 import com.norconex.jef4.status.JobSuiteStatusSnapshot;
@@ -358,7 +359,8 @@ public final class JobSuite {
                                         + status.getJobId(), e);
                     }
                     fire(jobLifeCycleListeners, "jobProgressed", status);
-                    IJobStatus parentStatus = jobSuiteStatusSnapshot.getParent(status);
+                    IJobStatus parentStatus = 
+                            jobSuiteStatusSnapshot.getParent(status);
                     if (parentStatus != null) {
                         IJobGroup jobGroup = 
                                 (IJobGroup) jobs.get(parentStatus.getJobId());
@@ -449,13 +451,18 @@ public final class JobSuite {
         
         if (statusTree != null) {
             LOG.info("Previous execution detected.");
-            IJobStatus status = statusTree.getRoot();
+            MutableJobStatus status = (MutableJobStatus) statusTree.getRoot();
             JobState state = status.getState();
             ensureValidExecutionState(state);
             if (resumeIfIncomplete && !state.isOneOf(
                     JobState.COMPLETED, JobState.PREMATURE_TERMINATION)) {
                 LOG.info("Resuming from previous execution.");
-                //TODO increase resume attempts on each incomplete jobs
+                status.incrementResumeAttempts();
+                JobDuration duration = status.getDuration();
+                if (duration != null) {
+                    duration.setResumedStartTime(duration.getStartTime());
+                    duration.setResumedLastActivity(status.getLastActivity());
+                }
             } else {
                 // Back-up so we can start clean
                 LOG.info("Backing up previous execution status and log files.");
