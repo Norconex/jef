@@ -7,11 +7,14 @@
   </properties>
   <body>
 
-    <release version="4.0.4-SNAPSHOT" date="2015-??-??" description="Bug fix release">
+    <release version="4.0.4" date="2015-04-08" description="Bug fix release">
       <action dev="essiembre" type="fix">
         Number or resume attempts is now incremented properly. The duration 
         of the last job prior to a resume is also stored now.
       </action>
+      <action dev="essiembre" type="update">
+        Library updates: Apache Commons Lang 2.6.
+      </action>      
     </release>
 
     <release version="4.0.3" date="2015-04-02" description="Maintenance release">

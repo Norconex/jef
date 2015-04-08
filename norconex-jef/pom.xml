@@ -17,7 +17,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.norconex.jef</groupId>
   <artifactId>norconex-jef</artifactId>
-  <version>4.0.4-SNAPSHOT</version>
+  <version>4.0.4</version>
   <name>Norconex JEF</name>
 
   <properties>
@@ -70,6 +70,17 @@
         <artifactId>geronimo-javamail_1.4_mail</artifactId>
         <version>1.8.4</version>
     </dependency>
+    
+    <!-- The following dependencies are only present here to ensure their
+         proper version. They are otherwise provided by 
+         transitive dependencies. They can be removed from here once 
+         transitive versions match and don't cause conflicts. -->
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.6</version>
+    </dependency>        
+    
   </dependencies>
   
   <build>
