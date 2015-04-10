@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2015 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,10 +100,12 @@ public class MutableJobStatus implements IJobStatus {
         return duration.getStartTime() != null;
     }
     /**
-     * Checks whether the job has before its time.  This is not an indication
-     * that a job was completed or that there were no errors.
+     * Checks whether the job ended before its time. This may or may not
+     * be the result of an error.  Prematurely ended jobs are eligible
+     * for resuming.
      * @return <code>true</code> if job finished
      */
+    //TODO fix method typo (PrematurEly).
     @Override
     public boolean isPrematurlyEnded() {
         return duration.getEndTime() != null && !isCompleted();

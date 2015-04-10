@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2015 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -457,12 +457,7 @@ public final class JobSuite {
             if (resumeIfIncomplete && !state.isOneOf(
                     JobState.COMPLETED, JobState.PREMATURE_TERMINATION)) {
                 LOG.info("Resuming from previous execution.");
-                status.incrementResumeAttempts();
-                JobDuration duration = status.getDuration();
-                if (duration != null) {
-                    duration.setResumedStartTime(duration.getStartTime());
-                    duration.setResumedLastActivity(status.getLastActivity());
-                }
+                prepareStatusTreeForResume(statusTree);
             } else {
                 // Back-up so we can start clean
                 LOG.info("Backing up previous execution status and log files.");
@@ -480,6 +475,31 @@ public final class JobSuite {
         this.jobSuiteStatusSnapshot = statusTree;
     }
     
+    // This preparation is required otherwise, stopping of a resumed job
+    // will fail, because of previous "stopRequested" flag being set.
+    // "resumeAttempts" on the root must be incremented for resume to work, 
+    // but technically the root attempts should always be incremented whenever
+    // there is at least one child job that needs to be incremented.
+    // This method fixes: https://github.com/Norconex/collector-http/issues/69
+    private void prepareStatusTreeForResume(JobSuiteStatusSnapshot statusTree) {
+        statusTree.accept(new IJobStatusVisitor() {
+            @Override
+            public void visitJobStatus(IJobStatus jobStatus) {
+                MutableJobStatus status = (MutableJobStatus) jobStatus;
+                status.setStopRequested(false);
+                JobDuration duration = status.getDuration();
+                if (status.isStarted() && !status.isCompleted()) {
+                    status.incrementResumeAttempts();
+                    if (duration != null) {
+                        duration.setResumedStartTime(
+                                duration.getStartTime());
+                        duration.setResumedLastActivity(
+                                status.getLastActivity());
+                    }
+                }
+            }
+        });
+    }
     
     private void ensureValidExecutionState(JobState state) {
         if (state == JobState.RUNNING) {

@@ -7,6 +7,13 @@
   </properties>
   <body>
 
+    <release version="4.0.5-SNAPSHOT" date="2015-??-??" description="Bug fix release">
+      <action dev="essiembre" type="fix">
+        Resuming a stopped job now resets its last "stopped" flag so JEF does
+        not think it is currently stopping (preventing a clean stop).
+      </action>
+    </release>
+
     <release version="4.0.4" date="2015-04-08" description="Bug fix release">
       <action dev="essiembre" type="fix">
         Number or resume attempts is now incremented properly. The duration 
