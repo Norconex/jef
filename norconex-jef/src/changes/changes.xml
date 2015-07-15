@@ -7,6 +7,22 @@
   </properties>
   <body>
 
+    <release version="4.0.6-SNAPSHOT" date="2015-??-??" description="Maintenance release">
+      <action dev="essiembre" type="update">
+        Jar manifest now includes implementation entries and 
+        specifications entries (matching Maven pom.xml).
+      </action>
+      <action dev="essiembre" type="update">
+        Maven dependency updates: Norconex Commons Lang 1.6.2.
+      </action>      
+      <action dev="essiembre" type="fix">
+        FileJobStatusStore and FileLogManager are no longer creating
+        directories in default location (user home) when invoked with an
+        empty constructor. Required directories are now lazy-created
+        the first time they are referenced.
+      </action>
+    </release>
+
     <release version="4.0.5" date="2015-04-10" description="Bug fix release">
       <action dev="essiembre" type="fix">
         Resuming a stopped job now resets its last "stopped" flag so JEF does

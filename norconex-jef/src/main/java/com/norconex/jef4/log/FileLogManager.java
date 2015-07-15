@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2015 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,10 +63,10 @@ public class FileLogManager implements ILogManager {
     /** Base parent log directory. */
     private String logdir;
     
-    
     private static final String LOG_SUFFIX = ".log";
     
-
+    private boolean needToResolveDirs= true;
+    
     /**
      * Constructor using default log directory location.
      */
@@ -82,7 +82,7 @@ public class FileLogManager implements ILogManager {
     public FileLogManager(final String logdir) {
         super();
         this.logdir = logdir;
-        resolveDirs();
+        this.needToResolveDirs = true;
     }
 
     public String getLogDirectory() {
@@ -90,10 +90,16 @@ public class FileLogManager implements ILogManager {
     }
     public void setLogDirectory(String logdir) {
         this.logdir = logdir;
-        resolveDirs();
+        this.needToResolveDirs = true;
     }
     
-    private void resolveDirs() {
+    private synchronized void resolveDirsIfNeeded() {
+        // Leave now if we do not need to update dirs.
+        if (!needToResolveDirs) {
+            return;
+        }
+
+        // Log dir changed, update dirs
         String path = logdir;
         if (StringUtils.isBlank(logdir)) {
             path = JEFUtil.FALLBACK_WORKDIR.getAbsolutePath();
@@ -116,12 +122,13 @@ public class FileLogManager implements ILogManager {
                 }
             }  
         }
+        this.needToResolveDirs = false;
     }
     
     @Override
     public final Appender createAppender(final String suiteId)
             throws IOException {
-        
+        resolveDirsIfNeeded();
         return new FileAppender(new PatternLayout(LAYOUT_PATTERN),
                 logdirLatest + "/" + 
                         FileUtil.toSafeFileName(suiteId) + LOG_SUFFIX);
@@ -130,6 +137,7 @@ public class FileLogManager implements ILogManager {
     @Override
     public final void backup(final String suiteId, final Date backupDate)
             throws IOException {
+        resolveDirsIfNeeded();
         String date = new SimpleDateFormat(
                 "yyyyMMddHHmmssSSSS").format(backupDate);
         File progressFile = getLogFile(suiteId);
@@ -184,6 +192,7 @@ public class FileLogManager implements ILogManager {
         if (suiteId == null) {
             return null;
         }
+        resolveDirsIfNeeded();
         return new File(logdirLatest + "/" 
                 + FileUtil.toSafeFileName(suiteId) + LOG_SUFFIX);
     }

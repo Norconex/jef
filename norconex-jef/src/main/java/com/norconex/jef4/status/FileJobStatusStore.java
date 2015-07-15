@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2015 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ import com.norconex.jef4.JEFUtil;
 import com.norconex.jef4.job.JobException;
 
 /**
- * Serializer using a file to store job status information. The created
+ * File-based status store. The created
  * file name matches the job id, plus the ".job" extension.  The path
  * where to locate the file depends on the constructor invoked.
  *
@@ -61,9 +61,11 @@ public class FileJobStatusStore implements IJobStatusStore {
     private String jobdirBackupBase;
     private String statusDir;
 
+    private boolean needToResolveDirs= true;
     
     public FileJobStatusStore() {
         super();
+        this.needToResolveDirs = true;
     }
     /**
      * Creates a file-based job status serializer storing files in the given
@@ -72,7 +74,7 @@ public class FileJobStatusStore implements IJobStatusStore {
      */
     public FileJobStatusStore(final String statusDir) {
         this.statusDir = statusDir;
-        resolveDirs();
+        this.needToResolveDirs = true;
     }
     
     public String getStatusDirectory() {
@@ -80,10 +82,16 @@ public class FileJobStatusStore implements IJobStatusStore {
     }
     public void setStatusDirectory(String statusDirectory) {
         this.statusDir = statusDirectory;
-        resolveDirs();
+        this.needToResolveDirs = true;
     }
 
-    private void resolveDirs() {
+    private synchronized void resolveDirsIfNeeded() {
+        // Leave now if we do not need to update dirs.
+        if (!needToResolveDirs) {
+            return;
+        }
+
+        // Status dir changed, update dirs
         String path = statusDir;
         if (StringUtils.isBlank(statusDir)) {
             LOG.info("No status directory specified.");
@@ -104,11 +112,11 @@ public class FileJobStatusStore implements IJobStatusStore {
                         + dir, e);
             }
         }
+        this.needToResolveDirs = false;
     }
 
     @Override
-    public final void write(
-            String suiteName, final IJobStatus jobStatus)
+    public final void write(String suiteName, final IJobStatus jobStatus)
             throws IOException {
 
         File file = getStatusFile(suiteName, jobStatus.getJobId());
@@ -153,9 +161,10 @@ public class FileJobStatusStore implements IJobStatusStore {
     }
 
     @Override
-    public final IJobStatus read(
-            String suiteName, final String jobId)
+    public final IJobStatus read(String suiteName, final String jobId)
             throws IOException {
+        
+        resolveDirsIfNeeded();
         MutableJobStatus jobStatus = new MutableJobStatus(jobId);
         File file = getStatusFile(suiteName, jobId);
         
@@ -238,6 +247,7 @@ public class FileJobStatusStore implements IJobStatusStore {
      * @return file used to store the job process
      */
     private File getStatusFile(final String suiteName, final String jobId) {
+        resolveDirsIfNeeded();
         return new File(jobdirLatest 
                 + "/" + FileUtil.toSafeFileName(suiteName)
                 + "__" + FileUtil.toSafeFileName(jobId) + ".job");
@@ -251,6 +261,7 @@ public class FileJobStatusStore implements IJobStatusStore {
      */
     private File getBackupFile(final String suiteName, final String jobId, 
             final Date backupDate) {
+        resolveDirsIfNeeded();
         String date = new SimpleDateFormat(
                 "yyyyMMddHHmmssSSSS").format(backupDate);
         File backupDir;

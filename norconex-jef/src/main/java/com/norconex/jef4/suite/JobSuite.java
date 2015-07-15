@@ -302,8 +302,8 @@ public final class JobSuite {
             success = runJob(getRootJob());
         } finally {
             stopMonitor.stopMonitoring();
-            if (success 
-                    && jobSuiteStatusSnapshot.getRoot().getState() == JobState.COMPLETED) {
+            JobState jobState = jobSuiteStatusSnapshot.getRoot().getState();
+            if (success && jobState == JobState.COMPLETED) {
                 fire(suiteLifeCycleListeners, "suiteCompleted", this);
             }
             // Remove appender
