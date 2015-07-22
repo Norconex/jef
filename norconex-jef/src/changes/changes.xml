@@ -7,7 +7,7 @@
   </properties>
   <body>
 
-    <release version="4.0.6-SNAPSHOT" date="2015-??-??" description="Maintenance release">
+    <release version="4.0.6" date="2015-07-21" description="Maintenance release">
       <action dev="essiembre" type="update">
         Jar manifest now includes implementation entries and 
         specifications entries (matching Maven pom.xml).
