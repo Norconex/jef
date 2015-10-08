@@ -120,10 +120,8 @@ public class FileJobStatusStore implements IJobStatusStore {
             throws IOException {
 
         File file = getStatusFile(suiteName, jobStatus.getJobId());
-        if (!file.exists()) {
-            if (!file.createNewFile()) {
-                throw new IOException("Cannot create status file: " + file);
-            }
+        if (file.createNewFile() && LOG.isDebugEnabled()) {
+            LOG.debug("Created status file: " + file);
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Writing status file: " + file);
