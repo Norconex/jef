@@ -172,8 +172,6 @@ public final class JobSuite {
             success = doExecute(resumeIfIncomplete);
         } catch (Throwable e) {
             LOG.fatal("Job suite execution failed: " + getId(), e);
-        } finally {
-            fire(suiteLifeCycleListeners, "suiteFinished", this);
         }
         if (!success) {
             fire(suiteLifeCycleListeners, "suiteAborted", this);

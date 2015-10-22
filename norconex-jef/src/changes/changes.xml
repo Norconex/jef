@@ -9,6 +9,10 @@
 
     <release version="4.0.7-SNAPSHOT" date="2015-??-??" description="Bug fix release">
       <action dev="essiembre" type="fix">
+        Fixed NoSuchMethodException when JobSuite wrongfully tried to 
+        trigger a "suiteFinished" event.
+      </action>
+      <action dev="essiembre" type="fix">
         Fixed intermittent IOException when multiple threads try creating 
         the same status files.
       </action>
