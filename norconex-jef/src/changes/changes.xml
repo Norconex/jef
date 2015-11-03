@@ -7,7 +7,7 @@
   </properties>
   <body>
 
-    <release version="4.0.7-SNAPSHOT" date="2015-??-??" description="Bug fix release">
+    <release version="4.0.7" date="2015-11-02" description="Bug fix release">
       <action dev="essiembre" type="update">
         Maven dependency updates: Norconex Commons Lang 1.8.0.
       </action>      
