@@ -111,7 +111,7 @@ public class StopRequestMonitor extends Thread {
     private void stopJob(final IJob job, final IJobStatus status) {
         ((MutableJobStatus) status).setStopRequested(true);
         job.stop(status, suite);
-        while (status.getState() == JobState.RUNNING) {
+        while (status.isRunning()) {
             Sleeper.sleepSeconds(STOP_WAIT_DELAY);
         }
         if (status.getState() == JobState.STOPPED) {
