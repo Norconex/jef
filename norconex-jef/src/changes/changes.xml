@@ -9,6 +9,12 @@
 
     <release version="4.0.8-SNAPSHOT" date="2016-??-??" description="Bug fix release">
       <action dev="essiembre" type="fix">
+        Fixed events fired on IJobLifeCycleListener throwing exceptions. 
+      </action>
+      <action dev="essiembre" type="fix">
+        Fixed COMPLETED event being fired when job was stopped. 
+      </action>
+      <action dev="essiembre" type="fix">
         Fixed #suiteStopped not being invoked on ISuiteLifeCycleListener
         when the collector is stopped.
       </action>      

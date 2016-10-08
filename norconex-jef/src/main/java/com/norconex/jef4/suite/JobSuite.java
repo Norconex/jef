@@ -312,7 +312,6 @@ public final class JobSuite {
         return success;
     }
     
-    //TODO make public, to allow to start a specific job??
     //TODO document this is not a public method?
     public boolean runJob(final IJob job) {
         if (job == null) {
@@ -392,12 +391,18 @@ public final class JobSuite {
                 LOG.fatal("Fatal error occured in job: " + job.getId());
             }
             LOG.info("Running " + job.getId()  
-                    + ": END (" + status.getDuration().getStartTime() + ")");  
-            if (success) {
-                fire(jobLifeCycleListeners, "jobCompleted", status);
-            } else {
-                fire(jobLifeCycleListeners, 
-                        "jobTerminatedPrematuraly", status);
+                    + ": END (" + status.getDuration().getStartTime() + ")");
+            
+            // If stopping or stopped, corresponding events will have been
+            // fired already and we do not fire additional ones.
+            if (status.getState() != JobState.STOPPING
+                    && status.getState() != JobState.STOPPED) {
+                if (success) {
+                    fire(jobLifeCycleListeners, "jobCompleted", status);
+                } else {
+                    fire(jobLifeCycleListeners, 
+                            "jobTerminatedPrematuraly", status);
+                }
             }
         }
         return success;
@@ -634,7 +639,7 @@ public final class JobSuite {
     private void fire(List<?> listeners, String methodName, Object argument) {
         for (Object l : listeners) {
             try {
-                MethodUtils.invokeExactMethod(l, methodName, argument);
+                MethodUtils.invokeMethod(l, methodName, argument);
             } catch (NoSuchMethodException | IllegalAccessException
                     | InvocationTargetException e) {
                 throw new JobException(
