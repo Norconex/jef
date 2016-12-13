@@ -17,7 +17,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.norconex.jef</groupId>
   <artifactId>norconex-jef</artifactId>
-  <version>4.0.8-SNAPSHOT</version>
+  <version>4.0.8</version>
   <name>Norconex JEF</name>
 
   <properties>
@@ -63,7 +63,7 @@
     <dependency>
         <groupId>com.norconex.commons</groupId>
         <artifactId>norconex-commons-lang</artifactId>
-        <version>1.12.2</version>
+        <version>1.12.3</version>
     </dependency>
     <dependency>
         <groupId>org.apache.geronimo.javamail</groupId>

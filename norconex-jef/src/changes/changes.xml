@@ -7,9 +7,9 @@
   </properties>
   <body>
 
-    <release version="4.0.8-SNAPSHOT" date="2016-??-??" description="Bug fix release">
+    <release version="4.0.8" date="2016-12-13" description="Bug fix release">
       <action dev="essiembre" type="update">
-        Maven dependency updates: Norconex Commons Lang 1.12.2.
+        Maven dependency updates: Norconex Commons Lang 1.12.3.
       </action>      
       <action dev="essiembre" type="fix">
         Fixed events fired on IJobLifeCycleListener throwing exceptions. 
