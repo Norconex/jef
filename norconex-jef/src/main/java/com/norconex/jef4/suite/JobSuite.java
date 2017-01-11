@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Norconex Inc.
+/* Copyright 2010-2017 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -301,9 +301,18 @@ public final class JobSuite {
         } finally {
             stopMonitor.stopMonitoring();
             JobState jobState = jobSuiteStatusSnapshot.getRoot().getState();
-            if (success && jobState == JobState.COMPLETED) {
-                fire(suiteLifeCycleListeners, "suiteCompleted", this);
+            if (success) {
+                if (jobState == JobState.COMPLETED) {
+                    fire(suiteLifeCycleListeners, "suiteCompleted", this);
+                } else if (jobState == JobState.PREMATURE_TERMINATION) {
+                    fire(suiteLifeCycleListeners,
+                            "suiteTerminatedPrematuraly", this);
+                } else {
+                    LOG.error("JobSuite was executed successfully but "
+                            + "job state does not reflect that: " + jobState);
+                }
             }
+            
             // Remove appender
             Logger.getRootLogger().removeAppender(appender);
             heartbeatGenerator.terminate();
