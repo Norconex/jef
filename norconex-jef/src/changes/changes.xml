@@ -12,6 +12,9 @@
       <action dev="essiembre" type="fix">
         Fixed PREMATURE_TERMINATION event never being fired when it should.
       </action>      
+      <action dev="essiembre" type="update">
+        Maven dependency updates: Norconex Commons Lang 1.13.0.
+      </action>      
     </release>
 
 
