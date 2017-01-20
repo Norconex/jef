@@ -28,7 +28,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.norconex.commons.lang.PercentFormatter;
-import com.norconex.commons.lang.config.ConfigurationUtil;
+import com.norconex.commons.lang.config.XMLConfigurationUtil;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.job.group.IJobGroup;
@@ -166,7 +166,7 @@ public final class JobSuiteStatusSnapshot {
         String suiteName = FileUtil.fromSafeFileName(
                 FilenameUtils.getBaseName(suiteIndex.getPath()));
         XMLConfiguration xml = new XMLConfiguration();
-        ConfigurationUtil.disableDelimiterParsing(xml);
+        XMLConfigurationUtil.disableDelimiterParsing(xml);
         try {
             xml.load(suiteIndex);
         } catch (ConfigurationException e) {
@@ -176,11 +176,11 @@ public final class JobSuiteStatusSnapshot {
 
         //--- LogManager ---
         ILogManager logManager = 
-                ConfigurationUtil.newInstance(xml, "logManager");
+                XMLConfigurationUtil.newInstance(xml, "logManager");
         
         //--- Load status tree ---
         IJobStatusStore serial = 
-                ConfigurationUtil.newInstance(xml, "statusStore");
+                XMLConfigurationUtil.newInstance(xml, "statusStore");
         return new JobSuiteStatusSnapshot(loadTreeNode(
                 null, xml.configurationAt("job"), suiteName, serial),
                         logManager);
