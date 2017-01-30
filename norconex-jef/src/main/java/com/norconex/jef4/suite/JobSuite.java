@@ -71,17 +71,13 @@ import com.norconex.jef4.status.MutableJobStatus;
  * All jobs making up a suite must have unique identifiers.
  * @author Pascal Essiembre
  */
-@SuppressWarnings("nls")
 public final class JobSuite {
 
-    //--- NEW STUFF ------------------------------------------------------------
     private static final Logger LOG = LogManager.getLogger(JobSuite.class);
     
     /** Associates job id with current thread. */
     private static final ThreadLocal<String> CURRENT_JOB_ID = 
-            new ThreadLocal<String>();
-    
-
+            new InheritableThreadLocal<>();
     
     private final Map<String, IJob> jobs = new HashMap<>();
     private final IJob rootJob;

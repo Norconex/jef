@@ -8,12 +8,17 @@
   <body>
 
 
-    <release version="4.0.9-SNAPSHOT" date="201?-??-??" description="Bug fix release">
+    <release version="4.1.0-SNAPSHOT" date="2017-??-??" description="Minor release">
+      <action dev="essiembre" type="update">
+        Maven dependency updates: Norconex Commons Lang 1.13.0.
+      </action>      
       <action dev="essiembre" type="fix">
         Fixed PREMATURE_TERMINATION event never being fired when it should.
       </action>      
-      <action dev="essiembre" type="update">
-        Maven dependency updates: Norconex Commons Lang 1.13.0.
+      <action dev="essiembre" type="remove">
+        ExecUtils, IExceptionFilter, IRetriable, RetriableException, 
+        RetriableExecutor, and SystemCommand were all moved to Norconex
+        Commons Lang (RetriableExecutor being renamed to Retrier).
       </action>      
     </release>
 
@@ -138,7 +143,6 @@
         Job progress is now tracked as double value from 0 to 1.
       </action>             
     </release>
-
 
   </body>
 </document>

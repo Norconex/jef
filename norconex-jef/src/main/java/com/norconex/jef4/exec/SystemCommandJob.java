@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2017 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  */
 package com.norconex.jef4.exec;
 
-import java.io.IOException;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import com.norconex.commons.lang.exec.SystemCommand;
+import com.norconex.commons.lang.exec.SystemCommandException;
 import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.job.JobException;
 import com.norconex.jef4.status.IJobStatus;
@@ -102,7 +102,7 @@ public class SystemCommandJob implements IJob {
             try {
                 systemCommand.execute();
                 statusUpdater.setProgress(commandsRan / commandCount);
-            } catch (IOException | InterruptedException e) {
+            } catch (SystemCommandException e) {
                 throw new JobException("Cannot execute command: "
                         + systemCommand, e);
             }
