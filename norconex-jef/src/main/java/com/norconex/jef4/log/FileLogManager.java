@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Norconex Inc.
+/* Copyright 2010-2017 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,10 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.LogManager;
@@ -44,10 +48,31 @@ import com.norconex.jef4.JEFException;
 import com.norconex.jef4.JEFUtil;
 
 /**
+ * <p>
  * Log manager using the file system to store its logs.
+ * When no log directory is explicitly set, it defaults to: 
+ * <code>&lt;user.home&gt;/Norconex/jef/workdir</code>
+ * </p>
+ * 
+ * <h3>XML configuration usage:</h3>
+ * <pre>
+ *  &lt;logManager class="com.norconex.jef4.log.FileLogManager"&gt;
+ *      &lt;logDir&gt;(directory where to store logs)&lt;/logDir&gt;
+ *  &lt;/logManager&gt;
+ * </pre>
+ * <h4>Usage example:</h4>
+ * <p>
+ * The following example indicates logs should be stored in this directory:
+ * <code>/tmp/jeflogs</code>
+ * </p>
+ * <pre>
+ *  &lt;logManager class="com.norconex.jef4.log.FileLogManager"&gt;
+ *      &lt;logDir&gt;/tmp/jeflogs&lt;/logDir&gt;
+ *  &lt;/logManager&gt;
+ * </pre>
+ * 
  * @author Pascal Essiembre
  */
-@SuppressWarnings("nls")
 public class FileLogManager implements ILogManager {
 
     private static final Logger LOG =
@@ -233,4 +258,29 @@ public class FileLogManager implements ILogManager {
         }
     }
 
+    @Override
+    public boolean equals(final Object other) {
+        if (!(other instanceof FileLogManager)) {
+            return false;
+        }
+        FileLogManager castOther = (FileLogManager) other;
+        return new EqualsBuilder()
+                .append(logdir, castOther.logdir)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(logdir)
+                .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .appendSuper(super.toString())
+                .append("logDir", logdir)
+                .toString();
+    }
 }

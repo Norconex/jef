@@ -352,6 +352,7 @@ public final class JobSuite {
             heartbeatGenerator.register(status);
             //--- Execute ---
             job.execute(new JobStatusUpdater(status) {
+                @Override
                 protected void statusUpdated(MutableJobStatus status) {
                     try {
                         getJobStatusStore().write(getId(), status);
@@ -370,8 +371,7 @@ public final class JobSuite {
                             jobGroup.groupProgressed(status);
                         }
                     }
-                };
-
+                }
             }, this);
             success = true;
         } catch (Exception e) {
@@ -601,7 +601,7 @@ public final class JobSuite {
     }
     
     private String resolveWorkdir(String configWorkdir) {
-        File dir = null;
+        File dir;
         if (StringUtils.isBlank(configWorkdir)) {
             dir = JEFUtil.FALLBACK_WORKDIR;
         } else {
@@ -622,13 +622,13 @@ public final class JobSuite {
         return dir.getAbsolutePath();
     }
     private ILogManager resolveLogManager(ILogManager configLogManager) {
-        ILogManager logManager = configLogManager;
-        if (logManager == null) {
-            logManager = new FileLogManager(workdir);
+        ILogManager lm = configLogManager;
+        if (lm == null) {
+            lm = new FileLogManager(workdir);
         }
         LOG.info("JEF log manager is : " 
-                + logManager.getClass().getSimpleName());
-        return logManager;
+                + lm.getClass().getSimpleName());
+        return lm;
     }
     private IJobStatusStore resolveJobStatusStore(
             IJobStatusStore configSerializer) {

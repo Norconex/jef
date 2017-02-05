@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Norconex Inc.
+/* Copyright 2010-2017 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,10 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -45,13 +49,33 @@ import com.norconex.jef4.JEFUtil;
 import com.norconex.jef4.job.JobException;
 
 /**
+ * <p>
  * File-based status store. The created
- * file name matches the job id, plus the ".job" extension.  The path
- * where to locate the file depends on the constructor invoked.
- *
+ * file name matches the job id, plus the ".job" extension. If no 
+ * status directory is explicitly set, it defaults to: 
+ * <code>&lt;user.home&gt;/Norconex/jef/workdir</code>
+ * </p>
+ * 
+ * <h3>XML configuration usage:</h3>
+ * <pre>
+ *  &lt;statusStore class="com.norconex.jef4.status.FileJobStatusStore"&gt;
+ *      &lt;statusDir&gt;(directory where to store status files)&lt;/statusDir&gt;
+ *  &lt;/statusStore&gt;
+ * </pre>
+ * <h4>Usage example:</h4>
+ * <p>
+ * The following example indicates status files should be stored in this 
+ * directory:
+ * <code>/tmp/jefstatuses</code>
+ * </p>
+ * <pre>
+ *  &lt;statusStore class="com.norconex.jef4.status.FileJobStatusStore"&gt;
+ *      &lt;statusDir&gt;/tmp/jefstatuses&lt;/statusDir&gt;
+ *  &lt;/statusStore&gt;
+ * </pre>
+ * 
  * @author Pascal Essiembre
  */
-@SuppressWarnings("nls")
 public class FileJobStatusStore implements IJobStatusStore {
 
     private static final Logger LOG =
@@ -268,7 +292,7 @@ public class FileJobStatusStore implements IJobStatusStore {
                     new File(jobdirBackupBase), backupDate);
         } catch (IOException e) {
             throw new JobException("Could not create backup directory for "
-                    + "job \"" + jobId + "\".");
+                    + "job \"" + jobId + "\".", e);
         }
         backupDir = new File(backupDir, "status");
         if (!backupDir.exists()) {
@@ -306,6 +330,32 @@ public class FileJobStatusStore implements IJobStatusStore {
         } catch (XMLStreamException e) {
             throw new IOException("Cannot save as XML.", e);
         }       
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (!(other instanceof FileJobStatusStore)) {
+            return false;
+        }
+        FileJobStatusStore castOther = (FileJobStatusStore) other;
+        return new EqualsBuilder()
+                .append(statusDir, castOther.statusDir)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(statusDir)
+                .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .appendSuper(super.toString())
+                .append("statusDir", statusDir)
+                .toString();
     }
 
 }
