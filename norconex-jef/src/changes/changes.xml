@@ -16,6 +16,10 @@
         XML configuration can now be validated for FileLogManager and
         FileJobStatus.
       </action>
+      <action dev="essiembre" type="update">
+        Modified Javadoc to include an XML usage example for all 
+        XML-configurable classes.
+      </action>
       <action dev="essiembre" type="fix">
         Fixed PREMATURE_TERMINATION event never being fired when it should.
       </action>
