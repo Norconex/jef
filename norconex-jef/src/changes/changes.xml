@@ -14,7 +14,7 @@
       </action>
       <action dev="essiembre" type="update">
         Now using Java NIO file locking mechanism to prevent possible partial 
-        reads of job statuses.
+        reads and other issues with job statuses and suite index.
       </action>
       <action dev="essiembre" type="update">
         Errors when loading suite index file will now log the file content with
@@ -27,6 +27,10 @@
       <action dev="essiembre" type="update">
         Modified Javadoc to include an XML usage example for all 
         XML-configurable classes.
+      </action>
+      <action dev="essiembre" type="update">
+        Junit tests now always use a unit temp directory which is cleaned
+        up after execution.
       </action>
       <action dev="essiembre" type="fix">
         Fixed PREMATURE_TERMINATION event never being fired when it should.

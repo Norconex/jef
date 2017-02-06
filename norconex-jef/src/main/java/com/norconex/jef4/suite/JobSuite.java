@@ -15,11 +15,13 @@
 package com.norconex.jef4.suite;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -28,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -562,30 +562,33 @@ public final class JobSuite {
     
     private void writeJobSuiteIndex(JobSuiteStatusSnapshot statusTree) 
             throws IOException {
-        Writer out = null;
-        try {
-            out = new OutputStreamWriter(
-                    new FileOutputStream(getSuiteIndexFile()), 
-                    CharEncoding.UTF_8);
-            out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-            out.write("<suite-index>");
+        
+        File indexFile = getSuiteIndexFile();
+        
+        StringWriter out = new StringWriter();
+        out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+        out.write("<suite-index>");
             
-            //--- Log Manager ---
-            out.flush();
-            getLogManager().saveToXML(out);
-
-            //--- JobStatusSerializer ---
-            out.flush();
-            getJobStatusStore().saveToXML(out);
-            
-            //--- Job Status ---
-            writeJobId(out, statusTree, statusTree.getRoot());
-            
-            out.write("</suite-index>");
-
-            out.flush();
-        } finally {
-            IOUtils.closeQuietly(out);
+        //--- Log Manager ---
+        out.flush();
+        getLogManager().saveToXML(out);
+    
+        //--- JobStatusSerializer ---
+        out.flush();
+        getJobStatusStore().saveToXML(out);
+        
+        //--- Job Status ---
+        writeJobId(out, statusTree, statusTree.getRoot());
+        
+        out.write("</suite-index>");
+        out.flush();
+        
+        // Using RandomAccessFile since evidence has shown it is better at 
+        // locking files in a way that cause less/no errors.
+        try (RandomAccessFile ras = new RandomAccessFile(indexFile, "rw");
+                FileChannel channel = ras.getChannel();
+                FileLock lock = channel.lock()) {
+            ras.writeUTF(out.toString());
         }
     }
     

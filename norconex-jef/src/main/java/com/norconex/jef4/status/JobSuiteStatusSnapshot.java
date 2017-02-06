@@ -16,8 +16,10 @@ package com.norconex.jef4.status;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +28,6 @@ import org.apache.commons.collections4.map.ListOrderedMap;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -171,12 +172,15 @@ public final class JobSuiteStatusSnapshot {
         XMLConfiguration xml = new XMLConfiguration();
         XMLConfigurationUtil.disableDelimiterParsing(xml);
         String indexFileContent = null;
-        try {
-            // Load to string first so we can report errors
-            indexFileContent = FileUtils.readFileToString(
-                    suiteIndex, StandardCharsets.UTF_8);
-            xml.load(new StringReader(indexFileContent));
-            //xml.load(suiteIndex);
+        // Using RandomAccessFile since evidence has shown it is better at 
+        // locking files in a way that cause less/no errors.
+        try (RandomAccessFile ras = new RandomAccessFile(suiteIndex, "rw");
+                FileChannel channel = ras.getChannel();
+                FileLock lock = channel.lock()) {
+            if (suiteIndex.exists()) {
+                StringReader sr = new StringReader(ras.readUTF());
+                xml.load(sr);
+            }
         } catch (ConfigurationException e) {
             throw new IOException(
                     "Could not load suite index: " + suiteIndex

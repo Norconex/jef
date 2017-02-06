@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2017 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,12 @@ package com.norconex.jef4.job.group;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.jobs.SleepyJob;
@@ -26,14 +30,19 @@ import com.norconex.jef4.suite.JobSuite;
 
 public class AsyncJobGroupTest {
 
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+    
     @Test
-    public void testExecuteGroup() {
+    public void testExecuteGroup() throws IOException {
         IJob job1 = new SleepyJob(30, 3);
         IJob job2 = new SleepyJob(20, 2);
         IJob job3 = new SleepyJob(10, 1);
-        IJob rootJob = new AsyncJobGroup("async sleepy jobs", 2, job1, job2, job3);
+        IJob rootJob = new AsyncJobGroup(
+                "async sleepy jobs", 2, job1, job2, job3);
         
-        JobSuite suite = new JobSuite(rootJob);
+        JobSuite suite = new JobSuite(
+                rootJob, JEFTestUtil.newConfigWithTempWorkdir(folder));
         Assert.assertTrue("Suite failed.", suite.execute());
         
         assertStatus(suite.getJobStatus(job1));
