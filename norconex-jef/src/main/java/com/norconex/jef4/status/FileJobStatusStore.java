@@ -14,15 +14,15 @@
  */
 package com.norconex.jef4.status;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -32,7 +32,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -143,13 +142,6 @@ public class FileJobStatusStore implements IJobStatusStore {
     public final void write(String suiteName, final IJobStatus jobStatus)
             throws IOException {
 
-        File file = getStatusFile(suiteName, jobStatus.getJobId());
-        if (file.createNewFile() && LOG.isDebugEnabled()) {
-            LOG.debug("Created status file: " + file);
-        }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Writing status file: " + file);
-        }
         Properties config = new Properties();
         config.setString("jobId", jobStatus.getJobId());
         config.setDouble("progress", jobStatus.getProgress());
@@ -176,10 +168,20 @@ public class FileJobStatusStore implements IJobStatusStore {
         for (String key : props.keySet()) {
             config.put("prop." + key, props.get(key));
         }
-        
-        OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
-        config.store(os, "Status for job: " + jobStatus.getJobId());
-        os.close();
+
+        File file = getStatusFile(suiteName, jobStatus.getJobId());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Writing status file: " + file);
+        }
+        // Using RandomAccessFile since evidence has shown it is better at 
+        // locking files in a way that cause less/no errors.
+        try (RandomAccessFile ras = new RandomAccessFile(file, "rw");
+                FileChannel channel = ras.getChannel();
+                FileLock lock = channel.lock()) {
+            StringWriter sw = new StringWriter();
+            config.store(sw, "Status for job: " + jobStatus.getJobId());
+            ras.writeUTF(sw.toString());
+        }
     }
 
     @Override
@@ -199,40 +201,43 @@ public class FileJobStatusStore implements IJobStatusStore {
         
 
         Properties config = new Properties();
-        InputStream is = null;
-        try {
-            is = new FileInputStream(file);
-            config.load(is);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(jobId + " last active time: "
-                        + new Date(file.lastModified()));
-            }
-            jobStatus.setLastActivity(new Date(file.lastModified()));
-            
-            jobStatus.setProgress(config.getDouble("progress", 0d));
-            jobStatus.setNote(config.getString("note", null));
-            jobStatus.setResumeAttempts(config.getInt("resumeAttempts", 0));
-            
-            JobDuration duration = new JobDuration();
-            duration.setResumedStartTime(
-                    config.getDate("resumedStartTime", null));
-            duration.setResumedLastActivity(
-                    config.getDate("resumedLastActivity", null));
-            duration.setStartTime(config.getDate("startTime", null));
-            duration.setEndTime(config.getDate("endTime", null));
-            jobStatus.setDuration(duration);
+        
+        // Using RandomAccessFile since evidence has shown it is better at 
+        // locking files in a way that cause less/no errors.
+        try (RandomAccessFile ras = new RandomAccessFile(file, "rw");
+                FileChannel channel = ras.getChannel();
+                FileLock lock = channel.lock()) {
+            StringReader sr = new StringReader(ras.readUTF());
+            config.load(sr);
+        }
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(jobId + " last active time: "
+                    + new Date(file.lastModified()));
+        }
+        jobStatus.setLastActivity(new Date(file.lastModified()));
+        
+        jobStatus.setProgress(config.getDouble("progress", 0d));
+        jobStatus.setNote(config.getString("note", null));
+        jobStatus.setResumeAttempts(config.getInt("resumeAttempts", 0));
+        
+        JobDuration duration = new JobDuration();
+        duration.setResumedStartTime(
+                config.getDate("resumedStartTime", null));
+        duration.setResumedLastActivity(
+                config.getDate("resumedLastActivity", null));
+        duration.setStartTime(config.getDate("startTime", null));
+        duration.setEndTime(config.getDate("endTime", null));
+        jobStatus.setDuration(duration);
 
-            jobStatus.setStopRequested(config.getBoolean("stopped", false));
-            
-            Properties props = jobStatus.getProperties();
-            for (String key : config.keySet()) {
-                if (key.startsWith("prop.")) {
-                    props.put(StringUtils.removeStart(
-                            "prop.", key), props.get(key));
-                }
+        jobStatus.setStopRequested(config.getBoolean("stopped", false));
+        
+        Properties props = jobStatus.getProperties();
+        for (String key : config.keySet()) {
+            if (key.startsWith("prop.")) {
+                props.put(StringUtils.removeStart(
+                        "prop.", key), props.get(key));
             }
-        } finally {
-            IOUtils.closeQuietly(is);
         }
         return jobStatus;
     }

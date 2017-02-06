@@ -16,6 +16,8 @@ package com.norconex.jef4.status;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ import org.apache.commons.collections4.map.ListOrderedMap;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -167,11 +170,17 @@ public final class JobSuiteStatusSnapshot {
                 FilenameUtils.getBaseName(suiteIndex.getPath()));
         XMLConfiguration xml = new XMLConfiguration();
         XMLConfigurationUtil.disableDelimiterParsing(xml);
+        String indexFileContent = null;
         try {
-            xml.load(suiteIndex);
+            // Load to string first so we can report errors
+            indexFileContent = FileUtils.readFileToString(
+                    suiteIndex, StandardCharsets.UTF_8);
+            xml.load(new StringReader(indexFileContent));
+            //xml.load(suiteIndex);
         } catch (ConfigurationException e) {
             throw new IOException(
-                    "Could not load suite index: " + suiteIndex, e);
+                    "Could not load suite index: " + suiteIndex
+                    + ". Index file content:\n" + indexFileContent, e);
         }
 
         //--- LogManager ---

@@ -13,6 +13,14 @@
         Maven dependency updates: Norconex Commons Lang 1.13.0.
       </action>
       <action dev="essiembre" type="update">
+        Now using Java NIO file locking mechanism to prevent possible partial 
+        reads of job statuses.
+      </action>
+      <action dev="essiembre" type="update">
+        Errors when loading suite index file will now log the file content with
+        the error.
+      </action>
+      <action dev="essiembre" type="update">
         XML configuration can now be validated for FileLogManager and
         FileJobStatus.
       </action>
