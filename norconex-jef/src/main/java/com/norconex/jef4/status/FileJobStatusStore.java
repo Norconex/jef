@@ -198,7 +198,10 @@ public class FileJobStatusStore implements IJobStatusStore {
         if (!file.exists()) {
             return jobStatus;
         }
-        
+        if (file.length() == 0) {
+            jobStatus.setLastActivity(new Date(file.lastModified()));
+            return jobStatus;
+        }
 
         Properties config = new Properties();
         
@@ -209,6 +212,9 @@ public class FileJobStatusStore implements IJobStatusStore {
                 FileLock lock = channel.lock()) {
             StringReader sr = new StringReader(ras.readUTF());
             config.load(sr);
+        } catch (IOException e) {
+            LOG.error("Cannot read file: " + file.getAbsolutePath());
+            throw e;
         }
         
         if (LOG.isDebugEnabled()) {
