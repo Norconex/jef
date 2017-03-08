@@ -174,8 +174,9 @@ public class FileJobStatusStore implements IJobStatusStore {
             LOG.debug("Writing status file: " + file);
         }
         // Using RandomAccessFile since evidence has shown it is better at 
-        // locking files in a way that cause less/no errors.
-        try (RandomAccessFile ras = new RandomAccessFile(file, "rw");
+        // dealing with files/locks in a way that cause less/no errors.
+        // "d" ensures content is all written before a read.
+        try (RandomAccessFile ras = new RandomAccessFile(file, "rwd");
                 FileChannel channel = ras.getChannel();
                 FileLock lock = channel.lock()) {
             StringWriter sw = new StringWriter();
@@ -206,10 +207,8 @@ public class FileJobStatusStore implements IJobStatusStore {
         Properties config = new Properties();
         
         // Using RandomAccessFile since evidence has shown it is better at 
-        // locking files in a way that cause less/no errors.
-        try (RandomAccessFile ras = new RandomAccessFile(file, "rw");
-                FileChannel channel = ras.getChannel();
-                FileLock lock = channel.lock()) {
+        // dealing with files/locks in a way that cause less/no errors.
+        try (RandomAccessFile ras = new RandomAccessFile(file, "r")) {
             StringReader sr = new StringReader(ras.readUTF());
             config.load(sr);
         } catch (IOException e) {

@@ -18,8 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.StringReader;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -173,10 +171,8 @@ public final class JobSuiteStatusSnapshot {
         XMLConfigurationUtil.disableDelimiterParsing(xml);
         String indexFileContent = null;
         // Using RandomAccessFile since evidence has shown it is better at 
-        // locking files in a way that cause less/no errors.
-        try (RandomAccessFile ras = new RandomAccessFile(suiteIndex, "rw");
-                FileChannel channel = ras.getChannel();
-                FileLock lock = channel.lock()) {
+        // dealing with files/locks in a way that cause less/no errors.
+        try (RandomAccessFile ras = new RandomAccessFile(suiteIndex, "r")) {
             if (suiteIndex.exists()) {
                 StringReader sr = new StringReader(ras.readUTF());
                 xml.load(sr);

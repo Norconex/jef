@@ -584,8 +584,8 @@ public final class JobSuite {
         out.flush();
         
         // Using RandomAccessFile since evidence has shown it is better at 
-        // locking files in a way that cause less/no errors.
-        try (RandomAccessFile ras = new RandomAccessFile(indexFile, "rw");
+        // dealing with files/locks in a way that cause less/no errors.
+        try (RandomAccessFile ras = new RandomAccessFile(indexFile, "rwd");
                 FileChannel channel = ras.getChannel();
                 FileLock lock = channel.lock()) {
             ras.writeUTF(out.toString());
