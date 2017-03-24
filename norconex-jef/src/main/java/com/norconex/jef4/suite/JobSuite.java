@@ -310,6 +310,7 @@ public final class JobSuite {
             }
             
             // Remove appender
+            appender.close();
             Logger.getRootLogger().removeAppender(appender);
             heartbeatGenerator.terminate();
         }

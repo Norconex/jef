@@ -7,7 +7,6 @@
   </properties>
   <body>
 
-
     <release version="4.1.0-SNAPSHOT" date="2017-??-??" description="Minor release">
       <action dev="essiembre" type="update">
         Maven dependency updates: Norconex Commons Lang 1.13.0.
@@ -33,6 +32,10 @@
         up after execution.
       </action>
       <action dev="essiembre" type="fix">
+        Fixed exceptions when trying to rerun the same suite withing same JVM
+        due to FileLocking issues on log files.
+      </action>
+      <action dev="essiembre" type="fix">
         Fixed PREMATURE_TERMINATION event never being fired when it should.
       </action>
       <action dev="essiembre" type="remove">
@@ -41,7 +44,6 @@
         Commons Lang (RetriableExecutor being renamed to Retrier).
       </action>
     </release>
-
 
     <release version="4.0.8" date="2016-12-13" description="Bug fix release">
       <action dev="essiembre" type="update">
