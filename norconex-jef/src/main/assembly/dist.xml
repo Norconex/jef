@@ -23,18 +23,12 @@
   <includeSiteDirectory>false</includeSiteDirectory>
   <fileSets>
     <fileSet>
-      <directory>${basedir}/src/main/scripts</directory>
-      <includes>
-        <include>**</include>
-      </includes>
-      <outputDirectory>/</outputDirectory>
-    </fileSet>
-    <fileSet>
       <directory>${basedir}/src/main/assembly/</directory>
       <excludes>
         <exclude>dist.xml</exclude>
       </excludes>
       <includes>
+        <include>scripts/**</include>
         <include>third-party/**</include>
         <include>*.txt</include>
       </includes>
@@ -43,6 +37,14 @@
     <fileSet>
       <directory>${project.build.directory}/site/apidocs</directory>
       <outputDirectory>apidocs</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/shared-resources</directory>
+      <excludes>
+        <exclude>scripts/decrypt*</exclude>
+        <exclude>scripts/encrypt*</exclude>
+      </excludes>
+      <outputDirectory>/</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>${project.build.directory}/generated-resources</directory>
