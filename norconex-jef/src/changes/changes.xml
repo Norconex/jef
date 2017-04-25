@@ -7,7 +7,7 @@
   </properties>
   <body>
 
-    <release version="4.1.0-SNAPSHOT" date="2017-??-??" description="Minor release">
+    <release version="4.1.0" date="2017-04-25" description="Minor release">
       <action dev="essiembre" type="add">
         Now distributed with utility scripts.
       </action>      
@@ -35,7 +35,7 @@
         up after execution.
       </action>
       <action dev="essiembre" type="fix">
-        Fixed exceptions when trying to rerun the same suite withing same JVM
+        Fixed exceptions when trying to rerun the same suite within same JVM
         due to FileLocking issues on log files.
       </action>
       <action dev="essiembre" type="fix">
