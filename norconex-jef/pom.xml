@@ -449,17 +449,5 @@
         <timezone>-4</timezone>
     </developer>
   </developers>
-  <contributors>
-    <contributor>
-        <name>David Gaulin</name>
-        <email>david.gaulin@norconex.com</email>
-        <organization>Norconex Inc.</organization>
-        <organizationUrl>http://www.norconex.com</organizationUrl>
-        <roles>
-          <role>developer</role>
-        </roles>
-        <timezone>-4</timezone>
-    </contributor>
-  </contributors>
   
 </project>

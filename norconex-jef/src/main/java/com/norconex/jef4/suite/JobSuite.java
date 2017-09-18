@@ -304,8 +304,8 @@ public final class JobSuite {
                     fire(suiteLifeCycleListeners,
                             "suiteTerminatedPrematuraly", this);
                 } else {
-                    LOG.error("JobSuite was executed successfully but "
-                            + "job state does not reflect that: " + jobState);
+                    LOG.error("JobSuite ended but job state does not "
+                            + "reflect completion: " + jobState);
                 }
             }
             
