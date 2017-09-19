@@ -15,8 +15,8 @@
 package com.norconex.jef4.exec;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.norconex.commons.lang.exec.SystemCommand;
 import com.norconex.commons.lang.exec.SystemCommandException;
@@ -41,7 +41,7 @@ public class SystemCommandJob implements IJob {
 
     /** Logger. */
     private static final Logger LOG =
-            LogManager.getLogger(SystemCommandJob.class);
+            LoggerFactory.getLogger(SystemCommandJob.class);
 
     /** Job unique id. */
     private final String id;
@@ -58,7 +58,6 @@ public class SystemCommandJob implements IJob {
      * @param commands array of individual commands to be executed
      * @see SystemCommandJob#SystemCommandJob(String, SystemCommand[])
      */
-    @SuppressWarnings("nls")
     public SystemCommandJob(String id, String... commands) {
         super();
         if (commands == null) {

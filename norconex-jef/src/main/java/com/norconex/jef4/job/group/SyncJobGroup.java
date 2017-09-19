@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2017 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  */
 package com.norconex.jef4.job.group;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.job.JobException;
@@ -34,12 +34,11 @@ import com.norconex.jef4.suite.JobSuite;
  *
  * @author Pascal Essiembre
  */
-@SuppressWarnings("nls")
 public class SyncJobGroup extends AbstractJobGroup {
 
     /** Logger. */
     private static final Logger LOG =
-            LogManager.getLogger(SyncJobGroup.class);
+            LoggerFactory.getLogger(SyncJobGroup.class);
 
     public SyncJobGroup(
             final String name, final IJob... jobs) {
@@ -52,19 +51,14 @@ public class SyncJobGroup extends AbstractJobGroup {
         IJob[] jobs = getJobs();
         String failedJob = null;
         for (int i = 0; i < jobs.length; i++) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Synchronous group \"" + getId() + "\" "
-                        + "about to run synchronous job \""
-                        + jobs[i].getId() + "\".");
-            }
+            LOG.debug("Synchronous group \"{}\" about to run synchronous "
+                    + "job \"{}\".", getId(), jobs[i].getId());
             if (!suite.runJob(jobs[i])) {
                 LOG.error("\"" + jobs[i].getId() + "\" failed.");
                 failedJob = jobs[i].getId();
                 break;
             }
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("\"" + jobs[i].getId() + "\" succeeded.");
-            }
+            LOG.debug("\"{}\" succeeded.", jobs[i].getId());
         }
         if (failedJob != null) {
             throw new JobException(

@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2017 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.norconex.jef4.JEFException;
 import com.norconex.jef4.job.IJob;
@@ -40,12 +40,11 @@ import com.norconex.jef4.suite.JobSuite;
  *
  * @author Pascal Essiembre
  */
-@SuppressWarnings("nls")
 public class AsyncJobGroup extends AbstractJobGroup {
 
     /** Logger. */
-    private static final Logger LOG =
-            LogManager.getLogger(AsyncJobGroup.class);
+    private static final Logger LOG = 
+            LoggerFactory.getLogger(AsyncJobGroup.class);
 
     private final int maxThread;
     

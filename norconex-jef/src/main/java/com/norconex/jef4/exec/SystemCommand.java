@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2017 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.norconex.commons.lang.io.IStreamListener;
 import com.norconex.jef4.job.group.AsyncJobGroup;
@@ -44,7 +44,8 @@ import com.norconex.jef4.job.group.AsyncJobGroup;
 public class SystemCommand {
 
     /** Logger. */
-    private static final Logger LOG = LogManager.getLogger(SystemCommand.class);
+    private static final Logger LOG = 
+            LoggerFactory.getLogger(SystemCommand.class);
 
     private static final String[] EMPTY_STRINGS = new String[] {};
     private static final String[] CMD_PREFIXES_WIN_LEGACY = 

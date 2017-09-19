@@ -34,11 +34,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.norconex.commons.lang.config.XMLConfigurationUtil;
 import com.norconex.commons.lang.file.FileUtil;
@@ -76,7 +73,7 @@ import com.norconex.jef4.JEFUtil;
 public class FileLogManager implements ILogManager {
 
     private static final Logger LOG =
-            LogManager.getLogger(FileLogManager.class);
+            LoggerFactory.getLogger(FileLogManager.class);
     
     private static final String LAYOUT_PATTERN = 
             "%d{yyyy-MM-dd HH:mm:ss} %p - %m\n";

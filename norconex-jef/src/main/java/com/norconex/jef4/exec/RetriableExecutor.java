@@ -14,8 +14,8 @@
  */
 package com.norconex.jef4.exec;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.norconex.commons.lang.Sleeper;
 import com.norconex.commons.lang.exec.Retrier;
@@ -34,7 +34,8 @@ import com.norconex.commons.lang.exec.Retrier;
 public class RetriableExecutor {
 
     /** Logger. */
-    private static final Logger LOG = LogManager.getLogger(RetriableExecutor.class);
+    private static final Logger LOG = 
+            LoggerFactory.getLogger(RetriableExecutor.class);
 
     /** Default maximum number of retries. */
     public static final int DEFAULT_MAX_RERUN_ATTEMPTS = 10;
@@ -119,9 +120,8 @@ public class RetriableExecutor {
      * Runs the {@link IRetriable} instance.
      * @param retriable the code to run
      * @throws RetriableException wrapper around last exception encountered
-     * or exeption thrown when max rerun attempts is reached.
+     * or exception thrown when max rerun attempts is reached.
      */
-    @SuppressWarnings("nls")
     public void execute(IRetriable retriable) throws RetriableException {
         int attemptCount = 0;
         Exception exception = null;
