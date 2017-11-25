@@ -323,6 +323,10 @@ public final class JobSuite {
         if (job == null) {
             throw new IllegalArgumentException("Job cannot be null.");
         }
+        if (StringUtils.isBlank(job.getId())) {
+            throw new IllegalArgumentException("Job id cannot be blank.");
+        }
+        
         boolean success = false;
         Thread.currentThread().setName(job.getId());
         setCurrentJobId(job.getId());
