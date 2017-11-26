@@ -24,7 +24,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>    
     <site.baseurl/>
-    <norconex-commons-lang.version>1.13.0</norconex-commons-lang.version>
+    <norconex-commons-lang.version>1.14.0-SNAPSHOT</norconex-commons-lang.version>
   </properties>
   <inceptionYear>2007</inceptionYear>
 
@@ -99,13 +99,13 @@
       <version>1.7.25</version>
     </dependency>
     <!--
+    -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.2.3</version>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
-    -->
   </dependencies>
   
   <dependencyManagement>

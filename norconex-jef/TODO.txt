@@ -1,0 +1,21 @@
+
+ILogManager will have a method called:
+  registerJEFLogger(SLF4jLogger rootLogger).
+    - with default implementating checking if logback before adding filesystem
+      appender.  Maybe support log4j also.
+      For other, throw warning that people are on their own.
+      - Offer a way to disable too, throwing warning.
+ 
+
+
+
+To consider maybe one day:
+- Have dynamic jobs
+- Have a thread utility method that split a job array in X number of threads
+- Support for I18N in descriptions and else.
+- In the backing up of Log + Progress, consider optional argument to delete
+  logs/jobs older than java.util.Date.
+- Have a way to configure logger created by JEF via logback.xml
+  - Challenge: making sure the minimum required are met (like pattern?).
+- Have rollback strategy instead of backups?
+- Remove mail dependency?

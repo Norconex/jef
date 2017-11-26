@@ -36,6 +36,7 @@ import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.jef4.JEFException;
@@ -314,7 +315,6 @@ public final class JobSuite {
             Logger.getRootLogger().removeAppender(appender);
             heartbeatGenerator.terminate();
         }
-
         return success;
     }
     
