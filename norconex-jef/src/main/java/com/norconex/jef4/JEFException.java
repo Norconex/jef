@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2017 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package com.norconex.jef4;
 /**
  * Represents a job-related exception.  Implementors are invited to
  * wrap exceptions they want explicitly handled by the framework in instances
- * of <code>JobException</code>.
+ * of JobException.
  * @author Pascal Essiembre
  */
 public class JEFException extends RuntimeException {

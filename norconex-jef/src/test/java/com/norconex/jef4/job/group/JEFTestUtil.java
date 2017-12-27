@@ -36,7 +36,7 @@ public final class JEFTestUtil {
     
     public static File setConfigWithTempWorkdir(
             JobSuiteConfig config, TemporaryFolder folder) throws IOException {
-        File tempDirectory = folder.newFolder("jef-test");
+        File tempDirectory = folder.newFolder("jef-test.fake");
         config.setWorkdir(tempDirectory.getCanonicalPath());
         return tempDirectory;
     }

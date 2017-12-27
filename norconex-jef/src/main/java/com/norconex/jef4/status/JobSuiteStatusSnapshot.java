@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2017 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,37 +17,39 @@ package com.norconex.jef4.status;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.map.ListOrderedMap;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.norconex.commons.lang.PercentFormatter;
+import com.norconex.commons.lang.config.ConfigurationException;
 import com.norconex.commons.lang.config.XMLConfigurationUtil;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.job.group.IJobGroup;
-import com.norconex.jef4.log.ILogManager;
 
 public final class JobSuiteStatusSnapshot {
 
+    private static final Logger LOG = 
+            LoggerFactory.getLogger(JobSuiteStatusSnapshot.class);
+    
     private static final int TO_STRING_INDENT = 4;
     
-    private final ILogManager logManager;
     private final JobStatusTreeNode rootNode;
     private Map<String, JobStatusTreeNode> flattenNodes = 
             new ListOrderedMap<>();
     
     private JobSuiteStatusSnapshot(
-            JobStatusTreeNode rootNode, ILogManager logManager) {
-        this.logManager = logManager;
+            JobStatusTreeNode rootNode) {
         this.rootNode = rootNode;
         flattenNode(rootNode);
     }
@@ -66,10 +68,6 @@ public final class JobSuiteStatusSnapshot {
         return null;
     }
     
-    public ILogManager getLogManager() {
-        return logManager;
-    }
-    
     public List<IJobStatus> getJobStatusList() {
         List<IJobStatus> list = new ArrayList<>(flattenNodes.size());
         for (JobStatusTreeNode node : flattenNodes.values()) {
@@ -84,7 +82,7 @@ public final class JobSuiteStatusSnapshot {
     public List<IJobStatus> getChildren(String jobId) {
         JobStatusTreeNode node = flattenNodes.get(jobId);
         if (node == null) {
-            return new ArrayList<IJobStatus>(0);
+            return new ArrayList<>(0);
         }
         List<JobStatusTreeNode> nodes = node.children;
         List<IJobStatus> statuses = new ArrayList<>(nodes.size());
@@ -124,13 +122,11 @@ public final class JobSuiteStatusSnapshot {
         }
     }
     
-    public static JobSuiteStatusSnapshot create(
-            IJob rootJob, ILogManager logManager) {
+    public static JobSuiteStatusSnapshot create(IJob rootJob) {
         if (rootJob == null) {
             throw new IllegalArgumentException("Root job cannot be null.");
         }
-        return new JobSuiteStatusSnapshot(
-                createTreeNode(null, rootJob), logManager);
+        return new JobSuiteStatusSnapshot(createTreeNode(null, rootJob));
     }
     private static JobStatusTreeNode createTreeNode(
             IJobStatus parentStatus, IJob job) {
@@ -167,15 +163,19 @@ public final class JobSuiteStatusSnapshot {
         //--- Load XML file ---
         String suiteName = FileUtil.fromSafeFileName(
                 FilenameUtils.getBaseName(suiteIndex.getPath()));
-        XMLConfiguration xml = new XMLConfiguration();
-        XMLConfigurationUtil.disableDelimiterParsing(xml);
+        XMLConfiguration xml = null;
         String indexFileContent = null;
         // Using RandomAccessFile since evidence has shown it is better at 
         // dealing with files/locks in a way that cause less/no errors.
         try (RandomAccessFile ras = new RandomAccessFile(suiteIndex, "r")) {
             if (suiteIndex.exists()) {
-                StringReader sr = new StringReader(ras.readUTF());
-                xml.load(sr);
+                xml = XMLConfigurationUtil.newXMLConfiguration(ras.readUTF());
+            }
+            if (xml == null) {
+                throw new IOException(
+                        "XML Configuration could not be loaded from suite "
+                      + "index: " + suiteIndex
+                      + ". Index file content: \n" + indexFileContent);
             }
         } catch (ConfigurationException e) {
             throw new IOException(
@@ -183,31 +183,33 @@ public final class JobSuiteStatusSnapshot {
                     + ". Index file content:\n" + indexFileContent, e);
         }
 
-        //--- LogManager ---
-        ILogManager logManager = 
-                XMLConfigurationUtil.newInstance(xml, "logManager");
-        
         //--- Load status tree ---
         IJobStatusStore serial = 
                 XMLConfigurationUtil.newInstance(xml, "statusStore");
+        if (serial == null) {
+            throw new IOException(
+                    "No 'statusStore' configuration found in suite index: "
+                  + suiteIndex + ". Index file content:\n"
+                  + indexFileContent);
+        }
         return new JobSuiteStatusSnapshot(loadTreeNode(
-                null, xml.configurationAt("job"), suiteName, serial),
-                        logManager);
+                null, xml.configurationAt("job"), suiteName, serial));
     }
     
     private static JobStatusTreeNode loadTreeNode(
             IJobStatus parentStatus,
-            HierarchicalConfiguration jobXML, String suiteName, 
+            HierarchicalConfiguration<ImmutableNode> jobXML, String suiteName, 
             IJobStatusStore store) throws IOException {
         if (jobXML == null) {
             return null;
         }
         String jobId = jobXML.getString("[@name]");
         IJobStatus jobStatus = store.read(suiteName, jobId);
-        List<HierarchicalConfiguration> xmls = jobXML.configurationsAt("job");
-        List<JobStatusTreeNode> childNodes = new ArrayList<JobStatusTreeNode>();
+        List<HierarchicalConfiguration<ImmutableNode>> xmls = 
+                jobXML.configurationsAt("job");
+        List<JobStatusTreeNode> childNodes = new ArrayList<>();
         if (xmls != null) {
-            for (HierarchicalConfiguration xml : xmls) {
+            for (HierarchicalConfiguration<ImmutableNode> xml : xmls) {
                 JobStatusTreeNode child = loadTreeNode(
                         jobStatus, xml, suiteName, store);
                 if (child != null) {
@@ -277,10 +279,16 @@ public final class JobSuiteStatusSnapshot {
     }
     private void toString(StringBuilder b, String jobId, int depth) {
         IJobStatus status = getJobStatus(jobId);
+        String percent;
+        if (status == null) {
+            LOG.error("Could not obtain status for job Id: {}", jobId);
+            percent = "?";
+        } else {
+            percent = new PercentFormatter().format(status.getProgress());
+        }
         b.append(StringUtils.repeat(' ', depth * TO_STRING_INDENT));
-        b.append(StringUtils.leftPad(new PercentFormatter().format(
-                status.getProgress()), TO_STRING_INDENT));
-        b.append("  ").append(status.getJobId());
+        b.append(StringUtils.leftPad(percent, TO_STRING_INDENT));
+        b.append("  ").append(jobId);
         b.append(System.lineSeparator());
         for (IJobStatus child : getChildren(jobId)) {
             toString(b, child.getJobId(), depth + 1);

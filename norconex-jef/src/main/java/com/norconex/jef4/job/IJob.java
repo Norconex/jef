@@ -24,7 +24,7 @@ import com.norconex.jef4.status.JobStatusUpdater;
  * uniform way.  Great care should be taken to make every jobs recoverable.</p>
  *
  * <p>Jobs are usually assembled together to form a <code>JobSuite</code>.
- * Progress tracking, error handling, logging, etc., are all handled by job
+ * Progress tracking, error handling, etc., are all handled by job
  * suites and implementors do not have to worry about these concerns when
  * creating jobs.</p>
  *
@@ -34,7 +34,6 @@ import com.norconex.jef4.status.JobStatusUpdater;
  *   <li>update job progress on <code>JobProgress</code>;
  *   <li>ensure jobs are recoverable by considering the current progress
  *       passed to the execute method;
- *   <li>use Log4J for all logging purposes;
  *   <li>wrap exceptions you explicitly want to be handled by the framework
  *       into a runtime <code>JobException</code> instance;
  *   <li>use lazy-loading where possible
@@ -44,12 +43,14 @@ import com.norconex.jef4.status.JobStatusUpdater;
  */
 public interface IJob {
 
+    //TODO document about logging?
     
     /**
      * Gets the job unique identifier. All characters are valid and regular
      * words can be used, as long as the returned string is unique.
      * @return job unique identifier
      */
+    //TODO rename to getName() ?
     String getId();
 
     /**

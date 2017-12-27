@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2017 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,38 +18,34 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.norconex.jef4.job.IJobErrorListener;
-import com.norconex.jef4.job.IJobLifeCycleListener;
-import com.norconex.jef4.log.ILogManager;
+import com.norconex.jef4.event.IJobEventListener;
 import com.norconex.jef4.status.IJobStatusStore;
+
+//TODO really have a config still??? given it contains so little, shall
+// we move these settings directly on JobSuite? Else, make IXMLConfigurable?
 
 public class JobSuiteConfig {
 
     private IJobStatusStore jobStatusStore;
-    private ILogManager logManager;
+//    private ILogManager logManager;
     private String workdir;
     
-    private final List<IJobLifeCycleListener> jobLifeCycleListeners =
-            new ArrayList<IJobLifeCycleListener>();
-    private final List<IJobErrorListener> jobErrorListeners =
-            new ArrayList<IJobErrorListener>();
-    private final List<ISuiteLifeCycleListener> suiteLifeCycleListeners =
-            new ArrayList<ISuiteLifeCycleListener>();
+    private final List<IJobEventListener> eventListeners = new ArrayList<>();
     
     public JobSuiteConfig() {
         super();
     }
 
-    /**
-     * Gets the Log4J log manager.
-     * @return Log4J log manager
-     */
-    public ILogManager getLogManager() {
-        return logManager;
-    }
-    public void setLogManager(ILogManager logManager) {
-        this.logManager = logManager;
-    }
+//    /**
+//     * Gets the Log4J log manager.
+//     * @return Log4J log manager
+//     */
+//    public ILogManager getLogManager() {
+//        return logManager;
+//    }
+//    public void setLogManager(ILogManager logManager) {
+//        this.logManager = logManager;
+//    }
 
     public String getWorkdir() {
         return workdir;
@@ -67,30 +63,20 @@ public class JobSuiteConfig {
         this.jobStatusStore = jobStatusStore;
     }
 
-    public List<IJobLifeCycleListener> getJobLifeCycleListeners() {
-        return jobLifeCycleListeners;
+    public List<IJobEventListener> getEventListeners() {
+        return eventListeners;
     }
-    public void setJobLifeCycleListeners(
-            IJobLifeCycleListener... jobLifeCycleListeners) {
-        this.jobLifeCycleListeners.clear();
-        this.jobLifeCycleListeners.addAll(Arrays.asList(jobLifeCycleListeners));
+    public void setEventListeners(IJobEventListener... eventListeners) {
+        this.eventListeners.clear();
+        this.eventListeners.addAll(Arrays.asList(eventListeners));
     }
-    public List<IJobErrorListener> getJobErrorListeners() {
-        return jobErrorListeners;
+    public void addEventListeners(IJobEventListener... eventListeners) {
+        this.eventListeners.addAll(Arrays.asList(eventListeners));
     }
-    public void setJobErrorListeners(IJobErrorListener... errorListeners) {
-        this.jobErrorListeners.clear();
-        this.jobErrorListeners.addAll(Arrays.asList(errorListeners));
+    public void removeEventListeners() {
+        this.eventListeners.clear();
     }
-    public List<ISuiteLifeCycleListener> getSuiteLifeCycleListeners() {
-        return suiteLifeCycleListeners;
+    public void removeEventListeners(IJobEventListener... eventListeners) {
+        this.eventListeners.removeAll(Arrays.asList(eventListeners));
     }
-    public void setSuiteLifeCycleListeners(
-            ISuiteLifeCycleListener... suiteLifeCycleListeners) {
-        this.suiteLifeCycleListeners.clear();
-        this.suiteLifeCycleListeners.addAll(
-                Arrays.asList(suiteLifeCycleListeners));
-    }
-
-
 }

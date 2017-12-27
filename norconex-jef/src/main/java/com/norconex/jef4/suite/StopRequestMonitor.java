@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2017 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@ package com.norconex.jef4.suite;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.norconex.commons.lang.Sleeper;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.jef4.JEFException;
+import com.norconex.jef4.event.IJobEventListener;
+import com.norconex.jef4.event.JobEvent;
 import com.norconex.jef4.job.IJob;
-import com.norconex.jef4.job.IJobLifeCycleListener;
-import com.norconex.jef4.job.IJobVisitor;
 import com.norconex.jef4.status.IJobStatus;
 import com.norconex.jef4.status.JobState;
 import com.norconex.jef4.status.MutableJobStatus;
@@ -36,14 +36,14 @@ import com.norconex.jef4.status.MutableJobStatus;
  * The directory where to locate the file depends on the constructor invoked.
  *
  * @author Pascal Essiembre
- * @since 2.0
  */
-@SuppressWarnings("nls")
 public class StopRequestMonitor extends Thread {
 
-    /** Logger. */
-    private static final Logger LOG =
-            LogManager.getLogger(StopRequestMonitor.class);
+    //TODO rename ShutdownHook?
+    
+    private static final Logger LOG = 
+            LoggerFactory.getLogger(StopRequestMonitor.class);
+    
     private static final int STOP_WAIT_DELAY = 3;
     
     private final File stopFile;
@@ -86,26 +86,23 @@ public class StopRequestMonitor extends Thread {
         monitoring = false;
         LOG.info("STOP request received.");
         
-        /// Notify Suite Life Cycle listeners
-        for (ISuiteLifeCycleListener l : suite.getSuiteLifeCycleListeners()) {
-            l.suiteStopping(suite);
+        // Notify Suite Life Cycle listeners
+        for (IJobEventListener l : suite.getEventListeners()) {
+            l.onEvent(new JobEvent(JobEvent.SUITE_STOPPING, null, suite));
         }
         
-        /// Notify Job Life Cycle listeners and stop them
-        suite.accept(new IJobVisitor() {
-            @Override
-            public void visitJob(final IJob job, final IJobStatus jobStatus) {
-                for (IJobLifeCycleListener l : 
-                        suite.getJobLifeCycleListeners()) {
-                    l.jobStopping(jobStatus);
-                }
-                new Thread(){
-                    @Override
-                    public void run() {
-                        stopJob(job, jobStatus);
-                    }
-                }.start();                
+        // Notify Job Life Cycle listeners and stop them
+        suite.accept((final IJob job, final IJobStatus jobStatus) -> {
+            for (IJobEventListener l : suite.getEventListeners()) {
+                l.onEvent(new JobEvent(
+                        JobEvent.JOB_STOPPING, jobStatus, suite));
             }
+            new Thread(){
+                @Override
+                public void run() {
+                    stopJob(job, jobStatus);
+                }
+            }.start();                
         });
     }
     private void stopJob(final IJob job, final IJobStatus status) {
@@ -115,14 +112,13 @@ public class StopRequestMonitor extends Thread {
             Sleeper.sleepSeconds(STOP_WAIT_DELAY);
         }
         if (status.getState() == JobState.STOPPED) {
-            for (IJobLifeCycleListener l : 
-                    suite.getJobLifeCycleListeners()) {
-                l.jobStopped(status);
+            for (IJobEventListener l : suite.getEventListeners()) {
+                l.onEvent(new JobEvent(JobEvent.JOB_STOPPED, status, suite));
             }
             if (job.getId().equals(suite.getRootJob().getId())) {
-                for (ISuiteLifeCycleListener l : 
-                        suite.getSuiteLifeCycleListeners()) {
-                    l.suiteStopped(suite);
+                for (IJobEventListener l : suite.getEventListeners()) {
+                    l.onEvent(new JobEvent(
+                            JobEvent.SUITE_STOPPED, null, suite));
                 }
             }
         }

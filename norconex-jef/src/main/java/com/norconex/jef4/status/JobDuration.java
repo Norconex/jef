@@ -22,6 +22,8 @@ import org.apache.commons.lang3.ObjectUtils;
  * Holds time-related information about a job execution.
  * @author Pascal Essiembre
  */
+//TODO track duration history, with status history... if too many 
+// in memory, save old ones to disk???
 public class JobDuration {
 
     private Date resumedStartTime;

@@ -20,6 +20,7 @@ import com.norconex.commons.lang.file.FileUtil;
 
 public final class JEFUtil {
 
+    //TODO make it current directory instead + jobsuite name.
     public static final File FALLBACK_WORKDIR = 
             new File(System.getProperty("user.home") + "/Norconex/jef/workdir");
 

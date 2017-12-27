@@ -39,7 +39,8 @@ import com.norconex.jef4.suite.JobSuite;
  */
 public class SystemCommandJob implements IJob {
 
-    /** Logger. */
+    //TODO move under *.job.impl  or just *.job
+    
     private static final Logger LOG =
             LoggerFactory.getLogger(SystemCommandJob.class);
 

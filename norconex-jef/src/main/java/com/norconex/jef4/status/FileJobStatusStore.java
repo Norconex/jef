@@ -30,15 +30,13 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
 import com.norconex.commons.lang.config.XMLConfigurationUtil;
 import com.norconex.commons.lang.file.FileUtil;
@@ -77,8 +75,8 @@ import com.norconex.jef4.job.JobException;
  */
 public class FileJobStatusStore implements IJobStatusStore {
 
-    private static final Logger LOG =
-            LogManager.getLogger(FileJobStatusStore.class);
+//    private static final Logger LOG =
+//            LogManager.getLogger(FileJobStatusStore.class);
 
     private String jobdirLatest;
     private String jobdirBackupBase;
@@ -117,12 +115,12 @@ public class FileJobStatusStore implements IJobStatusStore {
         // Status dir changed, update dirs
         String path = statusDir;
         if (StringUtils.isBlank(statusDir)) {
-            LOG.info("No status directory specified.");
+//            LOG.info("No status directory specified.");
             path = JEFUtil.FALLBACK_WORKDIR.getAbsolutePath();
         } else {
             path = new File(path).getAbsolutePath();
         }
-        LOG.debug("Status serialization directory: " + path); 
+//        LOG.debug("Status serialization directory: " + path); 
         jobdirLatest = path + File.separatorChar 
                 + "latest" + File.separatorChar + "status";
         jobdirBackupBase = path + "/backup";
@@ -170,9 +168,9 @@ public class FileJobStatusStore implements IJobStatusStore {
         }
 
         File file = getStatusFile(suiteName, jobStatus.getJobId());
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Writing status file: " + file);
-        }
+//        if (LOG.isDebugEnabled()) {
+//            LOG.debug("Writing status file: " + file);
+//        }
         
         synchronized(jobStatus) {
             // Using RandomAccessFile since evidence has shown it is better at 
@@ -196,9 +194,9 @@ public class FileJobStatusStore implements IJobStatusStore {
         MutableJobStatus jobStatus = new MutableJobStatus(jobId);
         File file = getStatusFile(suiteName, jobId);
         
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Reading status file: " + file);
-        }
+//        if (LOG.isDebugEnabled()) {
+//            LOG.debug("Reading status file: " + file);
+//        }
         if (!file.exists()) {
             return jobStatus;
         }
@@ -215,14 +213,14 @@ public class FileJobStatusStore implements IJobStatusStore {
             StringReader sr = new StringReader(ras.readUTF());
             config.load(sr);
         } catch (IOException e) {
-            LOG.error("Cannot read file: " + file.getAbsolutePath());
+//            LOG.error("Cannot read file: " + file.getAbsolutePath());
             throw e;
         }
         
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(jobId + " last active time: "
-                    + new Date(file.lastModified()));
-        }
+//        if (LOG.isDebugEnabled()) {
+//            LOG.debug(jobId + " last active time: "
+//                    + new Date(file.lastModified()));
+//        }
         jobStatus.setLastActivity(new Date(file.lastModified()));
         
         jobStatus.setProgress(config.getDouble("progress", 0d));

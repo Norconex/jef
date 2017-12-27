@@ -18,6 +18,7 @@ import java.util.Date;
 
 import com.norconex.commons.lang.map.Properties;
 
+//TODO rename to IJobProgress?
 public interface IJobStatus {
 
 

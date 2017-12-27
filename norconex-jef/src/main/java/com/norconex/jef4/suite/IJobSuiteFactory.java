@@ -28,7 +28,8 @@ package com.norconex.jef4.suite;
  * @author Pascal Essiembre
  */
 public interface IJobSuiteFactory {
-
+//TODO delete this???  Or provide a default implementation maybe?
+    
     /**
      * Creates a job suite.
      * @return job suite
