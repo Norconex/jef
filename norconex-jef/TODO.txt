@@ -1,8 +1,15 @@
 
+- Allow to stop idividual jobs???  could be nice.
+
 - Rename StopRequestMonitor to ShutdownHook* and offer a port-based one in
   addition to filesystem.
 
 - Use Java DateTime everywhere as opposed to simple Date.
+
+- Use Path everywhere instead of File. Including in Norconex Commons Lang
+
+- If we keep backuping status files, backup directory to simplify instead of 
+  individual files.
 
 - JEFMon: assume job location to be xxx/yyy.log by default, but allow
   to specify dir/path to it if different.  Else, logs are not accessible

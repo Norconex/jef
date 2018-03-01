@@ -1,4 +1,4 @@
-/* Copyright 2010-2017 Norconex Inc.
+/* Copyright 2010-2018 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.jobs.SleepyJob;
-import com.norconex.jef4.status.IJobStatus;
-import com.norconex.jef4.suite.JobSuite;
+import com.norconex.jef5.job.IJob;
+import com.norconex.jef5.job.group.AsyncJobGroup;
+import com.norconex.jef5.session.JobSession;
+import com.norconex.jef5.suite.JobSuite;
 
 public class AsyncJobGroupTest {
 
@@ -45,13 +46,13 @@ public class AsyncJobGroupTest {
                 rootJob, JEFTestUtil.newConfigWithTempWorkdir(folder));
         Assert.assertTrue("Suite failed.", suite.execute());
         
-        assertStatus(suite.getJobStatus(job1));
-        assertStatus(suite.getJobStatus(job2));
-        assertStatus(suite.getJobStatus(job3));
-        assertStatus(suite.getJobStatus(rootJob));
+        assertStatus(suite.getJobSession(job1));
+        assertStatus(suite.getJobSession(job2));
+        assertStatus(suite.getJobSession(job3));
+        assertStatus(suite.getJobSession(rootJob));
     }
 
-    private void assertStatus(IJobStatus status) {
+    private void assertStatus(JobSession status) {
         System.out.println("Status of \"" + status.getJobId() + "\": "
                 + status.getState() + " (" + status.getProgress() + ")");
         assertTrue(status.getProgress() == 1d);

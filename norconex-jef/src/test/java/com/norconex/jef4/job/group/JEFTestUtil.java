@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import org.junit.rules.TemporaryFolder;
 
-import com.norconex.jef4.suite.JobSuiteConfig;
+import com.norconex.jef5.suite.JobSuiteConfig;
 
 public final class JEFTestUtil {
 
@@ -37,7 +37,7 @@ public final class JEFTestUtil {
     public static File setConfigWithTempWorkdir(
             JobSuiteConfig config, TemporaryFolder folder) throws IOException {
         File tempDirectory = folder.newFolder("jef-test.fake");
-        config.setWorkdir(tempDirectory.getCanonicalPath());
+        config.setWorkdir(tempDirectory.toPath());
         return tempDirectory;
     }
 }

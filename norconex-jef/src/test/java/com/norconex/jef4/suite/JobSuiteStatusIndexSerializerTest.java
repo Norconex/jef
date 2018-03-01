@@ -1,4 +1,4 @@
-/* Copyright 2010-2017 Norconex Inc.
+/* Copyright 2010-2018 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  */
 package com.norconex.jef4.suite;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -23,10 +23,12 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.norconex.commons.lang.file.FileUtil;
-import com.norconex.jef4.job.IJob;
 import com.norconex.jef4.job.group.JEFTestUtil;
 import com.norconex.jef4.jobs.SleepyJob;
-import com.norconex.jef4.status.JobSuiteStatusSnapshot;
+import com.norconex.jef5.job.IJob;
+import com.norconex.jef5.session.JobSessionFacade;
+import com.norconex.jef5.suite.JobSuite;
+import com.norconex.jef5.suite.JobSuiteConfig;
 
 public class JobSuiteStatusIndexSerializerTest {
 
@@ -41,12 +43,11 @@ public class JobSuiteStatusIndexSerializerTest {
         JobSuite suite = new JobSuite(job, config);
         Assert.assertTrue("Execution returned false.", suite.execute());
 
-        JobSuiteStatusSnapshot tree = 
-                JobSuiteStatusSnapshot.newSnapshot(
-                        new File(config.getWorkdir(), "latest/"
-                      + FileUtil.toSafeFileName(job.getId()) + ".index"));
+        JobSessionFacade tree = JobSessionFacade.get(
+                Paths.get(config.getWorkdir().toString(), "latest",
+                      FileUtil.toSafeFileName(job.getId()) + ".index"));
         System.out.println("TREE: " + tree);
-        Assert.assertEquals(1d, tree.getRoot().getProgress(), 0d);
+        Assert.assertEquals(1d, tree.getRootSession().getProgress(), 0d);
     }
 
 }

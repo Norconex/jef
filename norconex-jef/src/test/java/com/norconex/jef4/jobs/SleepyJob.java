@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2018 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 package com.norconex.jef4.jobs;
 
 import com.norconex.commons.lang.Sleeper;
-import com.norconex.jef4.job.IJob;
-import com.norconex.jef4.status.IJobStatus;
-import com.norconex.jef4.status.JobStatusUpdater;
-import com.norconex.jef4.suite.JobSuite;
+import com.norconex.jef5.job.IJob;
+import com.norconex.jef5.session.JobSession;
+import com.norconex.jef5.session.JobSessionUpdater;
+import com.norconex.jef5.suite.JobSuite;
 
 /**
  * Sleeps for a give number of seconds, and report itself every given seconds.
@@ -95,8 +95,8 @@ public class SleepyJob implements IJob {
 //    }
 
     @Override
-    public void execute(JobStatusUpdater statusUpdater, JobSuite suite) {
-      double elapsedSeconds = statusUpdater.getProgress();
+    public void execute(JobSessionUpdater sessionUpdater, JobSuite suite) {
+      double elapsedSeconds = sessionUpdater.getProgress();
       System.out.println("START PROGRESS IS: " + elapsedSeconds);
 
       while (elapsedSeconds < sleepSeconds) {
@@ -109,18 +109,18 @@ public class SleepyJob implements IJob {
               System.out.println("[" + getId() + "] Slept for "
                       + elapsedSeconds + " seconds.");
           }
-          statusUpdater.setProgress(elapsedSeconds / sleepSeconds);
-          statusUpdater.setNote("Slept for " + elapsedSeconds + " seconds.");
+          sessionUpdater.setProgress(elapsedSeconds / sleepSeconds);
+          sessionUpdater.setNote("Slept for " + elapsedSeconds + " seconds.");
 //          progress.incrementProgress(1);
 //          progress.setNote(
 //                  "Slept for " + progress.getProgress() + " seconds.");
       }
-      statusUpdater.setNote(
-              "Done sleeping for " + statusUpdater.getProgress() + " seconds.");
+      sessionUpdater.setNote(
+              "Done sleeping for " + sessionUpdater.getProgress() + " seconds.");
     }
 
     @Override
-    public void stop(IJobStatus executionStatus, JobSuite suite) {
+    public void stop(JobSession executionStatus, JobSuite suite) {
         // TODO Auto-generated method stub
         
     }
