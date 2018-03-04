@@ -5,12 +5,12 @@
     <storeDir>${tempDir}</storeDir>
     <!--  storeBackupDir -->
   </store>
-  <job name="Root Job">
-    <job name="Job A"/>
-    <job name="Job B">
-      <job name="Job B.1"/>
-      <job name="Job B.2"/>
+  <job id="Root Job">
+    <job id="Job A"/>
+    <job id="Job B">
+      <job id="Job B.1"/>
+      <job id="Job B.2"/>
     </job>
-    <job name="Job C"/>
+    <job id="Job C"/>
   </job>
 </suite-index>

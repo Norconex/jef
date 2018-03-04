@@ -15,13 +15,11 @@
 package com.norconex.jef5.session.store.impl;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +28,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -148,20 +147,52 @@ public class FileJobSessionStore
         Path file = resolveDataFile(suiteName, js.getJobId());
         LOG.trace("Writing status file: {}", file);
         
-//        synchronized(js) {
-            //TODO consider using SeekableByteChannel or else from NIO?
-            
-            // Using RandomAccessFile since evidence has shown it is better at 
-            // dealing with files/locks in a way that cause less/no errors.
-            // "d" ensures content is all written before a read.
-            try (RandomAccessFile ras = 
-                    new RandomAccessFile(file.toFile(), "rwd");
-                    FileChannel channel = ras.getChannel();
-                    FileLock lock = channel.lock()) {
-                StringWriter sw = new StringWriter();
-                config.store(sw);
-                ras.writeUTF(sw.toString());
-            }
+
+        StringWriter sw = new StringWriter();
+        config.store(sw);
+//        CharBuffer charBuffer = CharBuffer.wrap(sw.toString());
+
+        Files.createDirectories(file.getParent());
+        Files.write(file, sw.toString().getBytes(StandardCharsets.UTF_8));
+        
+        
+//        try (FileChannel fc = (FileChannel) Files.newByteChannel(file, 
+////                      StandardOpenOption.DSYNC, to make sure content is written
+//                StandardOpenOption.CREATE, 
+//                StandardOpenOption.READ, 
+//                StandardOpenOption.WRITE, 
+//                StandardOpenOption.TRUNCATE_EXISTING); //) {
+//                FileLock lock = fc.lock()) {  //TODO really lock?) {
+//            MappedByteBuffer mbb = fc.map(
+//                    FileChannel.MapMode.READ_WRITE, 0, charBuffer.length());
+//            if (mbb != null) {
+//                mbb.put(StandardCharsets.UTF_8.encode(charBuffer));
+//            }
+//        }        
+        
+//        try (RandomAccessFile raf = new RandomAccessFile(file.toFile(), "rwd");
+//                FileChannel fc = raf.getChannel();
+//                FileLock lock = fc.lock()) {  //TODO really lock?
+//            StringWriter sw = new StringWriter();
+//            config.store(sw);
+//            byte[] b = sw.toString().getBytes();
+//            MappedByteBuffer mmb = fc.map(
+//                    FileChannel.MapMode.READ_WRITE, fc.position(), b.length);
+//            mmb.put(b);
+//        }        
+        
+        
+//            // Using RandomAccessFile since evidence has shown it is better at 
+//            // dealing with files/locks in a way that cause less/no errors.
+//            // "d" ensures content is all written before a read.
+//            try (RandomAccessFile ras = 
+//                    new RandomAccessFile(file.toFile(), "rwd");
+//                    FileChannel channel = ras.getChannel();
+//                    FileLock lock = channel.lock()) {
+//                StringWriter sw = new StringWriter();
+//                config.store(sw);
+//                ras.writeChars(s);riteUTF(sw.toString());
+//            }
 //        }
     }
 
@@ -169,6 +200,10 @@ public class FileJobSessionStore
     public final JobSession read(String suiteName, final String jobId)
             throws IOException {
 
+        if (jobId == null) {
+            return null;
+        }
+        
         Set<JobSessionData> attempts = new TreeSet<>();
         Path file = null;
         int attemptNo = 1;
@@ -189,30 +224,56 @@ public class FileJobSessionStore
         if (LOG.isDebugEnabled()) {
             LOG.debug("Reading session file: " + file);
         }
-        if (/*!file.toFile().exists() || */ Files.size(file) == 0) {
-            jsd.setLastActivity(LocalDateTime.from(
-                    Files.getLastModifiedTime(file).toInstant()));
+        
+        if (file.getFileName().toString().startsWith("null")) {
+            System.out.println("XXXX: " + jsd);
+        }
+        
+        if (!file.toFile().exists() || Files.size(file) == 0) {
+            //TODO really use now??
+            jsd.setLastActivity(LocalDateTime.now());
+//            jsd.setLastActivity(LocalDateTime.from(
+//                    Files.getLastModifiedTime(file).toInstant()));
             return;
         }
 
         Properties config = new Properties();
         
-        //TODO consider using SeekableByteChannel or else from NIO?
-        // Is the following working (locks)?
-//      config.load(new ByteArrayInputStream(Files.readAllBytes(file)));
+        config.load(new StringReader(
+                new String(Files.readAllBytes(file),StandardCharsets.UTF_8)));
         
-        // Using RandomAccessFile since evidence has shown it is better at 
-        // dealing with files/locks in a way that cause less/no errors.
-        try (RandomAccessFile ras = new RandomAccessFile(file.toFile(), "r")) {
-            StringReader sr = new StringReader(ras.readUTF());
-            config.load(sr);
-        } catch (IOException e) {
-            LOG.error("Cannot read file: {}", file.toAbsolutePath());
-            throw e;
-        }        
+//        
+//        CharBuffer charBuffer = null;
+//        try (FileChannel fileChannel = (FileChannel) Files.newByteChannel(
+//            file, StandardOpenOption.READ)) {
+//            MappedByteBuffer mappedByteBuffer = fileChannel.map(
+//                    FileChannel.MapMode.READ_ONLY, 0, fileChannel.size());
+//            if (mappedByteBuffer != null) {
+//                charBuffer = StandardCharsets.UTF_8.decode(mappedByteBuffer);
+//                StringReader sr = new StringReader(charBuffer.toString());
+//                config.load(sr);
+//            }
+//        }
+        
+        
+
+//        
+//        //TODO consider using SeekableByteChannel or else from NIO?
+//        // Is the following working (locks)?
+////      config.load(new ByteArrayInputStream(Files.readAllBytes(file)));
+//        
+//        // Using RandomAccessFile since evidence has shown it is better at 
+//        // dealing with files/locks in a way that cause less/no errors.
+//        try (RandomAccessFile ras = new RandomAccessFile(file.toFile(), "r")) {
+//            StringReader sr = new StringReader(ras.readUTF());
+//            config.load(sr);
+//        } catch (IOException e) {
+//            LOG.error("Cannot read file: {}", file.toAbsolutePath());
+//            throw e;
+//        }        
 
         LocalDateTime lastModified = LocalDateTime.from(
-                Files.getLastModifiedTime(file).toInstant());
+                Files.getLastModifiedTime(file).toInstant().atZone(ZoneId.of("UTC")));
         
         LOG.trace("{} last activity: {}", file.toAbsolutePath(), lastModified);
         
@@ -263,9 +324,14 @@ public class FileJobSessionStore
     public LocalDateTime touch(String suiteName, String jobId) 
             throws IOException {
         Path file = resolveDataFile(suiteName, jobId);
+        
+        if (!file.toFile().exists()) {
+            Files.createDirectories(file.getParent());
+            Files.createFile(file);
+        }
         Instant now = Instant.now();
         Files.setLastModifiedTime(file, FileTime.from(now));        
-        return LocalDateTime.from(now);
+        return LocalDateTime.from(now.atZone(ZoneId.of("UTC")));
     }
     
     

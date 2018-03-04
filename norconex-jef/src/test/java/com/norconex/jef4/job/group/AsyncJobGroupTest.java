@@ -36,9 +36,9 @@ public class AsyncJobGroupTest {
     
     @Test
     public void testExecuteGroup() throws IOException {
-        IJob job1 = new SleepyJob(30, 3);
-        IJob job2 = new SleepyJob(20, 2);
-        IJob job3 = new SleepyJob(10, 1);
+        IJob job1 = new SleepyJob(10, 3);
+        IJob job2 = new SleepyJob(5, 2);
+        IJob job3 = new SleepyJob(3, 1);
         IJob rootJob = new AsyncJobGroup(
                 "async sleepy jobs", 2, job1, job2, job3);
         

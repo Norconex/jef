@@ -15,8 +15,10 @@
 package com.norconex.jef5.session;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,17 +28,18 @@ import org.apache.commons.collections4.map.ListOrderedMap;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.text.StringEscapeUtils;
 
 import com.norconex.commons.lang.config.XMLConfigurationUtil;
-import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.jef5.JefException;
 import com.norconex.jef5.job.IJob;
+import com.norconex.jef5.job.group.IJobGroup;
 import com.norconex.jef5.session.store.IJobSessionStore;
+import com.norconex.jef5.suite.JobSuite;
 
 // snapshot in time.  
 public final class JobSessionFacade {
@@ -44,7 +47,7 @@ public final class JobSessionFacade {
 //    private static final Logger LOG = 
 //            LoggerFactory.getLogger(JobSessionFacade.class);
     
-    private final String suiteName;
+//    private final String suiteName;
     private final IJobSessionStore store;
 
     // These two could be merged with an ordered multivalue Map instead?  
@@ -54,17 +57,72 @@ public final class JobSessionFacade {
             new ListOrderedMap<>();
 
     private JobSessionFacade(
-            String suiteName, TreeNode rootNode, 
+            /*String suiteName, */
+            TreeNode rootNode, 
             Map<String, TreeNode> flattenNodes, IJobSessionStore store) {
-        this.suiteName = suiteName;
+//        this.suiteName = suiteName;
         this.rootNode = rootNode;
         this.store = store;
         this.flattenNodes.putAll(flattenNodes);
     }
-    
+
+    public static JobSessionFacade get(JobSuite jobSuite) throws IOException {
+        if (jobSuite == null) {
+            return null;
+        }
         
-    public static JobSessionFacade get(Path suiteIndex)
-            throws IOException {
+        Map<String, TreeNode> flattenNodes = new ListOrderedMap<>();
+        return new JobSessionFacade(
+                loadJobTree(null, jobSuite.getRootJob(), flattenNodes), 
+                flattenNodes,
+                jobSuite.getJobSessionStore());        
+    }
+
+//  //TODO move these writeXX methods to JobSessionFacade??
+//  private void writeJobSuiteIndex() 
+//          throws IOException {
+//      
+//      Path indexFile = getSuiteIndexFile();
+//      
+//      StringWriter out = new StringWriter();
+//      out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+//      out.write("<suite-index>");
+//          
+//      //--- JobStatusSerializer ---
+//      out.flush();
+//      if (jobSessionStore instanceof IXMLConfigurable) {
+//          ((IXMLConfigurable) jobSessionStore).saveToXML(out);
+//      }
+//      
+//      //--- Jobs ---
+//      writeJobSuiteIndexJob(out, rootJob);
+//      
+//      out.write("</suite-index>");
+//      out.flush();
+//      
+//      // Using RandomAccessFile since evidence has shown it is better at 
+//      // dealing with files/locks in a way that cause less/no errors.
+//      try (RandomAccessFile ras = 
+//              new RandomAccessFile(indexFile.toFile(), "rwd");
+//              FileChannel channel = ras.getChannel();
+//              FileLock lock = channel.lock()) {
+//          ras.writeUTF(out.toString());
+//      }
+//  }
+//  private void writeJobSuiteIndexJob(
+//          Writer out, IJob job) throws IOException {
+//      out.write("<job id=\"");
+//      out.write(StringEscapeUtils.escapeXml11(job.getId()));
+//      out.write("\">");
+//      if (job instanceof IJobGroup) {
+//          for (IJob childJob: ((IJobGroup) job).getJobs()) {
+//              writeJobSuiteIndexJob(out, childJob);
+//          }
+//      }
+//      out.write("</job>");
+//  }
+        
+    public static JobSessionFacade get(Path suiteIndex) throws IOException {
         
         //--- Ensure file looks good ---
         if (suiteIndex == null) {
@@ -80,14 +138,14 @@ public final class JobSessionFacade {
         }
 
         //--- Load XML file ---
-        String suiteName = FileUtil.fromSafeFileName(
-                FilenameUtils.getBaseName(suiteIndex.toString()));
-
-        return get(suiteName, new FileReader(suiteIndex.toFile()));
+//        String suiteName = FileUtil.fromSafeFileName(
+//                FilenameUtils.getBaseName(suiteIndex.toString()));
+//TODO have a readIndex and writeIndex methods... and remove writeUTF from JobSuite
+        return get(/*suiteName, */ new FileReader(suiteIndex.toFile()));
     }
 
     // reader will be closed.
-    public static JobSessionFacade get(String suiteName, Reader reader)
+    public static JobSessionFacade get(/*String suiteName, */Reader reader)
             throws IOException {
        
         try (Reader r = reader) {
@@ -99,17 +157,48 @@ public final class JobSessionFacade {
                     XMLConfigurationUtil.newInstance(xml, "store");
             if (store == null) {
                 throw new IOException("No job session store configuration "
-                      + "defined in job session index: " + suiteName);
+                      + "defined in job session index.");
             }
             Map<String, TreeNode> flattenNodes = new ListOrderedMap<>();
             return new JobSessionFacade(
-                    suiteName, 
                     loadJobTree(null, xml.configurationAt("job"), flattenNodes), 
                     flattenNodes,
                     store);
         }
     }
     
+    public void write(Path suiteIndex) throws IOException {
+        write(new FileWriter(suiteIndex.toFile()));
+    }
+
+
+    // Closes writer
+    public void write(Writer writer) throws IOException {
+        try (Writer w = writer) {
+            w.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+            w.write("<suite-index>");
+            w.flush();
+            XMLConfigurationUtil.saveToXML(store, w, "store");
+            writeSuiteIndexJob(w, getRootId());
+            w.write("</suite-index>");
+            w.flush();
+        }
+    }    
+    private void writeSuiteIndexJob(Writer w, String jobId) throws IOException {
+        w.write("<job id=\"");
+        w.write(StringEscapeUtils.escapeXml11(jobId));
+        List<String> childIds = getChildIds(jobId);
+        if (!childIds.isEmpty()) {
+            w.write("\">");
+            for (String childId : childIds) {
+                writeSuiteIndexJob(w, childId);
+            }
+            w.write("</job>");
+        } else {
+            w.write("\"/>");
+        }
+    }    
+
     private static TreeNode loadJobTree(
             String parentId, HierarchicalConfiguration<ImmutableNode> nodeXML,
             Map<String, TreeNode> flattenNodes) throws IOException {
@@ -136,6 +225,29 @@ public final class JobSessionFacade {
         }
         return node;
     }
+    private static TreeNode loadJobTree(String parentId, IJob job,
+            Map<String, TreeNode> flattenNodes) throws IOException {
+        if (job == null) {
+            return null;
+        }
+        String jobId = job.getId();
+        
+        TreeNode node = new TreeNode();
+        node.parentId = parentId;
+        node.jobId = jobId;
+
+        flattenNodes.put(jobId, node);
+
+        if (job instanceof IJobGroup) {
+            for (IJob childJob: ((IJobGroup) job).getJobs()) {
+                TreeNode child = loadJobTree(jobId, childJob, flattenNodes);
+                if (child != null) {
+                    node.childIds.add(child.jobId);
+                }
+            }
+        }
+        return node;
+    }
     
     public JobSession getRootSession() {
         return read(rootNode.jobId);
@@ -152,7 +264,7 @@ public final class JobSessionFacade {
     }
     private JobSession read(String jobId) {
         try {
-            return store.read(suiteName, jobId);
+            return store.read(getRootId(), jobId);
         } catch (IOException e) {
             throw new JefException("Cannot read session information for job: "
                     + jobId, e);
@@ -236,7 +348,7 @@ public final class JobSessionFacade {
     private static class TreeNode {
         private String jobId;
         private String parentId;
-        private List<String> childIds = new ArrayList<>();
+        private final List<String> childIds = new ArrayList<>();
         @Override
         public boolean equals(final Object other) {
             if (!(other instanceof TreeNode)) {
@@ -274,7 +386,6 @@ public final class JobSessionFacade {
         }
         JobSessionFacade castOther = (JobSessionFacade) other;
         return new EqualsBuilder()
-                .append(suiteName, castOther.suiteName)
                 .append(store, castOther.store)
                 .append(flattenNodes, castOther.flattenNodes)
                 .isEquals();
@@ -282,7 +393,6 @@ public final class JobSessionFacade {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(suiteName)
                 .append(store)
                 .append(flattenNodes)
                 .toHashCode();

@@ -28,7 +28,7 @@ public class JobSessionFacadeTest {
     @Test
     public void testLoadJobSessions() throws IOException {
         JobSessionFacade facade = JobSessionFacade.get(
-                "Root Job", new InputStreamReader(
+                new InputStreamReader(
                 JobSessionFacadeTest.class.getResourceAsStream(
                         JobSessionFacadeTest.class.getSimpleName() + ".xml"),
                 StandardCharsets.UTF_8));

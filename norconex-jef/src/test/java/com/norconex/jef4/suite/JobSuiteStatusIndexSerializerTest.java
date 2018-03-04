@@ -15,14 +15,12 @@
 package com.norconex.jef4.suite;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.jef4.job.group.JEFTestUtil;
 import com.norconex.jef4.jobs.SleepyJob;
 import com.norconex.jef5.job.IJob;
@@ -43,9 +41,7 @@ public class JobSuiteStatusIndexSerializerTest {
         JobSuite suite = new JobSuite(job, config);
         Assert.assertTrue("Execution returned false.", suite.execute());
 
-        JobSessionFacade tree = JobSessionFacade.get(
-                Paths.get(config.getWorkdir().toString(), "latest",
-                      FileUtil.toSafeFileName(job.getId()) + ".index"));
+        JobSessionFacade tree = JobSessionFacade.get(suite.getSuiteIndexFile());
         System.out.println("TREE: " + tree);
         Assert.assertEquals(1d, tree.getRootSession().getProgress(), 0d);
     }

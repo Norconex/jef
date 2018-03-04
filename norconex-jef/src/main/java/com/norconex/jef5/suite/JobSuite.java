@@ -15,11 +15,6 @@
 package com.norconex.jef5.suite;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,11 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.norconex.commons.lang.config.IXMLConfigurable;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.commons.lang.time.DateUtil;
 import com.norconex.jef5.JefException;
@@ -123,7 +116,7 @@ public final class JobSuite {
     }
     
     
-    /*default*/ IJobSessionStore getJobSessionStore() {
+    public IJobSessionStore getJobSessionStore() {
         return jobSessionStore;
     }
     
@@ -151,7 +144,6 @@ public final class JobSuite {
         LOG.info("Initialization...");
         this.jobSessionFacade = resolveJobSessionFacade(resumeIfIncomplete);
 
-        
         heartbeatGenerator.start();
         
         shutdownHook.setup(this);
@@ -220,8 +212,10 @@ public final class JobSuite {
             LOG.info("No previous execution detected.");
         }
         if (facade == null) {
-            writeJobSuiteIndex();
-            facade = JobSessionFacade.get(getSuiteIndexFile());
+            facade = JobSessionFacade.get(this);
+            facade.write(getSuiteIndexFile());
+//            writeJobSuiteIndex();
+//            facade = JobSessionFacade.get(getSuiteIndexFile());
         }
         return facade;
     }
@@ -307,7 +301,7 @@ public final class JobSuite {
      * @return job identifier or <code>null</code> if no job is currently
      *         associated with the current thread
      */
-    public static String getCurrentJobId() {
+    public static String getRunningJobId() {
         return CURRENT_JOB_ID.get();
     }
     /**
@@ -368,7 +362,7 @@ public final class JobSuite {
 
     
     //TODO document this is not a public method?
-    // Wrap this logic in a JobRunner class, passing it to job groups?
+    //TODO Wrap this logic in a JobRunner class, passing it to job groups?
     public boolean runJob(final IJob job) {
         if (job == null) {
             throw new IllegalArgumentException("Job cannot be null.");
@@ -414,11 +408,11 @@ public final class JobSuite {
                                     + session.getJobId(), e);
                 }
                 fire(JefEvent.JOB_PROGRESSED, session, job);
-                JobSession parentStatus = 
+                JobSession parentSession = 
                         jobSessionFacade.getParentSession(session);
-                if (parentStatus != null) {
+                if (parentSession != null) {
                     IJobGroup jobGroup = 
-                            (IJobGroup) jobs.get(parentStatus.getJobId());
+                            (IJobGroup) jobs.get(parentSession.getJobId());
                     if (jobGroup != null) {
                         jobGroup.groupProgressed(session);
                     }
@@ -564,49 +558,49 @@ public final class JobSuite {
         }
     }
     
-    //TODO move these writeXX methods to JobSessionFacade??
-    private void writeJobSuiteIndex() 
-            throws IOException {
-        
-        Path indexFile = getSuiteIndexFile();
-        
-        StringWriter out = new StringWriter();
-        out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-        out.write("<suite-index>");
-            
-        //--- JobStatusSerializer ---
-        out.flush();
-        if (jobSessionStore instanceof IXMLConfigurable) {
-            ((IXMLConfigurable) jobSessionStore).saveToXML(out);
-        }
-        
-        //--- Jobs ---
-        writeJobSuiteIndexJob(out, rootJob);
-        
-        out.write("</suite-index>");
-        out.flush();
-        
-        // Using RandomAccessFile since evidence has shown it is better at 
-        // dealing with files/locks in a way that cause less/no errors.
-        try (RandomAccessFile ras = 
-                new RandomAccessFile(indexFile.toFile(), "rwd");
-                FileChannel channel = ras.getChannel();
-                FileLock lock = channel.lock()) {
-            ras.writeUTF(out.toString());
-        }
-    }
-    private void writeJobSuiteIndexJob(
-            Writer out, IJob job) throws IOException {
-        out.write("<job id=\"");
-        out.write(StringEscapeUtils.escapeXml11(job.getId()));
-        out.write("\">");
-        if (job instanceof IJobGroup) {
-            for (IJob childJob: ((IJobGroup) job).getJobs()) {
-                writeJobSuiteIndexJob(out, childJob);
-            }
-        }
-        out.write("</job>");
-    }
+//    //TODO move these writeXX methods to JobSessionFacade??
+//    private void writeJobSuiteIndex() 
+//            throws IOException {
+//        
+//        Path indexFile = getSuiteIndexFile();
+//        
+//        StringWriter out = new StringWriter();
+//        out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+//        out.write("<suite-index>");
+//            
+//        //--- JobStatusSerializer ---
+//        out.flush();
+//        if (jobSessionStore instanceof IXMLConfigurable) {
+//            ((IXMLConfigurable) jobSessionStore).saveToXML(out);
+//        }
+//        
+//        //--- Jobs ---
+//        writeJobSuiteIndexJob(out, rootJob);
+//        
+//        out.write("</suite-index>");
+//        out.flush();
+//        
+//        // Using RandomAccessFile since evidence has shown it is better at 
+//        // dealing with files/locks in a way that cause less/no errors.
+//        try (RandomAccessFile ras = 
+//                new RandomAccessFile(indexFile.toFile(), "rwd");
+//                FileChannel channel = ras.getChannel();
+//                FileLock lock = channel.lock()) {
+//            ras.writeUTF(out.toString());
+//        }
+//    }
+//    private void writeJobSuiteIndexJob(
+//            Writer out, IJob job) throws IOException {
+//        out.write("<job id=\"");
+//        out.write(StringEscapeUtils.escapeXml11(job.getId()));
+//        out.write("\">");
+//        if (job instanceof IJobGroup) {
+//            for (IJob childJob: ((IJobGroup) job).getJobs()) {
+//                writeJobSuiteIndexJob(out, childJob);
+//            }
+//        }
+//        out.write("</job>");
+//    }
     
     private Path resolveWorkdir(Path configWorkdir) {
         // Default to working directory??
