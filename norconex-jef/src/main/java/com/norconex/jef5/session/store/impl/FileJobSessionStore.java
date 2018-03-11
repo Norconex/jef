@@ -14,12 +14,12 @@
  */
 package com.norconex.jef5.session.store.impl;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -153,8 +153,10 @@ public class FileJobSessionStore
 //        CharBuffer charBuffer = CharBuffer.wrap(sw.toString());
 
         Files.createDirectories(file.getParent());
-        Files.write(file, sw.toString().getBytes(StandardCharsets.UTF_8));
-        
+        //Files.write(file, sw.toString().getBytes(StandardCharsets.UTF_8));
+        try (BufferedWriter w = Files.newBufferedWriter(file)) {
+            w.write(sw.toString());
+        }
         
 //        try (FileChannel fc = (FileChannel) Files.newByteChannel(file, 
 ////                      StandardOpenOption.DSYNC, to make sure content is written
@@ -239,8 +241,12 @@ public class FileJobSessionStore
 
         Properties config = new Properties();
         
-        config.load(new StringReader(
-                new String(Files.readAllBytes(file),StandardCharsets.UTF_8)));
+        try (BufferedReader r = Files.newBufferedReader(file)) {
+            config.load(r);
+        }
+        
+//        config.load(new StringReader(
+//                new String(Files.readAllBytes(file),StandardCharsets.UTF_8)));
         
 //        
 //        CharBuffer charBuffer = null;

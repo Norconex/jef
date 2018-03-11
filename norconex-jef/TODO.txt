@@ -1,16 +1,6 @@
 
 - Allow to stop idividual jobs???  could be nice.
 
-- Rename StopRequestMonitor to ShutdownHook* and offer a port-based one in
-  addition to filesystem.
-
-- Use Java DateTime everywhere as opposed to simple Date.
-
-- Use Path everywhere instead of File. Including in Norconex Commons Lang
-
-- If we keep backuping status files, backup directory to simplify instead of 
-  individual files.
-
 - JEFMon: assume job location to be xxx/yyy.log by default, but allow
   to specify dir/path to it if different.  Else, logs are not accessible
   in JEFMon.
@@ -25,8 +15,6 @@
   
 
 - Reduce heartbeatgenerator default delay?
-
-- Keep a history of duration (start/end pairs) for all start/resume occurences
 
 - When starting a job... wait a few seconds in case the other one
   was just completed but not enough time has passed to think it is done.
@@ -47,11 +35,6 @@
   Or leave it to consuming libraries (e.g. HTTP Collector) to add
   mail support if they want to.
   
-
-Maybe drop JEF altogether.  Or modify it so it can use somethign other
-than flat files for progress... which would be the crawl data stores
-for the collectors (but then no history/backup is kept???).
-
 
 ILogManager will have a method called:
   registerJEFLogger(SLF4jLogger rootLogger).
