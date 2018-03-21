@@ -39,7 +39,9 @@ public class JobSession extends JobSessionData {
     
     public JobSession(String jobId, Set<JobSessionData> resumedAttempts) {
         this.jobId = jobId;
-        this.resumedAttempts.addAll(resumedAttempts);
+        if (resumedAttempts != null) {
+            this.resumedAttempts.addAll(resumedAttempts);
+        }
     }
     
     public String getJobId() {
@@ -58,6 +60,11 @@ public class JobSession extends JobSessionData {
         return !resumedAttempts.isEmpty();
     }
 
+    /**
+     * Gets the start time of the oldest resumee attempt,
+     * or the current start time if there were no previous attempt. 
+     * @return session start time or <code>null</code> if never started
+     */
     public LocalDateTime getSessionStartTime() {
         if (resumedAttempts.isEmpty()) {
             return getStartTime();
@@ -66,29 +73,30 @@ public class JobSession extends JobSessionData {
     }
     //TODO have sessionEndTime? will always be same as endTime.
     
-    // Start date of first resumed job until end date or last activity date.
+    // Start date of oldest resumed instance until end date of most recent
+    // attempt or last activity date.
     // If never resumed, same as calling #getDuration().
     public Duration getSessionDuration() {
         LocalDateTime start = getSessionStartTime();
         LocalDateTime end = ObjectUtils.defaultIfNull(
                 getEndTime(), getLastActivity());
-        if (end != null) {
+        if (start != null && end != null) {
             return Duration.between(start, end);
         }
         return Duration.ZERO;
     }
     
     // Combine the elapsed time of all resumed job plus this one to give
-    // the cummulated time jobs have run as opposed to calendar-duration.
-    public Duration getSessionActiveDuration() {
+    // the cumulated time jobs have run as opposed to calendar-duration.
+    public Duration getSessionEffectiveDuration() {
+        Duration duration = getDuration();
         if (resumedAttempts.isEmpty()) {
-            return getDuration();
+            return duration;
         }
-        Duration d = getDuration();
         for (JobSessionData js : resumedAttempts) {
-            d = d.plus(js.getDuration());
+            duration = duration.plus(js.getDuration());
         }
-        return d;
+        return duration;
     }
     
     @Override

@@ -14,6 +14,7 @@
  */
 package com.norconex.jef5.job;
 
+import com.norconex.jef5.event.IJefEventListener;
 import com.norconex.jef5.session.JobSession;
 import com.norconex.jef5.session.JobSessionUpdater;
 import com.norconex.jef5.suite.JobSuite;
@@ -28,8 +29,10 @@ import com.norconex.jef5.suite.JobSuite;
  * suites and implementors do not have to worry about these concerns when
  * creating jobs.</p>
  *
- * <p>To ensure the best integration possible with the framework, implementors
+ * <p>
+ * To ensure the best integration possible with the framework, implementors
  * are invited to adhere to the following practices:
+ * </p>
  * <ul>
  *   <li>update job progress on <code>JobProgress</code>;
  *   <li>ensure jobs are recoverable by considering the current progress
@@ -38,6 +41,11 @@ import com.norconex.jef5.suite.JobSuite;
  *       into a runtime <code>JobException</code> instance;
  *   <li>use lazy-loading where possible
  * </ul>
+ *
+ * <p>
+ * Jobs can be notified of JobSuite events if they implement 
+ * {@link IJefEventListener}.
+ * </p>
  *
  * @author Pascal Essiembre
  */

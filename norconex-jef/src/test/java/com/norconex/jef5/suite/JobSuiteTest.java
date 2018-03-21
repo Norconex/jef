@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.norconex.jef4.suite;
+package com.norconex.jef5.suite;
 
 import java.io.IOException;
 
@@ -21,14 +21,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.norconex.jef4.job.group.JEFTestUtil;
-import com.norconex.jef4.jobs.SleepyJob;
+import com.norconex.jef5.JEFTestUtil;
 import com.norconex.jef5.job.IJob;
-import com.norconex.jef5.session.JobSessionFacade;
-import com.norconex.jef5.suite.JobSuite;
-import com.norconex.jef5.suite.JobSuiteConfig;
+import com.norconex.jef5.job.impl.SleepyJob;
+import com.norconex.jef5.session.NEW.JobSuiteSession;
 
-public class JobSuiteStatusIndexSerializerTest {
+public class JobSuiteTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -36,12 +34,13 @@ public class JobSuiteStatusIndexSerializerTest {
     @Test
     public void testWriteJobSuiteIndex() throws IOException {
         
-        JobSuiteConfig config = JEFTestUtil.newConfigWithTempWorkdir(folder);
+        JobSuiteConfig config = JEFTestUtil.newConfig(folder);
         IJob job = new SleepyJob(5, 1);
         JobSuite suite = new JobSuite(job, config);
         Assert.assertTrue("Execution returned false.", suite.execute());
 
-        JobSessionFacade tree = JobSessionFacade.get(suite.getSuiteIndexFile());
+        JobSuiteSession tree = 
+                JobSuiteSession.getInstance(suite.getSessionIndex());
         System.out.println("TREE: " + tree);
         Assert.assertEquals(1d, tree.getRootSession().getProgress(), 0d);
     }

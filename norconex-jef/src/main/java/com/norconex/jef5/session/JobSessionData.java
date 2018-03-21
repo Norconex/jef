@@ -51,7 +51,7 @@ public class JobSessionData
     
     /**
      * Gets the end time.
-     * @return end time
+     * @return end time or <code>null</code> if the job has not ended
      */
     public final LocalDateTime getEndTime() {
         return endTime;
@@ -66,7 +66,7 @@ public class JobSessionData
 
     /**
      * Gets the start time.
-     * @return start time
+     * @return start time or <code>null</code> if the job has not yet started
      */
     public final LocalDateTime getStartTime() {
         return startTime;

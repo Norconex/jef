@@ -28,8 +28,8 @@ import com.norconex.jef5.JefException;
 import com.norconex.jef5.event.JefEvent;
 import com.norconex.jef5.job.IJob;
 import com.norconex.jef5.session.JobSession;
-import com.norconex.jef5.session.JobSessionFacade;
 import com.norconex.jef5.session.JobState;
+import com.norconex.jef5.session.NEW.JobSuiteSession;
 import com.norconex.jef5.shutdown.IShutdownHook;
 import com.norconex.jef5.shutdown.ShutdownException;
 import com.norconex.jef5.suite.JobSuite;
@@ -55,7 +55,7 @@ public class FileShutdownHook implements IShutdownHook {
     @Override
     public void setup(final JobSuite suite) {
         this.suite = suite;
-        final Path stopFile = getStopFile(suite.getSuiteIndexFile());
+        final Path stopFile = getStopFile(suite.getSessionIndex());
         new Thread(() -> {
             monitoring = true;
             while(monitoring) {
@@ -71,7 +71,7 @@ public class FileShutdownHook implements IShutdownHook {
     @Override
     public void destroy() {
         monitoring = false;
-        Path stopFile = getStopFile(suite.getSuiteIndexFile());
+        Path stopFile = getStopFile(suite.getSessionIndex());
         if (stopFile.toFile().exists()) {
             try {
                 Files.delete(stopFile);
@@ -96,7 +96,8 @@ public class FileShutdownHook implements IShutdownHook {
         }
 
         try {
-            if (!JobSessionFacade.get(indexFile).getRootSession().isRunning()) {
+            if (!JobSuiteSession.getInstance(
+                    indexFile).getRootSession().isRunning()) {
                 LOG.info("The job suite is not running.");
                 return false;
             }

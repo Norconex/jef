@@ -14,22 +14,24 @@
  */
 package com.norconex.jef5.suite;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.norconex.commons.lang.config.IXMLConfigurable;
 import com.norconex.jef5.event.IJefEventListener;
-import com.norconex.jef5.session.store.IJobSessionStore;
 
 //TODO really have a config still??? given it contains so little, shall
 // we move these settings directly on JobSuite? Else, make IXMLConfigurable?
 
-public class JobSuiteConfig {
+public class JobSuiteConfig implements IXMLConfigurable {
 
-    private IJobSessionStore jobSessionStore;
     private Path workdir;
-    
+    private boolean backupDisabled;
     private final List<IJefEventListener> eventListeners = new ArrayList<>();
     
     public JobSuiteConfig() {
@@ -39,17 +41,15 @@ public class JobSuiteConfig {
     public Path getWorkdir() {
         return workdir;
     }
-
     public void setWorkdir(Path workdir) {
         this.workdir = workdir;
     }
 
-    public IJobSessionStore getJobSessionStore() {
-        return jobSessionStore;
+    public boolean isBackupDisabled() {
+        return backupDisabled;
     }
-
-    public void setJobSessionStore(IJobSessionStore jobSessionStore) {
-        this.jobSessionStore = jobSessionStore;
+    public void setBackupDisabled(boolean backupDisabled) {
+        this.backupDisabled = backupDisabled;
     }
 
     public List<IJefEventListener> getEventListeners() {
@@ -67,5 +67,16 @@ public class JobSuiteConfig {
     }
     public void removeEventListeners(IJefEventListener... eventListeners) {
         this.eventListeners.removeAll(Arrays.asList(eventListeners));
+    }
+    
+    @Override
+    public void loadFromXML(Reader in) throws IOException {
+        // TODO Auto-generated method stub
+        
+    }
+    @Override
+    public void saveToXML(Writer out) throws IOException {
+        // TODO Auto-generated method stub
+        
     }
 }

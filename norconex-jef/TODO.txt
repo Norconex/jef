@@ -1,4 +1,10 @@
 
+= A unit tests for resumed jobs (with cummulated durations).
+
+- For JEF Job Groups, provide fluid-style way of adding child jobs. 
+
+- Rename JEFMon* to JefMon* everywhere.
+
 - Allow to stop idividual jobs???  could be nice.
 
 - JEFMon: assume job location to be xxx/yyy.log by default, but allow

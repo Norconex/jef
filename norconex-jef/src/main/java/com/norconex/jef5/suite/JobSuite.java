@@ -18,13 +18,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +40,10 @@ import com.norconex.jef5.job.IJobVisitor;
 import com.norconex.jef5.job.group.IJobGroup;
 import com.norconex.jef5.session.IJobSessionVisitor;
 import com.norconex.jef5.session.JobSession;
-import com.norconex.jef5.session.JobSessionFacade;
 import com.norconex.jef5.session.JobSessionUpdater;
 import com.norconex.jef5.session.JobState;
-import com.norconex.jef5.session.store.IJobSessionStore;
-import com.norconex.jef5.session.store.impl.FileJobSessionStore;
+import com.norconex.jef5.session.NEW.JobSuiteSession;
+import com.norconex.jef5.session.NEW.JobSuiteSessionDAO;
 import com.norconex.jef5.shutdown.IShutdownHook;
 import com.norconex.jef5.shutdown.ShutdownException;
 import com.norconex.jef5.shutdown.impl.FileShutdownHook;
@@ -63,6 +63,10 @@ public final class JobSuite {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobSuite.class);
     
+    
+    public static final String SESSION_SUBDIR = "session";
+    public static final String SESSION_BACKUP_SUBDIR = "backups/session";
+    
     /** Associates job id with current thread. */
     private static final ThreadLocal<String> CURRENT_JOB_ID = 
             new InheritableThreadLocal<>();
@@ -71,13 +75,16 @@ public final class JobSuite {
     private final IJob rootJob;
 //    private final JobSuiteConfig config;
     private Path workdir;
+    private boolean backupDisabled;
     //TODO rename JobEvent* to just Event*
     private final List<IJefEventListener> eventListeners = new ArrayList<>();
     
     private final JobHeartbeatGenerator heartbeatGenerator;
     
-    private JobSessionFacade jobSessionFacade;
-    private final IJobSessionStore jobSessionStore;
+//    private JobSessionFacade jobSessionFacade;
+//    private final IJobSessionStore jobSessionStore;
+    private JobSuiteSession suiteSession;
+    private final JobSuiteSessionDAO suiteSessionDAO;
     
     //TODO consider making configurable?
     //TODO have it optinally implement JefEventListener instead of 
@@ -86,26 +93,73 @@ public final class JobSuite {
     IShutdownHook shutdownHook = new FileShutdownHook();
 
     public JobSuite(final IJob rootJob) {
-        this(rootJob, new JobSuiteConfig());
+        this(rootJob, null);
     }
 
     public JobSuite(final IJob rootJob, JobSuiteConfig config) {
         super();
+        Objects.requireNonNull(rootJob, "rootJob");
         this.rootJob = rootJob;
-//        this.config = config;
+        JobSuiteConfig cfg = 
+                ObjectUtils.defaultIfNull(config, new JobSuiteConfig());
         
-        this.workdir = resolveWorkdir(config.getWorkdir());
-        this.jobSessionStore = 
-                resolveJobSessionStore(config.getJobSessionStore());
-        this.eventListeners.addAll(config.getEventListeners());
+        
+        //TODO do the remaining as the first thing when execute is called
+        // to prevent processing/file creation from happening until
+        // actually started.
+
+        //TODO have a reset/clean method so a new execute can start fresh? 
+        
+        this.workdir = resolveWorkdir(cfg.getWorkdir());
+        this.suiteSessionDAO = 
+                new JobSuiteSessionDAO(rootJob.getId(), getSessionDir());
+//        try {
+//            this.suiteSession = JobSuiteSession.getInstance(this);
+//        } catch (IOException e) {
+//            throw new JefException("Cannot create JEF suite session.", e);
+//        }
+        this.eventListeners.addAll(cfg.getEventListeners());
         this.heartbeatGenerator = new JobHeartbeatGenerator(this);
+        this.backupDisabled = cfg.isBackupDisabled();
         
         accept((job, jobSession) -> jobs.put(job.getId(), job));
 
         // register listening objects 
         registerListener(rootJob);
-        registerListener(jobSessionStore);
     }
+    
+    
+    public Path getSessionDir() {
+        return getSessionDir(workdir, getId());
+    }
+    public static Path getSessionDir(Path suiteWorkdir, String suiteId) {
+        return suiteWorkdir.resolve(Paths.get(
+                FileUtil.toSafeFileName(suiteId), SESSION_SUBDIR));
+    }
+
+    public Path getSessionBackupDir(LocalDateTime date) {
+        return getSessionBackupDir(workdir, getId(), date);
+    }
+    public static Path getSessionBackupDir(
+            Path suiteWorkdir, String suiteId, LocalDateTime date) {
+        return FileUtil.toDateFormattedDir(suiteWorkdir.resolve(Paths.get(
+                FileUtil.toSafeFileName(suiteId), 
+                        SESSION_BACKUP_SUBDIR)).toFile(),
+                DateUtil.toDate(date), "yyyy/MM/dd/HH-mm-ss").toPath();
+    }
+    
+    public Path getSessionIndex() {
+        return getSessionIndex(getSessionDir());
+    }    
+    /**
+     * Gets the path to job suite index.
+     * @param sessionDir suite working directory
+     * @return file the index file
+     */
+    public static Path getSessionIndex(Path sessionDir) {
+        return sessionDir.resolve("suite.index"); // make it "suite.jef"? 
+    }
+
 
     public IJob getRootJob() {
         return rootJob;
@@ -115,10 +169,15 @@ public final class JobSuite {
         return workdir;
     }
     
-    
-    public IJobSessionStore getJobSessionStore() {
-        return jobSessionStore;
+    // make package visibility?
+    public JobSuiteSessionDAO getJobSuiteSessionDAO() {
+        return suiteSessionDAO;
     }
+    
+    
+//    public IJobSessionStore getJobSessionStore() {
+//        return jobSessionStore;
+//    }
     
     public boolean execute() {
         return execute(false);
@@ -142,8 +201,9 @@ public final class JobSuite {
         boolean success = false;
 
         LOG.info("Initialization...");
-        this.jobSessionFacade = resolveJobSessionFacade(resumeIfIncomplete);
-
+//        this.jobSessionFacade = resolveJobSessionFacade(resumeIfIncomplete);
+        suiteSession = resolveSuiteSession(resumeIfIncomplete);
+        
         heartbeatGenerator.start();
         
         shutdownHook.setup(this);
@@ -158,7 +218,7 @@ public final class JobSuite {
         } finally {
 //            stopMonitor.stopMonitoring();
             shutdownHook.destroy();
-            JobState jobState = jobSessionFacade.getRootSession().getState();
+            JobState jobState = suiteSession.getRootSession().getState();
             if (success) {
                 if (jobState == JobState.COMPLETED) {
                     fire(JefEvent.SUITE_COMPLETED, null, this);
@@ -188,13 +248,16 @@ public final class JobSuite {
         }
     }
     
-    private JobSessionFacade resolveJobSessionFacade(boolean resumeIfIncomplete)
+    private JobSuiteSession resolveSuiteSession(boolean resumeIfIncomplete)
             throws IOException {
-        JobSessionFacade facade = JobSessionFacade.get(getSuiteIndexFile());
         
-        if (facade != null) {
+        JobSuiteSession session = 
+                JobSuiteSession.getInstance(getSessionIndex());
+//        JobSessionFacade facade = JobSessionFacade.get(getSuiteIndexFile());
+        
+        if (session != null) {
             LOG.info("Previous execution detected.");
-            JobSession rootSession = facade.getRootSession();
+            JobSession rootSession = session.getRootSession();
             JobState state = rootSession.getState();
             ensureValidExecutionState(state);
             if (resumeIfIncomplete && !state.isOneOf(
@@ -204,20 +267,26 @@ public final class JobSuite {
             } else {
                 // Back-up so we can start clean
                 //TODO only backup if backup dir set...
-                LOG.info("Backing up previous execution session.");
-                backupSuite(facade);
-                facade = null;
+                if (backupDisabled) {
+                    LOG.info("Deleting previous execution session.");
+                    suiteSessionDAO.delete();
+                    //deleteSuite(facade);
+                } else {
+                    LOG.info("Backing up previous execution session.");
+                    backupSuite(session);
+                }
+                session = null;
             }
         } else {
             LOG.info("No previous execution detected.");
         }
-        if (facade == null) {
-            facade = JobSessionFacade.get(this);
-            facade.write(getSuiteIndexFile());
+        if (session == null) {
+            session = JobSuiteSession.getInstance(this);
+            session.toXML(getSessionIndex());
 //            writeJobSuiteIndex();
 //            facade = JobSessionFacade.get(getSuiteIndexFile());
         }
-        return facade;
+        return session;
     }
         
     
@@ -238,25 +307,26 @@ public final class JobSuite {
         return getJobSession(job.getId());
     }
     public JobSession getJobSession(String jobId) {
-        if (jobSessionFacade != null) {
-            return jobSessionFacade.getSession(jobId);
+        if (suiteSession != null) {
+            return suiteSession.getSession(jobId);
         }
-        try {
-            Path indexFile = getSuiteIndexFile();
-            JobSessionFacade snapshot = 
-                    JobSessionFacade.get(indexFile);
-            if (snapshot != null) {
-                return snapshot.getSession(jobId);
-            }
-            return null;
-        } catch (IOException e) {
-            throw new JefException("Cannot obtain job session.", e);
-        }
+        return null;
+//        try {
+//            Path indexFile = getSuiteIndexFile();
+//            JobSessionFacade snapshot = 
+//                    JobSessionFacade.get(indexFile);
+//            if (snapshot != null) {
+//                return snapshot.getSession(jobId);
+//            }
+//            return null;
+//        } catch (IOException e) {
+//            throw new JefException("Cannot obtain job session.", e);
+//        }
     }
     
     
     public void accept(IJobSessionVisitor visitor) {
-        jobSessionFacade.accept(visitor);
+        suiteSession.accept(visitor);
     }
     
     /**
@@ -282,11 +352,8 @@ public final class JobSuite {
             return;
         }
         if (jobClassFilter == null || jobClassFilter.isInstance(job)) {
-            JobSession status = null;
-            if (jobSessionFacade != null) {
-                status = jobSessionFacade.getSession(job);
-            }
-            visitor.accept(job, status);
+            JobSession jobSession = getJobSession(job);
+            visitor.accept(job, jobSession);
         }
         if (job instanceof IJobGroup) {
             for (IJob childJob : ((IJobGroup) job).getJobs()) {
@@ -325,33 +392,33 @@ public final class JobSuite {
         return null;
     }
     
-    /**
-     * Gets the latest index file created for a job suite (if one exists).
-     * @param suiteWorkdir suite working directory
-     * @param suiteId suite unique ID (ID of the root job)
-     * @return file the index file
-     */
-    public static Path getSuiteIndexFile(
-            Path suiteWorkdir, String suiteId) {
-        return suiteWorkdir.resolve(
-                FileUtil.toSafeFileName(suiteId) + ".index");
-    }
-    
-    public Path getSuiteIndexFile() {
-        Path indexFile = getSuiteIndexFile(workdir, getId());
-        if (!indexFile.toFile().exists()) {
-            Path indexDir = indexFile.getParent();
-            if (!indexDir.toFile().exists()) {
-                try {
-                    Files.createDirectories(indexDir);
-                } catch (IOException e) {
-                    throw new JefException(
-                            "Cannot create index directory: " + indexDir, e);
-                }
-            }
-        }
-        return indexFile;
-    }
+//    /**
+//     * Gets the latest index file created for a job suite (if one exists).
+//     * @param suiteWorkdir suite working directory
+//     * @param suiteId suite unique ID (ID of the root job)
+//     * @return file the index file
+//     */
+//    public static Path getSuiteIndexFile(
+//            Path suiteWorkdir, String suiteId) {
+//        return suiteWorkdir.resolve(
+//                FileUtil.toSafeFileName(suiteId) + ".index");
+//    }
+//    
+//    public Path getSuiteIndexFile() {
+//        Path indexFile = getSuiteIndexFile(workdir, getId());
+//        if (!indexFile.toFile().exists()) {
+//            Path indexDir = indexFile.getParent();
+//            if (!indexDir.toFile().exists()) {
+//                try {
+//                    Files.createDirectories(indexDir);
+//                } catch (IOException e) {
+//                    throw new JefException(
+//                            "Cannot create index directory: " + indexDir, e);
+//                }
+//            }
+//        }
+//        return indexFile;
+//    }
     
     
 //    /*default*/ File getSuiteStopFile() {
@@ -375,7 +442,7 @@ public final class JobSuite {
         Thread.currentThread().setName(job.getId());
         setCurrentJobId(job.getId());
         
-        JobSession jobSession = jobSessionFacade.getSession(job);
+        JobSession jobSession = suiteSession.getSession(job);
         if (jobSession.getState() == JobState.COMPLETED) {
             LOG.info("Job skipped: " + job.getId() + " (already completed)");
             fire(JefEvent.JOB_SKIPPED, jobSession, job);
@@ -399,22 +466,22 @@ public final class JobSuite {
 
             heartbeatGenerator.register(jobSession);
             //--- Execute ---
-            job.execute(new JobSessionUpdater(jobSession, session -> {
+            job.execute(new JobSessionUpdater(jobSession, js -> {
                 try {
-                    jobSessionStore.write(getId(), session);
+                    suiteSessionDAO.write(js);
                 } catch (IOException e) {
                     throw new JefException(
                             "Cannot persist status update for job: "
-                                    + session.getJobId(), e);
+                                    + js.getJobId(), e);
                 }
-                fire(JefEvent.JOB_PROGRESSED, session, job);
+                fire(JefEvent.JOB_PROGRESSED, js, job);
                 JobSession parentSession = 
-                        jobSessionFacade.getParentSession(session);
+                        suiteSession.getParentSession(js);
                 if (parentSession != null) {
                     IJobGroup jobGroup = 
                             (IJobGroup) jobs.get(parentSession.getJobId());
                     if (jobGroup != null) {
-                        jobGroup.groupProgressed(session);
+                        jobGroup.groupProgressed(js);
                     }
                 }
             }), this);
@@ -432,7 +499,7 @@ public final class JobSuite {
             heartbeatGenerator.unregister(jobSession);
             jobSession.setEndTime(LocalDateTime.now());
             try {
-                jobSessionStore.write(getId(), jobSession);
+                suiteSessionDAO.write(jobSession);
             } catch (IOException e) {
                 LOG.error("Cannot save final status.", e);
             }
@@ -457,7 +524,7 @@ public final class JobSuite {
     }
     
     public void stop() throws ShutdownException {
-        shutdownHook.shutdown(getSuiteIndexFile());
+        shutdownHook.shutdown(getSessionIndex());
 //        if (!getSuiteStopFile().createNewFile()) {
 //            throw new IOException(
 //                    "Could not create stop file: " + getSuiteStopFile());
@@ -530,8 +597,8 @@ public final class JobSuite {
         }
     }
     
-    private void backupSuite(JobSessionFacade facade) throws IOException {
-        JobSession suiteStatus = facade.getRootSession();
+    private void backupSuite(JobSuiteSession suiteSession) { // throws IOException {
+        JobSession suiteStatus = suiteSession.getRootSession();
         LocalDateTime backupDate = suiteStatus.getEndTime();
         if (backupDate == null) {
             backupDate = suiteStatus.getLastActivity();
@@ -539,24 +606,56 @@ public final class JobSuite {
         if (backupDate == null) {
             backupDate = LocalDateTime.now();
         }
-        // Backup status files
-        jobSessionStore.backup(getId(), backupDate);
-
-        // Backup suite index
-        String date = new SimpleDateFormat(
-                "yyyyMMddHHmmssSSSS").format(backupDate);
-        Path indexFile = getSuiteIndexFile();
         try {
-            Path backupDir = FileUtil.createDateDirs(workdir.resolve(
-                    "backup").toFile(), DateUtil.toDate(backupDate)).toPath();
-            Files.createDirectories(backupDir);
-            Path backupFile = backupDir.resolve(
-                    date + "_" + indexFile.getFileName());
-            Files.move(indexFile, backupFile);
+            suiteSessionDAO.backup(getSessionBackupDir(backupDate));
+            
+//            // Backup status files
+//            jobSessionStore.backup(getId(), backupDate);
+//
+//            // Backup suite index
+//            Path indexFile = getSuiteIndexFile();
+//            Path backupFile = FileUtil.toDateFormattedDir(
+//                    workdir.resolve(FileUtil.toSafeFileName(getId())).toFile(), 
+//                    DateUtil.toDate(
+//                            backupDate), "yyyy/MM/dd/HH-mm-ss").toPath();
+//            Files.move(indexFile, backupFile);
+            
+//            String date = new SimpleDateFormat(
+//                    "yyyyMMddHHmmssSSSS").format(DateUtil.toDate(backupDate));
+//            Path indexFile = getSuiteIndexFile();
+//
+//            Path backupDir = FileUtil.createDateDirs(workdir.resolve(
+//                    "backups").toFile(), DateUtil.toDate(backupDate)).toPath();
+//            Files.createDirectories(backupDir);
+//            Path backupFile = backupDir.resolve(
+//                    date + "_" + indexFile.getFileName());
+//            Files.move(indexFile, backupFile);
         } catch (IOException e) {
-            throw new JefException("Could not backup suite index.", e);
+            throw new JefException("Suite session backup unsuccessful.", e);
         }
     }
+
+//    private void deleteSuite(JobSessionFacade facade) {// throws IOException {
+//        try {
+//            jobSessionStore.remove(getId());
+//            Path indexFile = getSuiteIndexFile();
+//            Files.delete(indexFile);
+//        } catch (IOException e) {
+//            throw new JefException("Suite session delete unsuccessful.", e);
+//        }
+
+//        try {
+//            Path backupDir = FileUtil.createDateDirs(workdir.resolve(
+//                    "backup").toFile(), DateUtil.toDate(backupDate)).toPath();
+//            Files.createDirectories(backupDir);
+//            Path backupFile = backupDir.resolve(
+//                    date + "_" + indexFile.getFileName());
+//            Files.move(indexFile, backupFile);
+//        } catch (IOException e) {
+//            throw new JefException("Could not backup suite index.", e);
+//        }
+//    }
+    
     
 //    //TODO move these writeXX methods to JobSessionFacade??
 //    private void writeJobSuiteIndex() 
@@ -612,8 +711,8 @@ public final class JobSuite {
             try {
                 Files.createDirectories(dir);
             } catch (IOException e) {
-                throw new JefException("Cannot create work directory: " 
-                        + dir, e);
+                throw new JefException(
+                        "Cannot create work directory: " + dir, e);
             }
         } else if (!dir.toFile().isDirectory()) {
             throw new JefException("Invalid work directory: " + dir);
@@ -623,14 +722,14 @@ public final class JobSuite {
         return dir;
     }
 
-    private IJobSessionStore resolveJobSessionStore(IJobSessionStore store) {
-        IJobSessionStore s = store;
-        if (s == null) {
-            s = new FileJobSessionStore(workdir);
-        }
-        LOG.info("JEF job status store is {}", s.getClass().getSimpleName());
-        return s;
-    }
+//    private IJobSessionStore resolveJobSessionStore(IJobSessionStore store) {
+//        IJobSessionStore s = store;
+//        if (s == null) {
+//            s = new FileJobSessionStore(workdir);
+//        }
+//        LOG.info("JEF job status store is {}", s.getClass().getSimpleName());
+//        return s;
+//    }
     
     private void fire(String eventName, JobSession status, Object source) {
         fire(eventName, status, source, null);

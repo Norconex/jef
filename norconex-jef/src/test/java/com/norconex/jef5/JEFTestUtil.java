@@ -1,4 +1,4 @@
-/* Copyright 2017 Norconex Inc.
+/* Copyright 2017-2018 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.norconex.jef4.job.group;
+package com.norconex.jef5;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,21 +23,27 @@ import com.norconex.jef5.suite.JobSuiteConfig;
 
 public final class JEFTestUtil {
 
+    public static final String TEMP_DIR_ROOT = "jef-junit";
+    
     private JEFTestUtil() {
         super();
     }
     
-    public static JobSuiteConfig newConfigWithTempWorkdir(
+    public static JobSuiteConfig newConfig(
             TemporaryFolder folder) throws IOException {
         JobSuiteConfig config = new JobSuiteConfig();
-        setConfigWithTempWorkdir(config, folder);
+        config.setWorkdir(folder.newFolder(TEMP_DIR_ROOT).toPath());
         return config;
     }
-    
-    public static File setConfigWithTempWorkdir(
-            JobSuiteConfig config, TemporaryFolder folder) throws IOException {
-        File tempDirectory = folder.newFolder("jef-test-fake");
-        config.setWorkdir(tempDirectory.toPath());
-        return tempDirectory;
+
+    public static JobSuiteConfig newConfig(
+            File folder, TemporaryFolder fallbackFolder) throws IOException {
+        File dir = folder;
+        if (dir == null) {
+            dir = fallbackFolder.newFolder(TEMP_DIR_ROOT);
+        }
+        JobSuiteConfig config = new JobSuiteConfig();
+        config.setWorkdir(dir.toPath());
+        return config;
     }
 }

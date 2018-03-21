@@ -17,20 +17,23 @@ package com.norconex.jef5.session;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class JobSessionFacadeTest {
+import com.norconex.jef5.session.NEW.JobSuiteSession;
+
+public class JobSuiteSessionTest {
 
     @Test
     public void testLoadJobSessions() throws IOException {
-        JobSessionFacade facade = JobSessionFacade.get(
+        JobSuiteSession facade = JobSuiteSession.getInstance(Paths.get("n/a"), 
                 new InputStreamReader(
-                JobSessionFacadeTest.class.getResourceAsStream(
-                        JobSessionFacadeTest.class.getSimpleName() + ".xml"),
+                JobSuiteSessionTest.class.getResourceAsStream(
+                        JobSuiteSessionTest.class.getSimpleName() + ".xml"),
                 StandardCharsets.UTF_8));
         
         //TODO test getting sessions when files are not created

@@ -91,13 +91,6 @@
       <artifactId>slf4j-api</artifactId>
       <version>1.7.25</version>
     </dependency>
-    <!-- 
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-api</artifactId>
-      <version>2.10.0</version>
-    </dependency>
-     -->
 
     <!--  Tests: -->
     <dependency>
@@ -106,14 +99,6 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
-    <!-- 
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
-      <scope>test</scope>
-    </dependency>
-     -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
@@ -130,29 +115,29 @@
   
   <build>
     <resources>
-        <resource>
-            <directory>${project.build.testSourceDirectory}</directory>
-            <includes>
-                <include>**</include>
-            </includes>
-        </resource>
-        <resource>
-            <filtering>false</filtering>
-            <directory>${project.build.sourceDirectory}</directory>
-            <includes>
-                <include>**</include>
-            </includes>
-            <excludes>
-                <exclude>**/*.java</exclude>
-            </excludes>
-        </resource>
-        <resource>
-            <filtering>false</filtering>
-            <directory>src/main/resources</directory>
-            <includes>
-                <include>**</include>
-            </includes>
-        </resource>
+      <resource>
+        <directory>${project.build.testSourceDirectory}</directory>
+        <includes>
+          <include>**</include>
+        </includes>
+      </resource>
+      <resource>
+        <filtering>false</filtering>
+        <directory>${project.build.sourceDirectory}</directory>
+        <includes>
+          <include>**</include>
+        </includes>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/resources</directory>
+        <includes>
+            <include>**</include>
+        </includes>
+      </resource>
     </resources>  
     <extensions>
       <extension>
@@ -162,33 +147,33 @@
       </extension>
     </extensions>
     <pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-                <version>2.6</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>3.3</version>
-              <configuration>
-                <generateReports>true</generateReports>
-                <inputEncoding>UTF-8</inputEncoding>
-                <outputEncoding>UTF-8</outputEncoding>
-                <templateFile>
-                  ${basedir}/src/site/skinless.vm
-                </templateFile>
-              </configuration>
-              <dependencies>
-                <dependency>
-                  <groupId>org.apache.velocity</groupId>
-                  <artifactId>velocity</artifactId>
-                  <version>1.7</version>
-                </dependency>
-              </dependencies>
-            </plugin>
-        </plugins>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>2.6</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.3</version>
+          <configuration>
+            <generateReports>true</generateReports>
+            <inputEncoding>UTF-8</inputEncoding>
+            <outputEncoding>UTF-8</outputEncoding>
+            <templateFile>
+              ${basedir}/src/site/skinless.vm
+            </templateFile>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.velocity</groupId>
+              <artifactId>velocity</artifactId>
+              <version>1.7</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
     </pluginManagement>
     <plugins>
       <plugin>
