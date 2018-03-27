@@ -39,9 +39,9 @@ public abstract class AbstractJobGroup implements IJobGroup {
 
     /** Job group unique identifier. */
     private String id;
-    
+
     private GroupStatusUpdater groupUpdater;
-    
+
     /**
      * Constructor.
      * @param id job unique identifier
@@ -73,7 +73,7 @@ public abstract class AbstractJobGroup implements IJobGroup {
     public final String getId() {
         return id;
     }
-    
+
     @Override
     public void execute(JobStatusUpdater statusUpdater, JobSuite suite) {
         groupUpdater = new GroupStatusUpdater(statusUpdater);
@@ -84,14 +84,16 @@ public abstract class AbstractJobGroup implements IJobGroup {
 
     @Override
     public void groupProgressed(IJobStatus childJobStatus) {
-        groupUpdater.childStatusChanged(childJobStatus);
+        if (groupUpdater != null) {
+            groupUpdater.childStatusChanged(childJobStatus);
+        }
     }
-    
+
     @Override
     public void stop(IJobStatus status, JobSuite suite) {
         groupUpdater = null;
     }
-    
+
     /*default*/ GroupStatusUpdater getGroupStatusUpdater() {
         return groupUpdater;
     }
@@ -117,11 +119,11 @@ public abstract class AbstractJobGroup implements IJobGroup {
                 ratioTotal += completionRatios[i];
             }
             statusUpdater.setProgress(Math.min(1.0d,
-                    (ratioTotal / (double) jobs.length)));
+                    (ratioTotal / jobs.length)));
             statusUpdater.setNote(completedCount + " of "
                     + jobs.length + " jobs completed.");
         }
-        
+
     }
-    
+
 }
