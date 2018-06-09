@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE xml>
 <suite-index>
-  <store class="com.norconex.jef5.session.store.impl.FileJobSessionStore">
+  <store class="com.norconex.jef5.status.store.impl.FileJobStatusStore">
     <storeDir>${tempDir}</storeDir>
     <!--  storeBackupDir -->
   </store>

@@ -15,8 +15,8 @@
 package com.norconex.jef5.job;
 
 import com.norconex.jef5.event.IJefEventListener;
-import com.norconex.jef5.session.JobSession;
-import com.norconex.jef5.session.JobSessionUpdater;
+import com.norconex.jef5.status.JobStatus;
+import com.norconex.jef5.status.JobStatusUpdater;
 import com.norconex.jef5.suite.JobSuite;
 
 /**
@@ -68,11 +68,11 @@ public interface IJob {
 
     /**
      * Executes this job.  Implementors are responsible for updating
-     * execution progress on the given {@link JobSessionUpdater}.  
-     * @param sessionUpdater session updater
+     * execution progress on the given {@link JobStatusUpdater}.  
+     * @param statusUpdater status updater
      * @param suite job suite this job is part of
      */
-    void execute(final JobSessionUpdater sessionUpdater, final JobSuite suite);
+    void execute(final JobStatusUpdater statusUpdater, final JobSuite suite);
 
     /**
      * Stops this job.  Implementors are responsible for terminating
@@ -82,7 +82,7 @@ public interface IJob {
      * @param status current job status
      * @param suite job suite this job is part of
      */
-    void stop(final JobSession status, final JobSuite suite);
+    void stop(final JobStatus status, final JobSuite suite);
     
     
     //TODO clean() ?

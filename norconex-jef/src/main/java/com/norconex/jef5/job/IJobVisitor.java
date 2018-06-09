@@ -16,12 +16,12 @@ package com.norconex.jef5.job;
 
 import java.util.function.BiConsumer;
 
-import com.norconex.jef5.session.JobSession;
+import com.norconex.jef5.status.JobStatus;
 
 /**
  * Allows one to "visit" a job suite and walk its job hierarchy with 
  * minimal effort.  
  * @author Pascal Essiembre
  */
-public interface IJobVisitor extends BiConsumer<IJob, JobSession> {
+public interface IJobVisitor extends BiConsumer<IJob, JobStatus> {
 }

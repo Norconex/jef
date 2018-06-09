@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.norconex.jef5.session;
+package com.norconex.jef5.status;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -29,15 +29,15 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 //TODO rename to IJobProgress? JobExecutionStatus, JobExecStatus
 //or IJobReport?  IJobDetails?  IJobActivity? IJobActivityReport?
-public class JobSession extends JobSessionData {
+public class JobStatus extends JobStatusData {
 
     private static final long serialVersionUID = 1L;
 
     //TODO have status Comparable by JobDuration (startDate)
     private final String jobId;
-    private final Set<JobSessionData> resumedAttempts = new TreeSet<>();
+    private final Set<JobStatusData> resumedAttempts = new TreeSet<>();
     
-    public JobSession(String jobId, Set<JobSessionData> resumedAttempts) {
+    public JobStatus(String jobId, Set<JobStatusData> resumedAttempts) {
         this.jobId = jobId;
         if (resumedAttempts != null) {
             this.resumedAttempts.addAll(resumedAttempts);
@@ -47,7 +47,7 @@ public class JobSession extends JobSessionData {
     public String getJobId() {
         return jobId;
     }
-    public Set<JobSessionData> getResumedAttempts() {
+    public Set<JobStatusData> getResumedAttempts() {
         return resumedAttempts;
     }
 
@@ -61,9 +61,9 @@ public class JobSession extends JobSessionData {
     }
 
     /**
-     * Gets the start time of the oldest resumee attempt,
+     * Gets the start time of the oldest resumed attempt,
      * or the current start time if there were no previous attempt. 
-     * @return session start time or <code>null</code> if never started
+     * @return status start time or <code>null</code> if never started
      */
     public LocalDateTime getSessionStartTime() {
         if (resumedAttempts.isEmpty()) {
@@ -93,7 +93,7 @@ public class JobSession extends JobSessionData {
         if (resumedAttempts.isEmpty()) {
             return duration;
         }
-        for (JobSessionData js : resumedAttempts) {
+        for (JobStatusData js : resumedAttempts) {
             duration = duration.plus(js.getDuration());
         }
         return duration;
@@ -101,10 +101,10 @@ public class JobSession extends JobSessionData {
     
     @Override
     public boolean equals(final Object other) {
-        if (!(other instanceof JobSession)) {
+        if (!(other instanceof JobStatus)) {
             return false;
         }
-        JobSession castOther = (JobSession) other;
+        JobStatus castOther = (JobStatus) other;
         return new EqualsBuilder()
                 .appendSuper(super.equals(castOther))
                 .append(jobId, castOther.jobId)

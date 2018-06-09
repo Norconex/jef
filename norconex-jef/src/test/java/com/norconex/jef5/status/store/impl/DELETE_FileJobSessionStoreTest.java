@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.norconex.jef5.session.store.impl;
+package com.norconex.jef5.status.store.impl;
 
 public class DELETE_FileJobSessionStoreTest {
 

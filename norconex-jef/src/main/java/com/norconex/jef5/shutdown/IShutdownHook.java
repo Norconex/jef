@@ -43,7 +43,7 @@ public interface IShutdownHook {
     
     /**
      * Shuts down a currently running job suite.
-     * @param indexFile path to index file, containing suite session info
+     * @param indexFile path to index file, containing suite status info
      * @return <code>true</code> if the process was running and successfully 
      *         shut down. <code>false</code> if no process running.
      * @throws ShutdownException could not shutdown running suite.

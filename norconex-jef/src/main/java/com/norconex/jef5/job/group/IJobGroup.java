@@ -15,7 +15,7 @@
 package com.norconex.jef5.job.group;
 
 import com.norconex.jef5.job.IJob;
-import com.norconex.jef5.session.JobSession;
+import com.norconex.jef5.status.JobStatus;
 
 
 /**
@@ -33,5 +33,5 @@ public interface IJobGroup extends IJob {
     IJob[] getJobs();
     
     
-    void groupProgressed(JobSession childJobStatus);
+    void groupProgressed(JobStatus childJobStatus);
 }

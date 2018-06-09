@@ -14,21 +14,20 @@
  */
 package com.norconex.jef5.event;
 
-import java.util.Objects;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.norconex.jef5.session.JobSession;
+import com.norconex.commons.lang.event.Event;
+import com.norconex.jef5.status.JobStatus;
 
 /**
  * A crawler event.
  * @author Pascal Essiembre
  * @see IJefEventListener
  */
-public class JefEvent {
+public class JefEvent extends Event<Object> {
 
     public static final String SUITE_STARTED = "SUITE_STARTED";
     public static final String SUITE_STOPPING = "SUITE_STOPPING";
@@ -59,10 +58,7 @@ public class JefEvent {
     // this one replaces IJobErrorListener
     public static final String JOB_ERROR = "JOB_ERROR";
     
-    private final String name;
-    private final JobSession status;
-    private final Object source;
-    private final Throwable exception;
+    private final JobStatus status;
 
     /**
      * New crawler event.
@@ -70,7 +66,7 @@ public class JefEvent {
      * @param status job status
      * @param source object responsible for triggering the event
      */
-    public JefEvent(String name, JobSession status, Object source) {
+    public JefEvent(String name, JobStatus status, Object source) {
         this(name, status, source, null);
     }
 
@@ -82,55 +78,18 @@ public class JefEvent {
      * @param source object responsible for triggering the event
      * @param exception exception
      */
-    public JefEvent(String name, JobSession status, 
+    public JefEvent(String name, JobStatus status, 
             Object source, Throwable exception) {
-        super();
-        this.name = name;
+        super(name, source, exception);
         this.status = status;
-        this.source = source;
-        this.exception = exception;
     }
     
-    /**
-     * Gets the object representing the source of this event.
-     * @return the subject
-     */
-    public Object getSource() {
-        return source;
-    }
-
-    /**
-     * Gets the event name.
-     * @return the event name
-     */
-    public String getName() {
-        return name;
-    }
-
     /**
      * Gets the job status, if any.
      * @return the job status or <code>null</code>
      */
-    public JobSession getStatus() {
+    public JobStatus getStatus() {
         return status;
-    }
-    
-    /**
-     * Gets the exception, if any.
-     * @return the exception or <code>null</code>
-     */
-    public Throwable getException() {
-        return exception;
-    }
-
-    public boolean equalsName(JefEvent event) {
-        if (event == null) {
-            return false;
-        }
-        return equalsName(event.getName());
-    }
-    public boolean equalsName(String eventName) {
-        return Objects.equals(name, eventName);
     }
     
     @Override
@@ -139,30 +98,24 @@ public class JefEvent {
             return false;
         JefEvent castOther = (JefEvent) other;
         return new EqualsBuilder()
-                .append(name, castOther.name)
+                .appendSuper(super.equals(other))
                 .append(status, castOther.status)
-                .append(source, castOther.source)
-                .append(exception, castOther.exception)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(name)
+                .appendSuper(super.hashCode())
                 .append(status)
-                .append(source)
-                .append(exception)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("name", name)
+                .appendSuper(super.toString())
                 .append("status", status)
-                .append("source", source)
-                .append("exception", exception)
                 .toString();
     }
 }

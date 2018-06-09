@@ -16,8 +16,8 @@ package com.norconex.jef5.job.impl;
 
 import com.norconex.commons.lang.Sleeper;
 import com.norconex.jef5.job.IJob;
-import com.norconex.jef5.session.JobSession;
-import com.norconex.jef5.session.JobSessionUpdater;
+import com.norconex.jef5.status.JobStatus;
+import com.norconex.jef5.status.JobStatusUpdater;
 import com.norconex.jef5.suite.JobSuite;
 
 /**
@@ -53,8 +53,8 @@ public class SleepyJob implements IJob {
     }
 
     @Override
-    public void execute(JobSessionUpdater sessionUpdater, JobSuite suite) {
-      double elapsedSeconds = sessionUpdater.getProgress();
+    public void execute(JobStatusUpdater statusUpdater, JobSuite suite) {
+      double elapsedSeconds = statusUpdater.getProgress();
       System.out.println("START PROGRESS IS: " + elapsedSeconds);
 
       while (elapsedSeconds < sleepSeconds) {
@@ -67,18 +67,18 @@ public class SleepyJob implements IJob {
               System.out.println("[" + getId() + "] Slept for "
                       + elapsedSeconds + " seconds.");
           }
-          sessionUpdater.setProgress(elapsedSeconds / sleepSeconds);
-          sessionUpdater.setNote("Slept for " + elapsedSeconds + " seconds.");
+          statusUpdater.setProgress(elapsedSeconds / sleepSeconds);
+          statusUpdater.setNote("Slept for " + elapsedSeconds + " seconds.");
 //          progress.incrementProgress(1);
 //          progress.setNote(
 //                  "Slept for " + progress.getProgress() + " seconds.");
       }
-      sessionUpdater.setNote(
-              "Done sleeping for " + sessionUpdater.getProgress() + " seconds.");
+      statusUpdater.setNote(
+              "Done sleeping for " + statusUpdater.getProgress() + " seconds.");
     }
 
     @Override
-    public void stop(JobSession executionStatus, JobSuite suite) {
+    public void stop(JobStatus executionStatus, JobSuite suite) {
         // TODO stop sleeping
         
     }

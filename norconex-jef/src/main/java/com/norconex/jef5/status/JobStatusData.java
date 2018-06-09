@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.norconex.jef5.session;
+package com.norconex.jef5.status;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -30,8 +30,8 @@ import com.norconex.commons.lang.map.Properties;
 
 //TODO rename to IJobProgress? JobExecutionStatus, JobExecStatus
 //or IJobReport?  IJobDetails?  IJobActivity? IJobActivityReport?
-public class JobSessionData 
-        implements Serializable, Comparable<JobSessionData> {
+public class JobStatusData 
+        implements Serializable, Comparable<JobStatusData> {
 
     private static final long serialVersionUID = 1L;
 
@@ -236,7 +236,7 @@ public class JobSessionData
     }
     
     @Override
-    public int compareTo(JobSessionData o) {
+    public int compareTo(JobStatusData o) {
         if (startTime == null && o.startTime == null) {
             return 0;
         }
@@ -251,10 +251,10 @@ public class JobSessionData
 
     @Override
     public boolean equals(final Object other) {
-        if (!(other instanceof JobSessionData)) {
+        if (!(other instanceof JobStatusData)) {
             return false;
         }
-        JobSessionData castOther = (JobSessionData) other;
+        JobStatusData castOther = (JobStatusData) other;
         return new EqualsBuilder()
                 .append(progress, castOther.progress)
                 .append(note, castOther.note)

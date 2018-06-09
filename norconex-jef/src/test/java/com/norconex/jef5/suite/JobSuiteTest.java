@@ -24,7 +24,7 @@ import org.junit.rules.TemporaryFolder;
 import com.norconex.jef5.JEFTestUtil;
 import com.norconex.jef5.job.IJob;
 import com.norconex.jef5.job.impl.SleepyJob;
-import com.norconex.jef5.session.NEW.JobSuiteSession;
+import com.norconex.jef5.status.JobSuiteStatus;
 
 public class JobSuiteTest {
 
@@ -39,10 +39,10 @@ public class JobSuiteTest {
         JobSuite suite = new JobSuite(job, config);
         Assert.assertTrue("Execution returned false.", suite.execute());
 
-        JobSuiteSession tree = 
-                JobSuiteSession.getInstance(suite.getSessionIndex());
+        JobSuiteStatus tree = 
+                JobSuiteStatus.getInstance(suite.getStatusIndex());
         System.out.println("TREE: " + tree);
-        Assert.assertEquals(1d, tree.getRootSession().getProgress(), 0d);
+        Assert.assertEquals(1d, tree.getRootStatus().getProgress(), 0d);
     }
 
 }

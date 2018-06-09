@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.norconex.jef5.session.NEW;
+package com.norconex.jef5.status;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -44,8 +44,6 @@ import org.slf4j.LoggerFactory;
 
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.commons.lang.map.Properties;
-import com.norconex.jef5.session.JobSession;
-import com.norconex.jef5.session.JobSessionData;
 
 /**
  * <p>
@@ -81,19 +79,19 @@ import com.norconex.jef5.session.JobSessionData;
 
 // workdir and backup dir... should be figured out by job suite and 
 // passed to read/write methods... if we want to make this DAO reusable
-// in JobSuiteSession.
+// in JobSuiteStatus.
 
 
 //TODO read/write index file from here??
 
-public class JobSuiteSessionDAO 
+public class JobSuiteStatusDAO
         implements Serializable {// IJefEventListener, IXMLConfigurable {
 
     private static final long serialVersionUID = 1L;
 
     //TODO if event listener specified, register the listener.
     private static final Logger LOG =
-            LoggerFactory.getLogger(JobSuiteSessionDAO.class);
+            LoggerFactory.getLogger(JobSuiteStatusDAO.class);
 
     //TODO make all static?
     
@@ -101,19 +99,19 @@ public class JobSuiteSessionDAO
 //    public static final String SESSION_SUBDIR = "session";
 //    public static final String SESSION_BACKUP_SUBDIR = "backups/session";
     
-    private final File sessionDir;
+    private final File statusDir;
 //    private final Path workdir;
     private final String suiteId;
 
-//    public JobSuiteSessionDAO(/*Path workdir,*/ String suiteId) {
-    public JobSuiteSessionDAO(String suiteId, Path sessionDir) {
+//    public JobSuiteStatusDAO(/*Path workdir,*/ String suiteId) {
+    public JobSuiteStatusDAO(String suiteId, Path statusDir) {
         super();
 //        this.workdir = workdir;
         Objects.requireNonNull(suiteId, "suiteId");
-        Objects.requireNonNull(sessionDir, "sessionDir");
+        Objects.requireNonNull(statusDir, "statusDir");
         
         this.suiteId = suiteId;
-        this.sessionDir = sessionDir.toFile();
+        this.statusDir = statusDir.toFile();
     }
 //    public Path getWorkdir() {
 //        return workdir;
@@ -121,8 +119,8 @@ public class JobSuiteSessionDAO
     public String getSuiteId() {
         return suiteId;
     }
-    public Path getSessionDir() {
-        return sessionDir.toPath();
+    public Path getStatusDir() {
+        return statusDir.toPath();
     }    
 //    public Path getSessionDir() {
 //        return getSessionDir(workdir, suiteId);
@@ -157,9 +155,9 @@ public class JobSuiteSessionDAO
     
     
 
-    public final void write(final JobSession js) throws IOException {
+    public final void write(final JobStatus js) throws IOException {
 
-        //The JobSessionData should not be written/read here??? so rename arg to JobSession?
+        //The JobStatusData should not be written/read here??? so rename arg to JobStatus?
         
         Properties config = new Properties();
         config.setString("jobId", js.getJobId());
@@ -189,30 +187,30 @@ public class JobSuiteSessionDAO
         }
     }
 
-    public final JobSession read(final String jobId) throws IOException {
+    public final JobStatus read(final String jobId) throws IOException {
 
         if (jobId == null) {
             return null;
         }
         
-        Set<JobSessionData> attempts = new TreeSet<>();
+        Set<JobStatusData> attempts = new TreeSet<>();
         Path file = null;
         int attemptNo = 1;
         while ((file = resolveJobFile(jobId, attemptNo++)).toFile().exists()) {
-            JobSessionData data = new JobSessionData();
+            JobStatusData data = new JobStatusData();
             read(data, file);
             attempts.add(data);
         }
-        JobSession jobSession = new JobSession(jobId, attempts);
-        read(jobSession, resolveJobFile(jobId));
-        return jobSession;
+        JobStatus jobStatus = new JobStatus(jobId, attempts);
+        read(jobStatus, resolveJobFile(jobId));
+        return jobStatus;
     }
 
-    private final void read(final JobSessionData jsd, final Path file)
+    private final void read(final JobStatusData jsd, final Path file)
             throws IOException {
         
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Reading session file: " + file);
+            LOG.debug("Reading status file: " + file);
         }
         
         if (file.getFileName().toString().startsWith("null")) {
@@ -250,15 +248,15 @@ public class JobSuiteSessionDAO
     }
 
     public final void delete() throws IOException {
-        FileUtils.deleteDirectory(sessionDir);
+        FileUtils.deleteDirectory(statusDir);
     }
 
     //TODO have built-in methods to load backed-up sessions? 
     public final void backup(Path backupDir) throws IOException {
         Objects.requireNonNull(backupDir, "backupDir");
-        LOG.debug("Moving {} to {}", sessionDir, backupDir);
+        LOG.debug("Moving {} to {}", statusDir, backupDir);
         try {
-            FileUtils.moveDirectory(sessionDir, backupDir.toFile());
+            FileUtils.moveDirectory(statusDir, backupDir.toFile());
         } catch (FileExistsException e) {
             LOG.error("Target backup directory already exists: {}", backupDir);
             throw e;
@@ -287,7 +285,7 @@ public class JobSuiteSessionDAO
         if (attemptNo > 0) {
             suffix = "." + Integer.toString(attemptNo);
         }
-        return sessionDir.toPath().resolve(
+        return statusDir.toPath().resolve(
                 FileUtil.toSafeFileName(jobId) + ".job" + suffix);
     }
 //    private Path resolveDataDir() {
@@ -346,12 +344,12 @@ public class JobSuiteSessionDAO
 
     @Override
     public boolean equals(final Object other) {
-        if (!(other instanceof JobSuiteSessionDAO)) {
+        if (!(other instanceof JobSuiteStatusDAO)) {
             return false;
         }
-        JobSuiteSessionDAO castOther = (JobSuiteSessionDAO) other;
+        JobSuiteStatusDAO castOther = (JobSuiteStatusDAO) other;
         return new EqualsBuilder()
-                .append(sessionDir, castOther.sessionDir)
+                .append(statusDir, castOther.statusDir)
                 .append(suiteId, castOther.suiteId)
                 .isEquals();
     }
@@ -359,7 +357,7 @@ public class JobSuiteSessionDAO
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(sessionDir)
+                .append(statusDir)
                 .append(suiteId)
                 .toHashCode();
     }
@@ -367,7 +365,7 @@ public class JobSuiteSessionDAO
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("sessionDir", sessionDir)
+                .append("statusDir", statusDir)
                 .append("suiteId", suiteId)
                 .toString();
     }

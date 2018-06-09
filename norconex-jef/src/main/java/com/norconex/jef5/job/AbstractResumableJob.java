@@ -14,8 +14,8 @@
  */
 package com.norconex.jef5.job;
 
-import com.norconex.jef5.session.JobSession;
-import com.norconex.jef5.session.JobSessionUpdater;
+import com.norconex.jef5.status.JobStatus;
+import com.norconex.jef5.status.JobStatusUpdater;
 import com.norconex.jef5.suite.JobSuite;
 
 
@@ -43,27 +43,27 @@ public abstract class AbstractResumableJob implements IJob {
     }
 
     @Override
-    public void execute(JobSessionUpdater sessionUpdater, JobSuite suite) {
-        JobSession status = suite.getJobSession(sessionUpdater.getJobId());
+    public void execute(JobStatusUpdater statusUpdater, JobSuite suite) {
+        JobStatus status = suite.getJobStatus(statusUpdater.getJobId());
         if (!status.isResumed()) {
-            startExecution(sessionUpdater, suite);
+            startExecution(statusUpdater, suite);
         } else if (!status.isCompleted()) {
-            resumeExecution(sessionUpdater, suite);
+            resumeExecution(statusUpdater, suite);
         }
     }
 
     /**
      * Starts the execution of a job.
-     * @param sessionUpdater job progress
+     * @param statusUpdater job progress
      * @param suite job suite
      */
     protected abstract void startExecution(
-            JobSessionUpdater sessionUpdater, JobSuite suite);
+            JobStatusUpdater statusUpdater, JobSuite suite);
     /**
      * Resumes the execution of a job.
-     * @param sessionUpdater job progress
+     * @param statusUpdater job progress
      * @param suite job suite
      */
     protected abstract void resumeExecution(
-            JobSessionUpdater sessionUpdater, JobSuite suite);
+            JobStatusUpdater statusUpdater, JobSuite suite);
 }

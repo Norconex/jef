@@ -20,14 +20,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.norconex.commons.lang.Sleeper;
 import com.norconex.jef5.JefException;
-import com.norconex.jef5.session.JobSession;
+import com.norconex.jef5.status.JobStatus;
 
 public class JobHeartbeatGenerator extends Thread {
 
     //TODO have a isRunning method on JobSessionFacade instead?
     public static final long HEARTBEAT_INTERVAL = 5000;
     
-    private final Queue<JobSession> statuses = 
+    private final Queue<JobStatus> statuses = 
             new ConcurrentLinkedQueue<>();
     private final JobSuite suite;
     
@@ -42,8 +42,8 @@ public class JobHeartbeatGenerator extends Thread {
     public void run() {
         try {
             while(!terminate) {
-                for (JobSession status : statuses) {
-                    status.setLastActivity(suite.getJobSuiteSessionDAO().touch(
+                for (JobStatus status : statuses) {
+                    status.setLastActivity(suite.getJobSuiteStatusDAO().touch(
                             status.getJobId()));
                 }
                 Sleeper.sleepMillis(HEARTBEAT_INTERVAL);
@@ -53,10 +53,10 @@ public class JobHeartbeatGenerator extends Thread {
         }
     }
 
-    public void register(JobSession status) {
+    public void register(JobStatus status) {
         statuses.add(status);
     }
-    public void unregister(JobSession status) {
+    public void unregister(JobStatus status) {
         statuses.remove(status);
     }
     

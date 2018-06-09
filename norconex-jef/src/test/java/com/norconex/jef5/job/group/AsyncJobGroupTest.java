@@ -28,7 +28,7 @@ import org.junit.rules.TemporaryFolder;
 import com.norconex.jef5.JEFTestUtil;
 import com.norconex.jef5.job.IJob;
 import com.norconex.jef5.job.impl.SleepyJob;
-import com.norconex.jef5.session.JobSession;
+import com.norconex.jef5.status.JobStatus;
 import com.norconex.jef5.suite.JobSuite;
 
 public class AsyncJobGroupTest {
@@ -54,13 +54,13 @@ public class AsyncJobGroupTest {
                 rootJob, JEFTestUtil.newConfig(folder, tempFolder));
         Assert.assertTrue("Suite failed.", suite.execute());
         
-        assertStatus(suite.getJobSession(job1));
-        assertStatus(suite.getJobSession(job2));
-        assertStatus(suite.getJobSession(job3));
-        assertStatus(suite.getJobSession(rootJob));
+        assertStatus(suite.getJobStatus(job1));
+        assertStatus(suite.getJobStatus(job2));
+        assertStatus(suite.getJobStatus(job3));
+        assertStatus(suite.getJobStatus(rootJob));
     }
 
-    private void assertStatus(JobSession status) {
+    private void assertStatus(JobStatus status) {
         System.out.println("Status of \"" + status.getJobId() + "\": "
                 + status.getState() + " (" + status.getProgress() + ")");
         assertTrue(status.getProgress() == 1d);

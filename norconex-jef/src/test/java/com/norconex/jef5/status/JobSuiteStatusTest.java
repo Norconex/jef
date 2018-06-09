@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.norconex.jef5.session;
+package com.norconex.jef5.status;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,16 +24,16 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.norconex.jef5.session.NEW.JobSuiteSession;
+import com.norconex.jef5.status.JobSuiteStatus;
 
-public class JobSuiteSessionTest {
+public class JobSuiteStatusTest {
 
     @Test
-    public void testLoadJobSessions() throws IOException {
-        JobSuiteSession facade = JobSuiteSession.getInstance(Paths.get("n/a"), 
+    public void testLoadJobStatuses() throws IOException {
+        JobSuiteStatus facade = JobSuiteStatus.getInstance(Paths.get("n/a"), 
                 new InputStreamReader(
-                JobSuiteSessionTest.class.getResourceAsStream(
-                        JobSuiteSessionTest.class.getSimpleName() + ".xml"),
+                JobSuiteStatusTest.class.getResourceAsStream(
+                        JobSuiteStatusTest.class.getSimpleName() + ".xml"),
                 StandardCharsets.UTF_8));
         
         //TODO test getting sessions when files are not created

@@ -15,4 +15,4 @@
 /**
  * Classes keeping track of a job activity through time.
  */
-package com.norconex.jef5.session;
+package com.norconex.jef5.status;

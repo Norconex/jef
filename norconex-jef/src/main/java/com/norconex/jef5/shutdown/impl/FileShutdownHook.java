@@ -27,11 +27,11 @@ import com.norconex.commons.lang.Sleeper;
 import com.norconex.jef5.JefException;
 import com.norconex.jef5.event.JefEvent;
 import com.norconex.jef5.job.IJob;
-import com.norconex.jef5.session.JobSession;
-import com.norconex.jef5.session.JobState;
-import com.norconex.jef5.session.NEW.JobSuiteSession;
 import com.norconex.jef5.shutdown.IShutdownHook;
 import com.norconex.jef5.shutdown.ShutdownException;
+import com.norconex.jef5.status.JobState;
+import com.norconex.jef5.status.JobStatus;
+import com.norconex.jef5.status.JobSuiteStatus;
 import com.norconex.jef5.suite.JobSuite;
 
 /**
@@ -55,7 +55,7 @@ public class FileShutdownHook implements IShutdownHook {
     @Override
     public void setup(final JobSuite suite) {
         this.suite = suite;
-        final Path stopFile = getStopFile(suite.getSessionIndex());
+        final Path stopFile = getStopFile(suite.getStatusIndex());
         new Thread(() -> {
             monitoring = true;
             while(monitoring) {
@@ -71,7 +71,7 @@ public class FileShutdownHook implements IShutdownHook {
     @Override
     public void destroy() {
         monitoring = false;
-        Path stopFile = getStopFile(suite.getSessionIndex());
+        Path stopFile = getStopFile(suite.getStatusIndex());
         if (stopFile.toFile().exists()) {
             try {
                 Files.delete(stopFile);
@@ -96,8 +96,8 @@ public class FileShutdownHook implements IShutdownHook {
         }
 
         try {
-            if (!JobSuiteSession.getInstance(
-                    indexFile).getRootSession().isRunning()) {
+            if (!JobSuiteStatus.getInstance(
+                    indexFile).getRootStatus().isRunning()) {
                 LOG.info("The job suite is not running.");
                 return false;
             }
@@ -131,12 +131,12 @@ public class FileShutdownHook implements IShutdownHook {
         suite.fire(new JefEvent(JefEvent.SUITE_STOPPING, null, suite));
         
         // Notify Job Life Cycle listeners and stop them
-        suite.accept((final IJob job, final JobSession jobSession) -> {
-            suite.fire(new JefEvent(JefEvent.JOB_STOPPING, jobSession, suite));
-            new Thread(() -> stopJob(job, jobSession), "Stop Thread").start();                
+        suite.accept((final IJob job, final JobStatus jobStatus) -> {
+            suite.fire(new JefEvent(JefEvent.JOB_STOPPING, jobStatus, suite));
+            new Thread(() -> stopJob(job, jobStatus), "Stop Thread").start();                
         });
     }
-    private void stopJob(final IJob job, final JobSession status) {
+    private void stopJob(final IJob job, final JobStatus status) {
         status.setStopRequested(true);
         job.stop(status, suite);
         while (status.isRunning()) {

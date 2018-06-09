@@ -22,8 +22,8 @@ import com.norconex.commons.lang.exec.SystemCommand;
 import com.norconex.commons.lang.exec.SystemCommandException;
 import com.norconex.jef5.JefException;
 import com.norconex.jef5.job.IJob;
-import com.norconex.jef5.session.JobSession;
-import com.norconex.jef5.session.JobSessionUpdater;
+import com.norconex.jef5.status.JobStatus;
+import com.norconex.jef5.status.JobStatusUpdater;
 import com.norconex.jef5.suite.JobSuite;
 
 /**
@@ -90,24 +90,24 @@ public class SystemCommandJob implements IJob {
     }
     
     @Override
-    public void execute(JobSessionUpdater sessionUpdater, JobSuite suite) {
+    public void execute(JobStatusUpdater statusUpdater, JobSuite suite) {
         double commandCount = systemCommands.length;
-        double commandsRan = sessionUpdater.getProperties().getDouble("ran", 0d);
+        double commandsRan = statusUpdater.getProperties().getDouble("ran", 0d);
         for (int i = (int) commandsRan; i < commandCount; i++) {
             SystemCommand systemCommand = systemCommands[i];
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Executing command: " + systemCommand);
             }
-            sessionUpdater.setNote("Executing: " + systemCommand);
+            statusUpdater.setNote("Executing: " + systemCommand);
             try {
                 systemCommand.execute();
-                sessionUpdater.setProgress(commandsRan / commandCount);
+                statusUpdater.setProgress(commandsRan / commandCount);
             } catch (SystemCommandException e) {
                 throw new JefException("Cannot execute command: "
                         + systemCommand, e);
             }
         }
-        sessionUpdater.setNote("Done.");
+        statusUpdater.setNote("Done.");
     }
     
     /**
@@ -120,7 +120,7 @@ public class SystemCommandJob implements IJob {
      * @since 2.0
      */
     @Override
-    public void stop(JobSession status, JobSuite suite) {
+    public void stop(JobStatus status, JobSuite suite) {
         for (SystemCommand command : systemCommands) {
             command.abort();
         }

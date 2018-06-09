@@ -12,19 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.norconex.jef5.session;
+package com.norconex.jef5.status;
 
-import com.norconex.jef5.session.JobSession;
+import com.norconex.jef5.status.JobStatus;
 
 /**
- * Allows one to "visit" job sessions and walk the status hierarchy with 
+ * Allows one to "visit" job statuses and walk the status hierarchy with 
  * minimal effort (matching job hierarchy).  
  * @author Pascal Essiembre
  */
-public interface IJobSessionVisitor {
+public interface IJobStatusVisitor {
     /**
      * Visits a job status.
-     * @param jobSession job session
+     * @param jobStatus job status
      */
-    void visitJobSession(JobSession jobSession);
+    void visitJobStatus(JobStatus jobStatus);
 }

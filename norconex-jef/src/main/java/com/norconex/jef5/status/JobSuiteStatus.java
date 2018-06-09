@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.norconex.jef5.session.NEW;
+package com.norconex.jef5.status;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -42,8 +43,6 @@ import com.norconex.commons.lang.xml.EnhancedXMLStreamWriter;
 import com.norconex.jef5.JefException;
 import com.norconex.jef5.job.IJob;
 import com.norconex.jef5.job.group.IJobGroup;
-import com.norconex.jef5.session.IJobSessionVisitor;
-import com.norconex.jef5.session.JobSession;
 import com.norconex.jef5.suite.JobSuite;
 
 /**
@@ -65,11 +64,13 @@ import com.norconex.jef5.suite.JobSuite;
 
 //TODO what about making it readonly?  what about write methods?  We leave those in a separate class?  Use dao for that.
 
-public class JobSuiteSession {
+public class JobSuiteStatus implements Serializable {
     
-    private final JobSuiteSessionDAO dao;
+    private static final long serialVersionUID = 1L;
 
-//    private JobSuiteSession(JobSuiteSessionDAO dao) {
+    private final JobSuiteStatusDAO dao;
+
+//    private JobSuiteStatus(JobSuiteStatusDAO dao) {
 //        super();
 //        this.dao = dao;
 //    }
@@ -79,11 +80,11 @@ public class JobSuiteSession {
     private final TreeNode rootNode;
     private final Map<String, TreeNode> flatNodes = new ListOrderedMap<>();
 
-    private JobSuiteSession(
+    private JobSuiteStatus(
             /*String suiteName, */
             TreeNode rootNode, 
 //            Map<String, TreeNode> flattenNodes, 
-            JobSuiteSessionDAO dao) {
+            JobSuiteStatusDAO dao) {
 //        this.suiteName = suiteName;
         this.rootNode = rootNode;
         this.dao = dao;
@@ -92,13 +93,13 @@ public class JobSuiteSession {
         flattenNodes(rootNode, flatNodes);
     }
 
-    public static JobSuiteSession getInstance(JobSuite jobSuite) throws IOException {
+    public static JobSuiteStatus getInstance(JobSuite jobSuite) throws IOException {
         if (jobSuite == null) {
             return null;
         }
-        return new JobSuiteSession(
+        return new JobSuiteStatus(
                 loadJobTree(null, jobSuite.getRootJob()), 
-                jobSuite.getJobSuiteSessionDAO());        
+                jobSuite.getJobSuiteStatusDAO());        
     }
 
 //  //TODO move these writeXX methods to JobSessionFacade??
@@ -145,7 +146,7 @@ public class JobSuiteSession {
 //      out.write("</job>");
 //  }
         
-    public static JobSuiteSession getInstance(Path suiteIndex) throws IOException {
+    public static JobSuiteStatus getInstance(Path suiteIndex) throws IOException {
         
         //TODO check if instance is defined for path already (weak hashmap).
         
@@ -170,7 +171,7 @@ public class JobSuiteSession {
 //    }
 //
 //    // reader will be closed.
-//    private static JobSuiteSession getInstance(/*String suiteName, */Reader reader)
+//    private static JobSuiteStatus getInstance(/*String suiteName, */Reader reader)
 //            throws IOException {
 
 // first job is suiteId (root).        
@@ -187,32 +188,32 @@ public class JobSuiteSession {
             if (xml == null) {
                 return null;
             }
-            JobSuiteSessionDAO dao = null;
+            JobSuiteStatusDAO dao = null;
             
             TreeNode tree = loadJobTree(null, xml.configurationAt("job"));
             if (tree == null) {
                 return null;
             }
-            dao = new JobSuiteSessionDAO(tree.jobId, suiteIndex.getParent());
-            return new JobSuiteSession(tree, dao);
+            dao = new JobSuiteStatusDAO(tree.jobId, suiteIndex.getParent());
+            return new JobSuiteStatus(tree, dao);
         }
     }
     
-    public static JobSuiteSession getInstance(
-            Path sessionDir, Reader reader) throws IOException {
+    public static JobSuiteStatus getInstance(
+            Path statusDir, Reader reader) throws IOException {
         try (Reader r = reader) {
             XMLConfiguration xml = XMLConfigurationUtil.newXMLConfiguration(r);
             if (xml == null) {
                 return null;
             }
-            JobSuiteSessionDAO dao = null;
+            JobSuiteStatusDAO dao = null;
             
             TreeNode tree = loadJobTree(null, xml.configurationAt("job"));
             if (tree == null) {
                 return null;
             }
-            dao = new JobSuiteSessionDAO(tree.jobId, sessionDir);
-            return new JobSuiteSession(tree, dao);
+            dao = new JobSuiteStatusDAO(tree.jobId, statusDir);
+            return new JobSuiteStatus(tree, dao);
         }
     }
 
@@ -244,7 +245,7 @@ public class JobSuiteSession {
             w.writeEndDocument();
             w.flush();
         } catch (XMLStreamException e) {
-            throw new IOException("Could not write suite session as XML.", e);
+            throw new IOException("Could not write suite status as XML.", e);
         }
     }    
     private void writeSuiteIndexJob(EnhancedXMLStreamWriter w, String jobId)
@@ -326,30 +327,30 @@ public class JobSuiteSession {
     }
             
     
-    public JobSession getRootSession() {
+    public JobStatus getRootStatus() {
         return read(rootNode.jobId);
     }
     public String getRootId() {
         return rootNode.jobId;
     }
     
-    public JobSession getSession(IJob job) {
+    public JobStatus getStatus(IJob job) {
         return read(job.getId());
     }
-    public JobSession getSession(String jobId) {
+    public JobStatus getStatus(String jobId) {
         return read(jobId);
     }
-    private JobSession read(String jobId) {
+    private JobStatus read(String jobId) {
         try {
             return dao.read(jobId);
         } catch (IOException e) {
-            throw new JefException("Cannot read session information for job: "
+            throw new JefException("Cannot read status information for job: "
                     + jobId, e);
         }
     }
     
-    public List<JobSession> getAllSessions() {
-        List<JobSession> list = new ArrayList<>(flatNodes.size());
+    public List<JobStatus> getAllStatuses() {
+        List<JobStatus> list = new ArrayList<>(flatNodes.size());
         for (TreeNode treeNode : flatNodes.values()) {
             list.add(read(treeNode.jobId));
         }
@@ -363,23 +364,23 @@ public class JobSuiteSession {
         return list;
     }
     
-    public List<JobSession> getChildSessions(JobSession jobSession) {
-        return getChildSessions(jobSession.getJobId());
+    public List<JobStatus> getChildStatuses(JobStatus jobStatus) {
+        return getChildStatuses(jobStatus.getJobId());
     }
-    public List<JobSession> getChildSessions(String jobId) {
+    public List<JobStatus> getChildStatuses(String jobId) {
         TreeNode treeNode = flatNodes.get(jobId);
         if (treeNode == null) {
             return new ArrayList<>(0);
         }
         List<TreeNode> treeNodes = treeNode.children;
-        List<JobSession> sessions = new ArrayList<>(treeNodes.size());
+        List<JobStatus> statuses = new ArrayList<>(treeNodes.size());
         for (TreeNode childNode : treeNodes) {
-            sessions.add(read(childNode.jobId));
+            statuses.add(read(childNode.jobId));
         }
-        return sessions;
+        return statuses;
     }
-    public List<String> getChildIds(JobSession jobSession) {
-        return getChildIds(jobSession.getJobId());
+    public List<String> getChildIds(JobStatus jobStatus) {
+        return getChildIds(jobStatus.getJobId());
     }
     public List<String> getChildIds(String jobId) {
         TreeNode treeNode = flatNodes.get(jobId);
@@ -394,18 +395,18 @@ public class JobSuiteSession {
         return ids;
     }
 
-    public JobSession getParentSession(JobSession jobSession) {
-        return getParentSession(jobSession.getJobId());
+    public JobStatus getParentStatus(JobStatus jobStatus) {
+        return getParentStatus(jobStatus.getJobId());
     }
-    public JobSession getParentSession(String jobId) {
+    public JobStatus getParentStatus(String jobId) {
         TreeNode treeNode = flatNodes.get(jobId);
         if (treeNode == null) {
             return null;
         }
         return read(treeNode.parentId);
     }
-    public String getParentId(JobSession jobSession) {
-        return getParentId(jobSession.getJobId());
+    public String getParentId(JobStatus jobStatus) {
+        return getParentId(jobStatus.getJobId());
     }
     public String getParentId(String jobId) {
         TreeNode treeNode = flatNodes.get(jobId);
@@ -415,13 +416,13 @@ public class JobSuiteSession {
         return treeNode.parentId;
     }
     
-    public void accept(IJobSessionVisitor visitor) {
-        accept(visitor, getRootSession().getJobId());
+    public void accept(IJobStatusVisitor visitor) {
+        accept(visitor, getRootStatus().getJobId());
     }
-    private void accept(IJobSessionVisitor visitor, String jobId) {
+    private void accept(IJobStatusVisitor visitor, String jobId) {
         if (visitor != null) {
-            visitor.visitJobSession(getSession(jobId));
-            for (JobSession child : getChildSessions(jobId)) {
+            visitor.visitJobStatus(getStatus(jobId));
+            for (JobStatus child : getChildStatuses(jobId)) {
                 accept(visitor, child.getJobId());
             }
         }
@@ -501,10 +502,10 @@ public class JobSuiteSession {
 
     @Override
     public boolean equals(final Object other) {
-        if (!(other instanceof JobSuiteSession)) {
+        if (!(other instanceof JobSuiteStatus)) {
             return false;
         }
-        JobSuiteSession castOther = (JobSuiteSession) other;
+        JobSuiteStatus castOther = (JobSuiteStatus) other;
         return new EqualsBuilder()
                 .append(dao, castOther.dao)
                 .append(flatNodes, castOther.flatNodes)
@@ -536,7 +537,7 @@ public class JobSuiteSession {
         for (String childId : getChildIds(jobId)) {
             toString(b, childId, depth + 1);
         }
-//        JobSession status = getSession(jobId);
+//        JobStatus status = getSession(jobId);
 //        String percent;
 //        if (status == null) {
 //            LOG.error("Could not obtain status for job Id: {}", jobId);
@@ -548,7 +549,7 @@ public class JobSuiteSession {
 //        b.append(StringUtils.leftPad(percent, TO_STRING_INDENT));
 //        b.append("  ").append(jobId);
 //        b.append(System.lineSeparator());
-//        for (JobSession child : getChildSessions(jobId)) {
+//        for (JobStatus child : getChildSessions(jobId)) {
 //            toString(b, child.getJobId(), depth + 1);
 //        }
     }
@@ -561,12 +562,12 @@ public class JobSuiteSession {
 //    private final Path workdir;
 //    private final String suiteId;
     
-//    public JobSuiteSession(Path workdir, String suiteId) {
+//    public JobSuiteStatus(Path workdir, String suiteId) {
 //        super();
 //        this.workdir = workdir;
 //        this.suiteId = suiteId;
 //    }
-//    public JobSuiteSession(JobSuite jobSuite) {
+//    public JobSuiteStatus(JobSuite jobSuite) {
 //        this(jobSuite.getWorkdir(), jobSuite.getId());
 //    }
 

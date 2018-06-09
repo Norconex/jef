@@ -16,12 +16,12 @@
           - now uses Java DateTime as opposed to Date.
           - Use Path everywhere instead of File. 
           - Now backing up directory instead of individual files.
-          - JobStatus now JobSession.
           - StopRequestMonitor now ShutdownHook.
           - Keep a history of duration (start/end pairs) for all 
             start/resume occurrences.
           - Dropped mail-related listeners.
           - Dropped LogManager.
+          - Now requires Java 8 minimum.
       </action>
     </release>
 

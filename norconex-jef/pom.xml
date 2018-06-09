@@ -52,7 +52,7 @@
   <dependencies>
   
     <!-- === Fix transitive dependencies versions: === -->
-
+<!-- 
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
@@ -63,6 +63,7 @@
       <artifactId>commons-collections</artifactId>
       <version>3.2.2</version>
     </dependency>      
+ -->
   
     <!-- === Other dependencies: === -->
   

@@ -12,56 +12,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.norconex.jef5.session;
+package com.norconex.jef5.status;
 
 import java.time.Duration;
 import java.util.function.Consumer;
 
 import com.norconex.commons.lang.map.Properties;
 
-public class JobSessionUpdater {
+public class JobStatusUpdater {
 
-    private final JobSession session;
-    private final Consumer<JobSession> changeListener; 
+    private final JobStatus status;
+    private final Consumer<JobStatus> changeListener; 
     
-    public JobSessionUpdater(
-            JobSession session, Consumer<JobSession> changeListener) {
-        this.session = session;
+    public JobStatusUpdater(
+            JobStatus status, Consumer<JobStatus> changeListener) {
+        this.status = status;
         this.changeListener = changeListener;
-        session.getProperties().addMapChangeListener(
-                event -> sessionUpdated(session));
+        status.getProperties().addMapChangeListener(
+                event -> statusUpdated(status));
     }
 
     public String getJobId() {
-        return session.getJobId();
+        return status.getJobId();
     }
     
     //TODO have set/getProperty(...) instead?
     public Properties getProperties() {
-        return session.getProperties();
+        return status.getProperties();
     }
     public double getProgress() {
-        return session.getProgress();
+        return status.getProgress();
     }
     public void setProgress(double progress) {
-        session.setProgress(progress);
-        sessionUpdated(session);
+        status.setProgress(progress);
+        statusUpdated(status);
     }
     public void incrementProgress(double increment) {
-        session.setProgress(session.getProgress() + increment);
-        sessionUpdated(session);
+        status.setProgress(status.getProgress() + increment);
+        statusUpdated(status);
     }
     public Duration getDuration() {
-        return session.getDuration();
+        return status.getDuration();
     }
     public void getNote() {
-        session.getNote();
+        status.getNote();
     }
     public void setNote(String note) {
-        session.setNote(note);
-        sessionUpdated(session);
+        status.setNote(note);
+        statusUpdated(status);
     }    
-    private void sessionUpdated(JobSession session) {
-        changeListener.accept(session);
+    private void statusUpdated(JobStatus status) {
+        changeListener.accept(status);
     }
 }

@@ -14,9 +14,8 @@
  */
 package com.norconex.jef5.event;
 
-import java.util.function.Consumer;
+import com.norconex.commons.lang.event.IEventListener;
 
-//TODO rename JEF to Jef?
-public interface IJefEventListener extends Consumer<JefEvent> {
+public interface IJefEventListener extends IEventListener<JefEvent> {
 
 }

@@ -20,8 +20,8 @@ import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.norconex.jef5.job.IJob;
-import com.norconex.jef5.session.JobSession;
-import com.norconex.jef5.session.JobSessionUpdater;
+import com.norconex.jef5.status.JobStatus;
+import com.norconex.jef5.status.JobStatusUpdater;
 import com.norconex.jef5.suite.JobSuite;
 
 /**
@@ -75,20 +75,20 @@ public abstract class AbstractJobGroup implements IJobGroup {
     }
     
     @Override
-    public void execute(JobSessionUpdater sessionUpdater, JobSuite suite) {
-        groupUpdater = new GroupStatusUpdater(sessionUpdater);
+    public void execute(JobStatusUpdater statusUpdater, JobSuite suite) {
+        groupUpdater = new GroupStatusUpdater(statusUpdater);
         executeGroup(suite);
     }
 
     public abstract void executeGroup(JobSuite suite);
 
     @Override
-    public void groupProgressed(JobSession childJobStatus) {
+    public void groupProgressed(JobStatus childJobStatus) {
         groupUpdater.childStatusChanged(childJobStatus);
     }
     
     @Override
-    public void stop(JobSession status, JobSuite suite) {
+    public void stop(JobStatus status, JobSuite suite) {
         groupUpdater = null;
     }
     
@@ -96,13 +96,13 @@ public abstract class AbstractJobGroup implements IJobGroup {
         return groupUpdater;
     }
     /*default*/ class GroupStatusUpdater {
-        private final JobSessionUpdater sessionUpdater;
+        private final JobStatusUpdater statusUpdater;
         private double[] completionRatios = new double[jobs.length];
-        public GroupStatusUpdater(JobSessionUpdater sessionUpdater) {
+        public GroupStatusUpdater(JobStatusUpdater statusUpdater) {
             super();
-            this.sessionUpdater = sessionUpdater;
+            this.statusUpdater = statusUpdater;
         }
-        public synchronized void childStatusChanged(JobSession status) {
+        public synchronized void childStatusChanged(JobStatus status) {
             int jobIndex = jobIds.indexOf(status.getJobId());
             if (jobIndex >= 0) {
                 completionRatios[jobIndex] = status.getProgress();
@@ -116,9 +116,9 @@ public abstract class AbstractJobGroup implements IJobGroup {
                 }
                 ratioTotal += completionRatios[i];
             }
-            sessionUpdater.setProgress(Math.min(1.0d,
+            statusUpdater.setProgress(Math.min(1.0d,
                     (ratioTotal / (double) jobs.length)));
-            sessionUpdater.setNote(completedCount + " of "
+            statusUpdater.setNote(completedCount + " of "
                     + jobs.length + " jobs completed.");
         }
         
