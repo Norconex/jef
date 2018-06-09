@@ -17,7 +17,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.norconex.jef</groupId>
   <artifactId>norconex-jef</artifactId>
-  <version>4.1.0</version>
+  <version>4.1.1-SNAPSHOT</version>
   <name>Norconex JEF</name>
 
   <properties>
