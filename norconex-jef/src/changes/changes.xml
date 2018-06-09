@@ -7,6 +7,13 @@
   </properties>
   <body>
 
+    <release version="4.1.1-SNAPSHOT" date="201?-??-??" description="Bugfix release">
+      <action dev="danizen" type="fix" issue="10">
+        Fixed NPE in AbstractJobGroup#groupProgressed when accesing while
+        execution has not yet started.
+      </action>
+    </release>
+
     <release version="4.1.0" date="2017-04-25" description="Minor release">
       <action dev="essiembre" type="add">
         Now distributed with utility scripts.
