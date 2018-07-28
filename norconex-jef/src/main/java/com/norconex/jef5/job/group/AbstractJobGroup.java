@@ -29,7 +29,6 @@ import com.norconex.jef5.suite.JobSuite;
  * of all job progress it contains.
  * @author Pascal Essiembre
  */
-@SuppressWarnings("nls")
 public abstract class AbstractJobGroup implements IJobGroup {
 
     /** Jobs that make up the group. */
@@ -38,10 +37,10 @@ public abstract class AbstractJobGroup implements IJobGroup {
     private final List<String> jobIds;
 
     /** Job group unique identifier. */
-    private String id;
-    
+    private final String id;
+
     private GroupStatusUpdater groupUpdater;
-    
+
     /**
      * Constructor.
      * @param id job unique identifier
@@ -59,7 +58,7 @@ public abstract class AbstractJobGroup implements IJobGroup {
         } else {
             this.jobs = jobs;
         }
-        this.jobIds = new ArrayList<String>(this.jobs.length);
+        this.jobIds = new ArrayList<>(this.jobs.length);
         for (int i = 0; i < this.jobs.length; i++) {
             jobIds.add(this.jobs[i].getId());
         }
@@ -73,7 +72,7 @@ public abstract class AbstractJobGroup implements IJobGroup {
     public final String getId() {
         return id;
     }
-    
+
     @Override
     public void execute(JobStatusUpdater statusUpdater, JobSuite suite) {
         groupUpdater = new GroupStatusUpdater(statusUpdater);
@@ -86,18 +85,18 @@ public abstract class AbstractJobGroup implements IJobGroup {
     public void groupProgressed(JobStatus childJobStatus) {
         groupUpdater.childStatusChanged(childJobStatus);
     }
-    
+
     @Override
     public void stop(JobStatus status, JobSuite suite) {
         groupUpdater = null;
     }
-    
+
     /*default*/ GroupStatusUpdater getGroupStatusUpdater() {
         return groupUpdater;
     }
     /*default*/ class GroupStatusUpdater {
         private final JobStatusUpdater statusUpdater;
-        private double[] completionRatios = new double[jobs.length];
+        private final double[] completionRatios = new double[jobs.length];
         public GroupStatusUpdater(JobStatusUpdater statusUpdater) {
             super();
             this.statusUpdater = statusUpdater;
@@ -117,11 +116,11 @@ public abstract class AbstractJobGroup implements IJobGroup {
                 ratioTotal += completionRatios[i];
             }
             statusUpdater.setProgress(Math.min(1.0d,
-                    (ratioTotal / (double) jobs.length)));
+                    (ratioTotal / jobs.length)));
             statusUpdater.setNote(completedCount + " of "
                     + jobs.length + " jobs completed.");
         }
-        
+
     }
-    
+
 }

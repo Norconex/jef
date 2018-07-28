@@ -10,10 +10,11 @@
     <release version="5.0.0" date="2018-??-??" description="Major release">
       <action dev="essiembre" type="add">
         Major refactor: 
+          - Now requires Java 8 minimum.
           - Logging now using SLF4j.
-          - simplifies event handling.
-          - update library dependencies. 
-          - now uses Java DateTime as opposed to Date.
+          - Simplified event handling.
+          - Update library dependencies. 
+          - Now uses Java DateTime as opposed to Date.
           - Use Path everywhere instead of File. 
           - Now backing up directory instead of individual files.
           - StopRequestMonitor now ShutdownHook.
@@ -21,7 +22,6 @@
             start/resume occurrences.
           - Dropped mail-related listeners.
           - Dropped LogManager.
-          - Now requires Java 8 minimum.
       </action>
     </release>
 

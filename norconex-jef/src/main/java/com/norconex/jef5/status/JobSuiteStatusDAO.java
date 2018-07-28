@@ -48,11 +48,11 @@ import com.norconex.commons.lang.map.Properties;
 /**
  * <p>
  * File-based status store. The created
- * file name matches the job id, plus the ".job" extension. If no 
- * status directory is explicitly set, it defaults to: 
+ * file name matches the job id, plus the ".job" extension. If no
+ * status directory is explicitly set, it defaults to:
  * <code>&lt;user.home&gt;/Norconex/jef/workdir</code>
  * </p>
- * 
+ *
  * <h3>XML configuration usage:</h3>
  * <pre>
  *  &lt;statusStore class="com.norconex.jef4.status.FileJobStatusStore"&gt;
@@ -61,7 +61,7 @@ import com.norconex.commons.lang.map.Properties;
  * </pre>
  * <h4>Usage example:</h4>
  * <p>
- * The following example indicates status files should be stored in this 
+ * The following example indicates status files should be stored in this
  * directory:
  * <code>/tmp/jefstatuses</code>
  * </p>
@@ -70,14 +70,14 @@ import com.norconex.commons.lang.map.Properties;
  *      &lt;statusDir&gt;/tmp/jefstatuses&lt;/statusDir&gt;
  *  &lt;/statusStore&gt;
  * </pre>
- * 
+ *
  * @author Pascal Essiembre
  */
-//TODO consider making an interface???  Events could be used if 
+//TODO consider making an interface???  Events could be used if
 // progress needs to be stored elsewhere as well.
 
 
-// workdir and backup dir... should be figured out by job suite and 
+// workdir and backup dir... should be figured out by job suite and
 // passed to read/write methods... if we want to make this DAO reusable
 // in JobSuiteStatus.
 
@@ -94,11 +94,11 @@ public class JobSuiteStatusDAO
             LoggerFactory.getLogger(JobSuiteStatusDAO.class);
 
     //TODO make all static?
-    
-    
+
+
 //    public static final String SESSION_SUBDIR = "session";
 //    public static final String SESSION_BACKUP_SUBDIR = "backups/session";
-    
+
     private final File statusDir;
 //    private final Path workdir;
     private final String suiteId;
@@ -109,7 +109,7 @@ public class JobSuiteStatusDAO
 //        this.workdir = workdir;
         Objects.requireNonNull(suiteId, "suiteId");
         Objects.requireNonNull(statusDir, "statusDir");
-        
+
         this.suiteId = suiteId;
         this.statusDir = statusDir.toFile();
     }
@@ -121,7 +121,7 @@ public class JobSuiteStatusDAO
     }
     public Path getStatusDir() {
         return statusDir.toPath();
-    }    
+    }
 //    public Path getSessionDir() {
 //        return getSessionDir(workdir, suiteId);
 //    }
@@ -142,30 +142,30 @@ public class JobSuiteStatusDAO
 
 //    public Path getSessionIndex() {
 //        return getSessionIndex(sessionDir);
-//    }    
+//    }
 //    /**
 //     * Gets the path to job suite index.
 //     * @param sessionDir suite working directory
 //     * @return file the index file
 //     */
 //    public static Path getSessionIndex(Path sessionDir) {
-//        return sessionDir.resolve("suite.index"); // make it "suite.jef"? 
+//        return sessionDir.resolve("suite.index"); // make it "suite.jef"?
 //    }
-    
-    
-    
+
+
+
 
     public final void write(final JobStatus js) throws IOException {
 
         //The JobStatusData should not be written/read here??? so rename arg to JobStatus?
-        
+
         Properties config = new Properties();
         config.setString("jobId", js.getJobId());
         config.setDouble("progress", js.getProgress());
         config.setString("note", js.getNote());
         config.setLocalDateTime("startTime", js.getStartTime());
         config.setLocalDateTime("endTime", js.getEndTime());
-        
+
         //TODO store different status for stopping and stopped?
         if (js.isStopping() || js.isStopped()) {
             config.setBoolean("stopRequested", true);
@@ -176,10 +176,10 @@ public class JobSuiteStatusDAO
         }
         Path file = resolveJobFile(js.getJobId());
         LOG.trace("Writing status file: {}", file);
-        
+
 
         StringWriter sw = new StringWriter();
-        config.store(sw);
+        config.storeToProperties(sw);
 
         Files.createDirectories(file.getParent());
         try (BufferedWriter w = Files.newBufferedWriter(file)) {
@@ -192,7 +192,7 @@ public class JobSuiteStatusDAO
         if (jobId == null) {
             return null;
         }
-        
+
         Set<JobStatusData> attempts = new TreeSet<>();
         Path file = null;
         int attemptNo = 1;
@@ -208,37 +208,37 @@ public class JobSuiteStatusDAO
 
     private final void read(final JobStatusData jsd, final Path file)
             throws IOException {
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Reading status file: " + file);
         }
-        
+
         if (file.getFileName().toString().startsWith("null")) {
             System.out.println("XXXX: " + jsd);
         }
-        
+
         if (!file.toFile().exists() || Files.size(file) == 0) {
             return;
         }
 
         Properties config = new Properties();
-        
+
         try (BufferedReader r = Files.newBufferedReader(file)) {
-            config.load(r);
+            config.loadFromProperties(r);
         }
-        
+
         LocalDateTime lastModified = LocalDateTime.from(
                 Files.getLastModifiedTime(file).toInstant().atZone(ZoneId.of("UTC")));
-        
+
         LOG.trace("{} last activity: {}", file.toAbsolutePath(), lastModified);
-        
+
         jsd.setLastActivity(lastModified);
         jsd.setProgress(config.getDouble("progress", 0d));
         jsd.setNote(config.getString("note", null));
         jsd.setStartTime(config.getLocalDateTime("startTime"));
         jsd.setEndTime(config.getLocalDateTime("endTime"));
         jsd.setStopRequested(config.getBoolean("stopRequested"));
-        
+
         Properties props = jsd.getProperties();
         for (String key : config.keySet()) {
             if (key.startsWith(".")) {
@@ -251,7 +251,7 @@ public class JobSuiteStatusDAO
         FileUtils.deleteDirectory(statusDir);
     }
 
-    //TODO have built-in methods to load backed-up sessions? 
+    //TODO have built-in methods to load backed-up sessions?
     public final void backup(Path backupDir) throws IOException {
         Objects.requireNonNull(backupDir, "backupDir");
         LOG.debug("Moving {} to {}", statusDir, backupDir);
@@ -265,17 +265,17 @@ public class JobSuiteStatusDAO
 
     public LocalDateTime touch(String jobId) throws IOException {
         Path file = resolveJobFile(jobId);
-        
+
         if (!file.toFile().exists()) {
             Files.createDirectories(file.getParent());
             Files.createFile(file);
         }
         Instant now = Instant.now();
-        Files.setLastModifiedTime(file, FileTime.from(now));        
+        Files.setLastModifiedTime(file, FileTime.from(now));
         return LocalDateTime.from(now.atZone(ZoneId.of("UTC")));
     }
-    
-    
+
+
     private Path resolveJobFile(final String jobId) {
         return resolveJobFile(jobId, 0);
     }
@@ -292,14 +292,14 @@ public class JobSuiteStatusDAO
 //        return storeDir.resolve(Paths.get(FileUtil.toSafeFileName(suiteId)));
 //    }
 //    private Path resolveBackupDir(
-//            final String suiteName, final LocalDateTime backupDate) 
+//            final String suiteName, final LocalDateTime backupDate)
 //                    throws IOException {
 //        Path dir = storeBackupDir;
 //        if (dir == null) {
 //            dir = storeDir.resolveSibling("backups");
 //        }
 //        return FileUtil.toDateFormattedDir(
-//                dir.resolve(FileUtil.toSafeFileName(suiteName)).toFile(), 
+//                dir.resolve(FileUtil.toSafeFileName(suiteName)).toFile(),
 //                DateUtil.toDate(backupDate), "yyyy/MM/dd/HH-mm-ss").toPath();
 //    }
 
@@ -307,7 +307,7 @@ public class JobSuiteStatusDAO
 //    public void loadFromXML(Reader in) throws IOException {
 //        XMLConfiguration xml = XMLConfigurationUtil.newXMLConfiguration(in);
 //        String dir = null;
-//        
+//
 //        dir = xml.getString("storeDir", null);
 //        if (dir != null) {
 //            setStoreDir(Paths.get(dir));
@@ -327,11 +327,11 @@ public class JobSuiteStatusDAO
 //            w.writeAttribute("class", getClass().getCanonicalName());
 //
 //            if (storeDir != null) {
-//                w.writeElementString("storeDir", 
+//                w.writeElementString("storeDir",
 //                        storeDir.toAbsolutePath().toString());
 //            }
 //            if (storeBackupDir != null) {
-//                w.writeElementString("storeBackupDir", 
+//                w.writeElementString("storeBackupDir",
 //                        storeBackupDir.toAbsolutePath().toString());
 //            }
 //            w.writeEndElement();
@@ -339,7 +339,7 @@ public class JobSuiteStatusDAO
 //            w.close();
 //        } catch (XMLStreamException e) {
 //            throw new IOException("Cannot save as XML.", e);
-//        }       
+//        }
 //    }
 
     @Override
@@ -389,11 +389,11 @@ public class JobSuiteStatusDAO
 //            throw new JefException("Cannot create session store directory: "
 //                    + dir.toAbsolutePath(), e);
 //        }
-//        
+//
 //        if (storeBackupDir != null) {
 //            try {
 //                Files.createDirectories(storeBackupDir);
-//                LOG.info("Job session store backup directory: {}", 
+//                LOG.info("Job session store backup directory: {}",
 //                        storeBackupDir.toAbsolutePath());
 //            } catch (IOException e) {
 //                throw new JefException(

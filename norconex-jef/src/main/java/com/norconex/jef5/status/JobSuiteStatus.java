@@ -14,7 +14,7 @@
  */
 package com.norconex.jef5.status;
 
-import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
@@ -30,16 +30,13 @@ import java.util.Objects;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.collections4.map.ListOrderedMap;
-import org.apache.commons.configuration2.HierarchicalConfiguration;
-import org.apache.commons.configuration2.XMLConfiguration;
-import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.norconex.commons.lang.config.XMLConfigurationUtil;
 import com.norconex.commons.lang.xml.EnhancedXMLStreamWriter;
+import com.norconex.commons.lang.xml.XML;
 import com.norconex.jef5.JefException;
 import com.norconex.jef5.job.IJob;
 import com.norconex.jef5.job.group.IJobGroup;
@@ -58,14 +55,14 @@ import com.norconex.jef5.suite.JobSuite;
 
       // related to all above... get rid of session store
 
-//TODO have static get() method instead of public constructor so we can 
+//TODO have static get() method instead of public constructor so we can
 // reuse instances if they are requested for same index path.
-//TODO derive workdir and suite name from path when we add path here  
+//TODO derive workdir and suite name from path when we add path here
 
 //TODO what about making it readonly?  what about write methods?  We leave those in a separate class?  Use dao for that.
 
 public class JobSuiteStatus implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
 
     private final JobSuiteStatusDAO dao;
@@ -75,21 +72,21 @@ public class JobSuiteStatus implements Serializable {
 //        this.dao = dao;
 //    }
 
-    // These two could be merged with an ordered multivalue Map instead?  
+    // These two could be merged with an ordered multivalue Map instead?
     // Root would be first key.
     private final TreeNode rootNode;
     private final Map<String, TreeNode> flatNodes = new ListOrderedMap<>();
 
     private JobSuiteStatus(
             /*String suiteName, */
-            TreeNode rootNode, 
-//            Map<String, TreeNode> flattenNodes, 
+            TreeNode rootNode,
+//            Map<String, TreeNode> flattenNodes,
             JobSuiteStatusDAO dao) {
 //        this.suiteName = suiteName;
         this.rootNode = rootNode;
         this.dao = dao;
 //        this.flatNodes.putAll(flattenNodes);
-  
+
         flattenNodes(rootNode, flatNodes);
     }
 
@@ -98,35 +95,35 @@ public class JobSuiteStatus implements Serializable {
             return null;
         }
         return new JobSuiteStatus(
-                loadJobTree(null, jobSuite.getRootJob()), 
-                jobSuite.getJobSuiteStatusDAO());        
+                loadJobTree(null, jobSuite.getRootJob()),
+                jobSuite.getJobSuiteStatusDAO());
     }
 
 //  //TODO move these writeXX methods to JobSessionFacade??
-//  private void writeJobSuiteIndex() 
+//  private void writeJobSuiteIndex()
 //          throws IOException {
-//      
+//
 //      Path indexFile = getSuiteIndexFile();
-//      
+//
 //      StringWriter out = new StringWriter();
 //      out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
 //      out.write("<suite-index>");
-//          
+//
 //      //--- JobStatusSerializer ---
 //      out.flush();
 //      if (jobSessionStore instanceof IXMLConfigurable) {
 //          ((IXMLConfigurable) jobSessionStore).saveToXML(out);
 //      }
-//      
+//
 //      //--- Jobs ---
 //      writeJobSuiteIndexJob(out, rootJob);
-//      
+//
 //      out.write("</suite-index>");
 //      out.flush();
-//      
-//      // Using RandomAccessFile since evidence has shown it is better at 
+//
+//      // Using RandomAccessFile since evidence has shown it is better at
 //      // dealing with files/locks in a way that cause less/no errors.
-//      try (RandomAccessFile ras = 
+//      try (RandomAccessFile ras =
 //              new RandomAccessFile(indexFile.toFile(), "rwd");
 //              FileChannel channel = ras.getChannel();
 //              FileLock lock = channel.lock()) {
@@ -145,20 +142,23 @@ public class JobSuiteStatus implements Serializable {
 //      }
 //      out.write("</job>");
 //  }
-        
-    public static JobSuiteStatus getInstance(Path suiteIndex) throws IOException {
-        
+
+    public static JobSuiteStatus getInstance(Path suiteIndex)
+            throws IOException {
+
+        File file = suiteIndex.toFile();
+
         //TODO check if instance is defined for path already (weak hashmap).
-        
+
         //--- Ensure file looks good ---
         Objects.requireNonNull(suiteIndex, "Suite index file cannot be null.");
-        if (!suiteIndex.toFile().exists()) {
+        if (!file.exists()) {
             return null;
 //            throw new IllegalArgumentException(
 //                    "Suite index file does not exists: "
 //                            + suiteIndex.toAbsolutePath());
         }
-        if (!suiteIndex.toFile().isFile()) {
+        if (!file.isFile()) {
             throw new IllegalArgumentException("Suite index is not a file: "
                     + suiteIndex.toAbsolutePath());
         }
@@ -174,7 +174,7 @@ public class JobSuiteStatus implements Serializable {
 //    private static JobSuiteStatus getInstance(/*String suiteName, */Reader reader)
 //            throws IOException {
 
-// first job is suiteId (root).        
+// first job is suiteId (root).
 //        <?xml version="1.0" encoding="UTF-8" ?>
 //        <job id="async sleepy jobs">
 //            <job id="Sleepy Job 10-3"/>
@@ -182,47 +182,45 @@ public class JobSuiteStatus implements Serializable {
 //            <job id="Sleepy Job 3-1"/>
 //        </job>
 
-        
-        try (Reader r = new FileReader(suiteIndex.toFile())) {
-            XMLConfiguration xml = XMLConfigurationUtil.newXMLConfiguration(r);
-            if (xml == null) {
-                return null;
-            }
+        if (file.exists()) {
+            XML xml = new XML(file);
             JobSuiteStatusDAO dao = null;
-            
-            TreeNode tree = loadJobTree(null, xml.configurationAt("job"));
+
+            TreeNode tree = loadJobTree(null, xml.getXML("job"));
             if (tree == null) {
                 return null;
             }
             dao = new JobSuiteStatusDAO(tree.jobId, suiteIndex.getParent());
             return new JobSuiteStatus(tree, dao);
+        } else {
+            return null;
         }
     }
-    
+
     public static JobSuiteStatus getInstance(
             Path statusDir, Reader reader) throws IOException {
         try (Reader r = reader) {
-            XMLConfiguration xml = XMLConfigurationUtil.newXMLConfiguration(r);
-            if (xml == null) {
+            XML xml = new XML(r);
+            if (xml.getNode() == null) {
                 return null;
             }
-            JobSuiteStatusDAO dao = null;
-            
-            TreeNode tree = loadJobTree(null, xml.configurationAt("job"));
+
+            TreeNode tree = loadJobTree(null, xml.getXML("job"));
             if (tree == null) {
                 return null;
             }
-            dao = new JobSuiteStatusDAO(tree.jobId, statusDir);
+            JobSuiteStatusDAO dao =
+                    new JobSuiteStatusDAO(tree.jobId, statusDir);
             return new JobSuiteStatus(tree, dao);
         }
     }
 
-    
+
 //    public String toXML() {
 //        return null;
 //    }
 //    public void toXML(Path suiteIndex) {
-//        
+//
 //    }
     public String toXML() throws IOException {
         StringWriter w = new StringWriter();
@@ -247,7 +245,7 @@ public class JobSuiteStatus implements Serializable {
         } catch (XMLStreamException e) {
             throw new IOException("Could not write suite status as XML.", e);
         }
-    }    
+    }
     private void writeSuiteIndexJob(EnhancedXMLStreamWriter w, String jobId)
             throws XMLStreamException  {
         w.writeStartElement("job");
@@ -256,42 +254,38 @@ public class JobSuiteStatus implements Serializable {
             writeSuiteIndexJob(w, childId);
         }
         w.writeEndElement();
-    }    
+    }
 
-    
+
 //    public String toJSON() {
-//        
+//
 //    }
 //    public void toJSON(Writer writer) {
-//        
+//
 //    }
 
 //    public void write(JobSuiteSessionWriter w) {
         //TODO have xml, json, etc.
-        
-//    }
-    
 
-    private static TreeNode loadJobTree(
-            String parentId, HierarchicalConfiguration<ImmutableNode> nodeXML)
-                    throws IOException {
+//    }
+
+
+    private static TreeNode loadJobTree(String parentId, XML nodeXML)
+            throws IOException {
         if (nodeXML == null) {
             return null;
         }
-        String jobId = nodeXML.getString("[@id]");
-        
+        String jobId = nodeXML.getString("@id");
+
         TreeNode node = new TreeNode();
         node.parentId = parentId;
         node.jobId = jobId;
 
-        List<HierarchicalConfiguration<ImmutableNode>> xmls = 
-                nodeXML.configurationsAt("job");
-        if (xmls != null) {
-            for (HierarchicalConfiguration<ImmutableNode> xml : xmls) {
-                TreeNode child = loadJobTree(jobId, xml);
-                if (child != null) {
-                    node.children.add(child);
-                }
+        List<XML> xmls = nodeXML.getXMLList("job");
+        for (XML xml : xmls) {
+            TreeNode child = loadJobTree(jobId, xml);
+            if (child != null) {
+                node.children.add(child);
             }
         }
         return node;
@@ -302,7 +296,7 @@ public class JobSuiteStatus implements Serializable {
             return null;
         }
         String jobId = job.getId();
-        
+
         TreeNode node = new TreeNode();
         node.parentId = parentId;
         node.jobId = jobId;
@@ -317,7 +311,7 @@ public class JobSuiteStatus implements Serializable {
         }
         return node;
     }
-    
+
     private static void flattenNodes(
             TreeNode node, Map<String, TreeNode> flatNodes) {
         flatNodes.put(node.jobId, node);
@@ -325,15 +319,15 @@ public class JobSuiteStatus implements Serializable {
             flattenNodes(childNode, flatNodes);
         }
     }
-            
-    
+
+
     public JobStatus getRootStatus() {
         return read(rootNode.jobId);
     }
     public String getRootId() {
         return rootNode.jobId;
     }
-    
+
     public JobStatus getStatus(IJob job) {
         return read(job.getId());
     }
@@ -348,7 +342,7 @@ public class JobSuiteStatus implements Serializable {
                     + jobId, e);
         }
     }
-    
+
     public List<JobStatus> getAllStatuses() {
         List<JobStatus> list = new ArrayList<>(flatNodes.size());
         for (TreeNode treeNode : flatNodes.values()) {
@@ -363,7 +357,7 @@ public class JobSuiteStatus implements Serializable {
         }
         return list;
     }
-    
+
     public List<JobStatus> getChildStatuses(JobStatus jobStatus) {
         return getChildStatuses(jobStatus.getJobId());
     }
@@ -415,7 +409,7 @@ public class JobSuiteStatus implements Serializable {
         }
         return treeNode.parentId;
     }
-    
+
     public void accept(IJobStatusVisitor visitor) {
         accept(visitor, getRootStatus().getJobId());
     }
@@ -428,9 +422,9 @@ public class JobSuiteStatus implements Serializable {
         }
     }
 
-    private static class TreeNode {//implements Serializable {
-        //private static final long serialVersionUID = 1L;
-        
+    private static class TreeNode implements Serializable {
+        private static final long serialVersionUID = 1L;
+
         private String jobId;
         private String parentId;
         private final List<TreeNode> children = new ArrayList<>();
@@ -461,12 +455,12 @@ public class JobSuiteStatus implements Serializable {
                     .append("parentId", parentId)
                     .append("childIds", children)
                     .toString();
-        }        
+        }
     }
-    
+
 //    private static class TreeNode {//implements Serializable {
 //        //private static final long serialVersionUID = 1L;
-//        
+//
 //        private String jobId;
 //        private String parentId;
 //        private final List<String> childIds = new ArrayList<>();
@@ -497,7 +491,7 @@ public class JobSuiteStatus implements Serializable {
 //                    .append("parentId", parentId)
 //                    .append("childIds", childIds)
 //                    .toString();
-//        }        
+//        }
 //    }
 
     @Override
@@ -553,15 +547,15 @@ public class JobSuiteStatus implements Serializable {
 //            toString(b, child.getJobId(), depth + 1);
 //        }
     }
-    
-    
-    
+
+
+
 //    public static final String SESSION_SUBDIR = "session";
 //    public static final String SESSION_BACKUP_SUBDIR = "backups/session";
-//    
+//
 //    private final Path workdir;
 //    private final String suiteId;
-    
+
 //    public JobSuiteStatus(Path workdir, String suiteId) {
 //        super();
 //        this.workdir = workdir;
@@ -577,7 +571,7 @@ public class JobSuiteStatus implements Serializable {
 //    public String getSuiteId() {
 //        return suiteId;
 //    }
-    
+
 //    public Path getSessionDir() {
 //        return getSessionDir(workdir, suiteId);
 //    }
@@ -598,7 +592,7 @@ public class JobSuiteStatus implements Serializable {
 //
 //    public Path getSessionIndex() {
 //        return getSessionIndex(workdir, suiteId);
-//    }    
+//    }
 //    /**
 //     * Gets the path to job suite index.
 //     * @param suiteWorkdir suite working directory
