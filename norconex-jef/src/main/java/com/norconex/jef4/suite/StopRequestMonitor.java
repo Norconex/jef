@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2018 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,24 +32,23 @@ import com.norconex.jef4.status.MutableJobStatus;
 
 /**
  * Listens for STOP requests using a stop file.  The stop file
- * file name matches the suite namespace, plus the ".stop" extension.  
+ * file name matches the suite namespace, plus the ".stop" extension.
  * The directory where to locate the file depends on the constructor invoked.
  *
  * @author Pascal Essiembre
  * @since 2.0
  */
-@SuppressWarnings("nls")
 public class StopRequestMonitor extends Thread {
 
     /** Logger. */
     private static final Logger LOG =
             LogManager.getLogger(StopRequestMonitor.class);
     private static final int STOP_WAIT_DELAY = 3;
-    
+
     private final File stopFile;
     private final JobSuite suite;
     private boolean monitoring = false;
-    
+
 
     public StopRequestMonitor(JobSuite suite) {
         this.stopFile = suite.getSuiteStopFile();
@@ -68,7 +67,7 @@ public class StopRequestMonitor extends Thread {
             Sleeper.sleepSeconds(1);
         }
     }
-    
+
     public synchronized void stopMonitoring() {
         monitoring = false;
         if (stopFile.exists()) {
@@ -81,21 +80,21 @@ public class StopRequestMonitor extends Thread {
         }
     }
 
- 
+
     private void stopSuite() {
         monitoring = false;
         LOG.info("STOP request received.");
-        
+
         /// Notify Suite Life Cycle listeners
         for (ISuiteLifeCycleListener l : suite.getSuiteLifeCycleListeners()) {
             l.suiteStopping(suite);
         }
-        
+
         /// Notify Job Life Cycle listeners and stop them
         suite.accept(new IJobVisitor() {
             @Override
             public void visitJob(final IJob job, final IJobStatus jobStatus) {
-                for (IJobLifeCycleListener l : 
+                for (IJobLifeCycleListener l :
                         suite.getJobLifeCycleListeners()) {
                     l.jobStopping(jobStatus);
                 }
@@ -104,7 +103,7 @@ public class StopRequestMonitor extends Thread {
                     public void run() {
                         stopJob(job, jobStatus);
                     }
-                }.start();                
+                }.start();
             }
         });
     }
@@ -115,12 +114,12 @@ public class StopRequestMonitor extends Thread {
             Sleeper.sleepSeconds(STOP_WAIT_DELAY);
         }
         if (status.getState() == JobState.STOPPED) {
-            for (IJobLifeCycleListener l : 
+            for (IJobLifeCycleListener l :
                     suite.getJobLifeCycleListeners()) {
                 l.jobStopped(status);
             }
             if (job.getId().equals(suite.getRootJob().getId())) {
-                for (ISuiteLifeCycleListener l : 
+                for (ISuiteLifeCycleListener l :
                         suite.getSuiteLifeCycleListeners()) {
                     l.suiteStopped(suite);
                 }

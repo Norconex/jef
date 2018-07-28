@@ -17,14 +17,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.norconex.jef</groupId>
   <artifactId>norconex-jef</artifactId>
-  <version>4.1.1-SNAPSHOT</version>
+  <version>4.1.1</version>
   <name>Norconex JEF</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>    
     <site.baseurl/>
-    <norconex-commons-lang.version>1.13.0</norconex-commons-lang.version>
+    <norconex-commons-lang.version>1.15.0</norconex-commons-lang.version>
   </properties>
   <inceptionYear>2007</inceptionYear>
 
