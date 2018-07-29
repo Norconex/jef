@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE xml>
+<suite-index>
+  <store class="com.norconex.jef5.status.store.impl.FileJobStatusStore">
+    <storeDir>${tempDir}</storeDir>
+    <!--  storeBackupDir -->
+  </store>
+  <job id="Root Job">
+    <job id="Job A"/>
+    <job id="Job B">
+      <job id="Job B.1"/>
+      <job id="Job B.2"/>
+    </job>
+    <job id="Job C"/>
+  </job>
+</suite-index>

@@ -1,0 +1,64 @@
+
+= A unit tests for resumed jobs (with cummulated durations).
+
+- For JEF Job Groups, provide fluid-style way of adding child jobs. 
+
+- Rename JEFMon* to JefMon* everywhere.
+
+- Allow to stop idividual jobs???  could be nice.
+
+- JEFMon: assume job location to be xxx/yyy.log by default, but allow
+  to specify dir/path to it if different.  Else, logs are not accessible
+  in JEFMon.
+    - OR, leave it to JEFMon to specify where logs are located.
+       - Via log reader implementation in JEFMon... default one being FileSystemLogReader
+       
+    - YES, good idea: Maybe have it as an optional "hint/metadata" in the JEF 
+      index file which LogREader to use and its config.  When defined that way, 
+      no need to define in JEFMon (other than to overwrite). 
+      This would be text only... no need to have LogReader classes
+      in JEF (leave to JEFMon).
+  
+
+- Reduce heartbeatgenerator default delay?
+
+- When starting a job... wait a few seconds in case the other one
+  was just completed but not enough time has passed to think it is done.
+  (file touch)
+
+- Pass to method a ProgressUpdater and that updater will contain listeners.
+    - One framework listener to update progress files.
+      - Other custom listeners
+  
+  
+- Improve state resolution (make states more intuitive).
+   - can it have multiple states?  
+  
+- Make mail-related classes a separate JEF project?  Like JEF Mail.
+  And use http://www.simplejavamail.org
+     (or http://commons.apache.org/proper/commons-email)
+  This would eliminate dependency not used most of the time?
+  Or leave it to consuming libraries (e.g. HTTP Collector) to add
+  mail support if they want to.
+  
+
+ILogManager will have a method called:
+  registerJEFLogger(SLF4jLogger rootLogger).
+    - with default implementating checking if logback before adding filesystem
+      appender.  Maybe support log4j also.
+      For other, throw warning that people are on their own.
+      - Offer a way to disable too, throwing warning.
+ 
+
+
+
+To consider maybe one day:
+- Have dynamic jobs
+- Have a thread utility method that split a job array in X number of threads
+- Support for I18N in descriptions and else.
+- In the backing up of Log + Progress, consider optional argument to delete
+  logs/jobs older than java.util.Date.
+- Have a way to configure logger created by JEF via logback.xml
+  - Challenge: making sure the minimum required are met (like pattern?).
+- Have rollback strategy instead of backups?
+- Remove mail dependency?

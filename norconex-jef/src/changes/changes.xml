@@ -7,6 +7,24 @@
   </properties>
   <body>
 
+    <release version="5.0.0" date="2018-??-??" description="Major release">
+      <action dev="essiembre" type="add">
+        Major refactor: 
+          - Now requires Java 8 minimum.
+          - Logging now using SLF4j.
+          - Simplified event handling.
+          - Update library dependencies. 
+          - Now uses Java DateTime as opposed to Date.
+          - Use Path everywhere instead of File. 
+          - Now backing up directory instead of individual files.
+          - StopRequestMonitor now ShutdownHook.
+          - Keep a history of duration (start/end pairs) for all 
+            start/resume occurrences.
+          - Dropped mail-related listeners.
+          - Dropped LogManager.
+      </action>
+    </release>
+
     <release version="4.1.1" date="2018-06-28" description="Bugfix release">
       <action dev="danizen" type="fix" issue="10">
         Fixed NPE in AbstractJobGroup#groupProgressed when accesing while
