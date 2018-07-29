@@ -83,7 +83,9 @@ public abstract class AbstractJobGroup implements IJobGroup {
 
     @Override
     public void groupProgressed(JobStatus childJobStatus) {
-        groupUpdater.childStatusChanged(childJobStatus);
+        if (groupUpdater != null) {
+            groupUpdater.childStatusChanged(childJobStatus);
+        }
     }
 
     @Override
