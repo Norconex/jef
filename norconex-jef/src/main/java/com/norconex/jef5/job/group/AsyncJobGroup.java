@@ -15,8 +15,10 @@
 package com.norconex.jef5.job.group;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,11 +44,11 @@ import com.norconex.jef5.suite.JobSuite;
 public class AsyncJobGroup extends AbstractJobGroup {
 
     /** Logger. */
-    private static final Logger LOG = 
+    private static final Logger LOG =
             LoggerFactory.getLogger(AsyncJobGroup.class);
 
     private final int maxThread;
-    
+
     /**
      * Constructor.
      * @param id unique identifier for this job group
@@ -55,7 +57,16 @@ public class AsyncJobGroup extends AbstractJobGroup {
     public AsyncJobGroup(final String id, final IJob... jobs) {
         this(id, jobs.length, jobs);
     }
-    
+    /**
+     * Constructor.
+     * @param id unique identifier for this job group
+     * @param jobs jobs making up this group
+     * @since 2.0.0
+     */
+    public AsyncJobGroup(String id, List<? extends IJob> jobs) {
+        this(id, jobs.size(), jobs);
+    }
+
     /**
      * Constructor.
      * @param id unique identifier for this job group
@@ -65,6 +76,18 @@ public class AsyncJobGroup extends AbstractJobGroup {
      */
     public AsyncJobGroup(
             final String id, int maxThreads, final IJob... jobs) {
+        this(id, maxThreads, Arrays.asList(jobs));
+    }
+    /**
+     * Constructor.
+     * @param id unique identifier for this job group
+     * @param maxThreads maximum number of threads (jobs) executing at the
+     *        same time
+     * @param jobs jobs making up this group
+     * @since 2.0.0
+     */
+    public AsyncJobGroup(
+            final String id, int maxThreads, final List<? extends IJob> jobs) {
         super(id, jobs);
         this.maxThread = maxThreads;
     }
@@ -72,18 +95,13 @@ public class AsyncJobGroup extends AbstractJobGroup {
     @Override
     public void executeGroup(final JobSuite suite) {
         final Collection<IJob> failedJobs =
-                Collections.synchronizedCollection(new ArrayList<IJob>());
-        IJob[] jobs = getJobs();
-        int realMaxThread = Math.min(maxThread, jobs.length);
-        final CountDownLatch latch = new CountDownLatch(jobs.length);
+                Collections.synchronizedCollection(new ArrayList<>());
+        List<IJob> jobs = getJobs();
+        int realMaxThread = Math.min(maxThread, jobs.size());
+        final CountDownLatch latch = new CountDownLatch(jobs.size());
         ExecutorService pool = Executors.newFixedThreadPool(realMaxThread);
         for (final IJob job : jobs) {
-            pool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    runJob(job, suite, failedJobs, latch);
-                }
-            });
+            pool.execute(() -> runJob(job, suite, failedJobs, latch));
         }
 
         try {
@@ -93,17 +111,17 @@ public class AsyncJobGroup extends AbstractJobGroup {
              throw new JefException(e);
         }
         if (LOG.isDebugEnabled()) {
-            LOG.debug("All threads finished for async group\"" 
+            LOG.debug("All threads finished for async group\""
                     + getId() + "\".");
         }
 
         if (!failedJobs.isEmpty()) {
             throw new JefException(
-                    failedJobs.size() + " out of " + jobs.length
+                    failedJobs.size() + " out of " + jobs.size()
                   + " jobs failed in async group \"" + getId() + "\"");
         }
     }
-    
+
     private void runJob(IJob job, JobSuite suite, Collection<IJob> failedJobs,
             CountDownLatch latch) {
         Thread.currentThread().setName(job.getId());
@@ -130,6 +148,6 @@ public class AsyncJobGroup extends AbstractJobGroup {
         } finally {
             latch.countDown();
         }
-        
+
     }
 }

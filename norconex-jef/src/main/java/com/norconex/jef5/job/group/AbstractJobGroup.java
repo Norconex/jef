@@ -15,9 +15,10 @@
 package com.norconex.jef5.job.group;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-
-import org.apache.commons.lang3.ArrayUtils;
+import java.util.stream.Collectors;
 
 import com.norconex.jef5.job.IJob;
 import com.norconex.jef5.status.JobStatus;
@@ -32,14 +33,15 @@ import com.norconex.jef5.suite.JobSuite;
 public abstract class AbstractJobGroup implements IJobGroup {
 
     /** Jobs that make up the group. */
-    private final IJob[] jobs;
+    private final List<IJob> jobs = new ArrayList<>();
     /** For faster references caches the job ids. */
-    private final List<String> jobIds;
+    private final List<String> jobIds = new ArrayList<>();
 
     /** Job group unique identifier. */
     private final String id;
 
     private GroupStatusUpdater groupUpdater;
+
 
     /**
      * Constructor.
@@ -48,25 +50,35 @@ public abstract class AbstractJobGroup implements IJobGroup {
      */
     public AbstractJobGroup(
             final String id, final IJob... jobs) {
-        super();
+        this(id, Arrays.asList(jobs));
+    }
+
+    /**
+     * Constructor.
+     * @param id job unique identifier
+     * @param jobs jobs to be run by the group
+     */
+    public AbstractJobGroup(
+            final String id, final List<? extends IJob> jobs) {
         if (id == null) {
             throw new IllegalArgumentException("Job id cannot be null");
         }
         this.id = id;
-        if (jobs == null) {
-            this.jobs = new IJob[] {};
-        } else {
-            this.jobs = jobs;
+        if (jobs != null) {
+            this.jobs.addAll(jobs);
+            this.jobIds.addAll(jobs.stream().map(
+                    x -> x.getId()).collect(Collectors.toList()));
         }
-        this.jobIds = new ArrayList<>(this.jobs.length);
-        for (int i = 0; i < this.jobs.length; i++) {
-            jobIds.add(this.jobs[i].getId());
-        }
+//        this.jobIds = new ArrayList<>(this.jobs.length);
+//        for (int i = 0; i < this.jobs.length; i++) {
+//            jobIds.add(this.jobs[i].getId());
+//        }
     }
 
+
     @Override
-    public final IJob[] getJobs() {
-        return ArrayUtils.clone(jobs);
+    public final List<IJob> getJobs() {
+        return Collections.unmodifiableList(jobs);
     }
     @Override
     public final String getId() {
@@ -98,7 +110,7 @@ public abstract class AbstractJobGroup implements IJobGroup {
     }
     /*default*/ class GroupStatusUpdater {
         private final JobStatusUpdater statusUpdater;
-        private final double[] completionRatios = new double[jobs.length];
+        private final double[] completionRatios = new double[jobs.size()];
         public GroupStatusUpdater(JobStatusUpdater statusUpdater) {
             super();
             this.statusUpdater = statusUpdater;
@@ -118,9 +130,9 @@ public abstract class AbstractJobGroup implements IJobGroup {
                 ratioTotal += completionRatios[i];
             }
             statusUpdater.setProgress(Math.min(1.0d,
-                    (ratioTotal / jobs.length)));
+                    (ratioTotal / jobs.size())));
             statusUpdater.setNote(completedCount + " of "
-                    + jobs.length + " jobs completed.");
+                    + jobs.size() + " jobs completed.");
         }
 
     }

@@ -22,6 +22,7 @@
             start/resume occurrences.
           - Dropped mail-related listeners.
           - Dropped LogManager.
+          - Now using List in favor of arrays.
       </action>
     </release>
 

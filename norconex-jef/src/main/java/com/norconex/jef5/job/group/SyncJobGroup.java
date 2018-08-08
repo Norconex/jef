@@ -14,6 +14,9 @@
  */
 package com.norconex.jef5.job.group;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,25 +43,33 @@ public class SyncJobGroup extends AbstractJobGroup {
     private static final Logger LOG =
             LoggerFactory.getLogger(SyncJobGroup.class);
 
-    public SyncJobGroup(
-            final String name, final IJob... jobs) {
-        super(name, jobs);
+    public SyncJobGroup(final String id, final IJob... jobs) {
+        this(id, Arrays.asList(jobs));
+    }
+    /**
+     * Constructor.
+     * @param id unique identifier for this job group
+     * @param jobs jobs making up this group
+     * @since 2.0.0
+     */
+    public SyncJobGroup(final String id, final List<IJob> jobs) {
+        super(id, jobs);
     }
 
     @Override
     public void executeGroup(JobSuite suite) {
 
-        IJob[] jobs = getJobs();
+        List<IJob> jobs = getJobs();
         String failedJob = null;
-        for (int i = 0; i < jobs.length; i++) {
+        for (IJob job : jobs) {
             LOG.debug("Synchronous group \"{}\" about to run synchronous "
-                    + "job \"{}\".", getId(), jobs[i].getId());
-            if (!suite.runJob(jobs[i])) {
-                LOG.error("\"" + jobs[i].getId() + "\" failed.");
-                failedJob = jobs[i].getId();
+                    + "job \"{}\".", getId(), job.getId());
+            if (!suite.runJob(job)) {
+                LOG.error("\"{}\" failed.", job.getId());
+                failedJob = job.getId();
                 break;
             }
-            LOG.debug("\"{}\" succeeded.", jobs[i].getId());
+            LOG.debug("\"{}\" succeeded.", job.getId());
         }
         if (failedJob != null) {
             throw new JefException(

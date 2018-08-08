@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.norconex.commons.lang.collection.CollectionUtil;
 import com.norconex.commons.lang.config.IXMLConfigurable;
 import com.norconex.jef5.event.IJefEventListener;
 
@@ -33,7 +34,7 @@ public class JobSuiteConfig implements IXMLConfigurable {
     private Path workdir;
     private boolean backupDisabled;
     private final List<IJefEventListener> eventListeners = new ArrayList<>();
-    
+
     public JobSuiteConfig() {
         super();
     }
@@ -56,8 +57,7 @@ public class JobSuiteConfig implements IXMLConfigurable {
         return eventListeners;
     }
     public void setEventListeners(IJefEventListener... eventListeners) {
-        this.eventListeners.clear();
-        this.eventListeners.addAll(Arrays.asList(eventListeners));
+        CollectionUtil.setAll(this.eventListeners, eventListeners);
     }
     public void addEventListeners(IJefEventListener... eventListeners) {
         this.eventListeners.addAll(Arrays.asList(eventListeners));
@@ -68,15 +68,15 @@ public class JobSuiteConfig implements IXMLConfigurable {
     public void removeEventListeners(IJefEventListener... eventListeners) {
         this.eventListeners.removeAll(Arrays.asList(eventListeners));
     }
-    
+
     @Override
     public void loadFromXML(Reader in) throws IOException {
         // TODO Auto-generated method stub
-        
+
     }
     @Override
     public void saveToXML(Writer out) throws IOException {
         // TODO Auto-generated method stub
-        
+
     }
 }

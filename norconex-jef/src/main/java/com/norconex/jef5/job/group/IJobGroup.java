@@ -14,6 +14,8 @@
  */
 package com.norconex.jef5.job.group;
 
+import java.util.List;
+
 import com.norconex.jef5.job.IJob;
 import com.norconex.jef5.status.JobStatus;
 
@@ -30,8 +32,8 @@ public interface IJobGroup extends IJob {
      * Gets all jobs part of this group.
      * @return jobs in the group
      */
-    IJob[] getJobs();
-    
-    
+    List<IJob> getJobs();
+
+
     void groupProgressed(JobStatus childJobStatus);
 }
