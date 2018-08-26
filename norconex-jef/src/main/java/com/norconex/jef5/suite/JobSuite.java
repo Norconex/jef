@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.commons.lang.time.DateUtil;
 import com.norconex.jef5.JefException;
-import com.norconex.jef5.event.IJefEventListener;
+import com.norconex.jef5.event.DELETE_IJefEventListener;
 import com.norconex.jef5.event.JefEvent;
 import com.norconex.jef5.job.IJob;
 import com.norconex.jef5.job.IJobVisitor;
@@ -62,33 +62,33 @@ import com.norconex.jef5.status.JobSuiteStatusDAO;
 public final class JobSuite {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobSuite.class);
-    
-    
+
+
     public static final String STATUS_SUBDIR = "status";
     public static final String STATUS_BACKUP_SUBDIR = "backups/status";
     public static final String INDEX_FILENAME = "suite.index";
-    
+
     /** Associates job id with current thread. */
-    private static final ThreadLocal<String> CURRENT_JOB_ID = 
+    private static final ThreadLocal<String> CURRENT_JOB_ID =
             new InheritableThreadLocal<>();
-    
+
     private final Map<String, IJob> jobs = new HashMap<>();
     private final IJob rootJob;
 //    private final JobSuiteConfig config;
-    private Path workdir;
-    private boolean backupDisabled;
+    private final Path workdir;
+    private final boolean backupDisabled;
     //TODO rename JobEvent* to just Event*
-    private final List<IJefEventListener> eventListeners = new ArrayList<>();
-    
+    private final List<DELETE_IJefEventListener> eventListeners = new ArrayList<>();
+
     private final JobHeartbeatGenerator heartbeatGenerator;
-    
+
 //    private JobSessionFacade jobSessionFacade;
 //    private final IJobSessionStore jobSessionStore;
     private JobSuiteStatus suiteStatus;
     private final JobSuiteStatusDAO suiteStatusDAO;
-    
+
     //TODO consider making configurable?
-    //TODO have it optinally implement JefEventListener instead of 
+    //TODO have it optinally implement JefEventListener instead of
     // setup/destroy methods?  In case one wants to react to whatever
     // event.
     IShutdownHook shutdownHook = new FileShutdownHook();
@@ -101,18 +101,18 @@ public final class JobSuite {
         super();
         Objects.requireNonNull(rootJob, "rootJob");
         this.rootJob = rootJob;
-        JobSuiteConfig cfg = 
+        JobSuiteConfig cfg =
                 ObjectUtils.defaultIfNull(config, new JobSuiteConfig());
-        
-        
+
+
         //TODO do the remaining as the first thing when execute is called
         // to prevent processing/file creation from happening until
         // actually started.
 
-        //TODO have a reset/clean method so a new execute can start fresh? 
-        
+        //TODO have a reset/clean method so a new execute can start fresh?
+
         this.workdir = resolveWorkdir(cfg.getWorkdir());
-        this.suiteStatusDAO = 
+        this.suiteStatusDAO =
                 new JobSuiteStatusDAO(rootJob.getId(), getStatusDir());
 //        try {
 //            this.suiteSession = JobSuiteStatus.getInstance(this);
@@ -122,14 +122,14 @@ public final class JobSuite {
         this.eventListeners.addAll(cfg.getEventListeners());
         this.heartbeatGenerator = new JobHeartbeatGenerator(this);
         this.backupDisabled = cfg.isBackupDisabled();
-        
+
         accept((job, jobStatus) -> jobs.put(job.getId(), job));
 
-        // register listening objects 
+        // register listening objects
         registerListener(rootJob);
     }
-    
-    
+
+
     public Path getStatusDir() {
         return getStatusDir(workdir, getId());
     }
@@ -144,21 +144,21 @@ public final class JobSuite {
     public static Path getStatusBackupDir(
             Path suiteWorkdir, String suiteId, LocalDateTime date) {
         return FileUtil.toDateFormattedDir(suiteWorkdir.resolve(Paths.get(
-                FileUtil.toSafeFileName(suiteId), 
+                FileUtil.toSafeFileName(suiteId),
                         STATUS_BACKUP_SUBDIR)).toFile(),
                 DateUtil.toDate(date), "yyyy/MM/dd/HH-mm-ss").toPath();
     }
-    
+
     public Path getStatusIndex() {
         return getStatusIndex(getStatusDir());
-    }    
+    }
     /**
      * Gets the path to job suite index.
      * @param statusDir suite working directory
      * @return file the index file
      */
     public static Path getStatusIndex(Path statusDir) {
-        return statusDir.resolve(INDEX_FILENAME); // make it "suite.jef"? 
+        return statusDir.resolve(INDEX_FILENAME); // make it "suite.jef"?
     }
 
 
@@ -169,23 +169,23 @@ public final class JobSuite {
     public Path getWorkdir() {
         return workdir;
     }
-    
+
     // make package visibility?
     public JobSuiteStatusDAO getJobSuiteStatusDAO() {
         return suiteStatusDAO;
     }
-    
-    
+
+
 //    public IJobSessionStore getJobSessionStore() {
 //        return jobSessionStore;
 //    }
-    
+
     public boolean execute() {
         return execute(false);
     }
     public boolean execute(boolean resumeIfIncomplete) {
         boolean success = false;
-        //TODO why catching exception here??? so we report it with status 
+        //TODO why catching exception here??? should we report it with status
         //instead?
         try {
             success = doExecute(resumeIfIncomplete);
@@ -197,23 +197,23 @@ public final class JobSuite {
         }
         return success;
     }
-    
+
     private boolean doExecute(boolean resumeIfIncomplete) throws IOException {
         boolean success = false;
 
         LOG.info("Initialization...");
 //        this.jobSessionFacade = resolveJobSessionFacade(resumeIfIncomplete);
         suiteStatus = resolveSuiteStatus(resumeIfIncomplete);
-        
+
         heartbeatGenerator.start();
-        
+
         shutdownHook.setup(this);
 //        StopRequestMonitor stopMonitor = new StopRequestMonitor(this);
 //        stopMonitor.start();
 
         LOG.info("Starting execution.");
         fire(JefEvent.SUITE_STARTED, null, this);
-        
+
         try {
             success = runJob(getRootJob());
         } finally {
@@ -223,7 +223,7 @@ public final class JobSuite {
             if (success) {
                 if (jobState == JobState.COMPLETED) {
                     fire(JefEvent.SUITE_COMPLETED, null, this);
-                } else if (jobState == JobState.PREMATURE_TERMINATION) {
+                } else if (jobState == JobState.UNCOMPLETED) {
                     fire(JefEvent.SUITE_TERMINATED_PREMATURALY, null, this);
                 } else {
                     LOG.error("JobSuite ended but job state does not "
@@ -239,8 +239,8 @@ public final class JobSuite {
         if (obj == null) {
             return;
         }
-        if (obj instanceof IJefEventListener) {
-            eventListeners.add((IJefEventListener) obj);
+        if (obj instanceof DELETE_IJefEventListener) {
+            eventListeners.add((DELETE_IJefEventListener) obj);
             if (obj instanceof IJobGroup) {
                 for (IJob childJob : ((IJobGroup) obj).getJobs()) {
                     registerListener(childJob);;
@@ -248,21 +248,21 @@ public final class JobSuite {
             }
         }
     }
-    
+
     private JobSuiteStatus resolveSuiteStatus(boolean resumeIfIncomplete)
             throws IOException {
-        
-        JobSuiteStatus status = 
+
+        JobSuiteStatus status =
                 JobSuiteStatus.getInstance(getStatusIndex());
 //        JobSessionFacade facade = JobSessionFacade.get(getSuiteIndexFile());
-        
+
         if (status != null) {
             LOG.info("Previous execution detected.");
             JobStatus rootStatus = status.getRootStatus();
             JobState state = rootStatus.getState();
             ensureValidExecutionState(state);
             if (resumeIfIncomplete && !state.isOneOf(
-                    JobState.COMPLETED, JobState.PREMATURE_TERMINATION)) {
+                    JobState.COMPLETED, JobState.UNCOMPLETED)) {
                 LOG.info("Resuming from previous execution.");
 //TODO fix this:                prepareStatusTreeForResume(statusTree);
             } else {
@@ -289,9 +289,9 @@ public final class JobSuite {
         }
         return status;
     }
-        
-    
-    
+
+
+
     /**
      * Gets the job status for the root job.  Has the same effect as invoking
      * <code>getJobStatus(getRootJob())</code>.
@@ -300,7 +300,7 @@ public final class JobSuite {
     public JobStatus getRootStatus() {
         return getJobStatus(getRootJob());
     }
-    
+
     public JobStatus getJobStatus(IJob job) {
         if (job == null) {
             return null;
@@ -314,7 +314,7 @@ public final class JobSuite {
         return null;
 //        try {
 //            Path indexFile = getSuiteIndexFile();
-//            JobSessionFacade snapshot = 
+//            JobSessionFacade snapshot =
 //                    JobSessionFacade.get(indexFile);
 //            if (snapshot != null) {
 //                return snapshot.getSession(jobId);
@@ -324,12 +324,12 @@ public final class JobSuite {
 //            throw new JefException("Cannot obtain job session.", e);
 //        }
     }
-    
-    
+
+
     public void accept(IJobStatusVisitor visitor) {
         suiteStatus.accept(visitor);
     }
-    
+
     /**
      * Accepts a job suite visitor.
      * @param visitor job suite visitor
@@ -345,7 +345,7 @@ public final class JobSuite {
      */
     public void accept(IJobVisitor visitor, Class<IJob> jobClassFilter) {
         accept(visitor, getRootJob(), jobClassFilter);
-    }    
+    }
 
     private void accept(
             IJobVisitor visitor, IJob job, Class<IJob> jobClassFilter) {
@@ -362,7 +362,7 @@ public final class JobSuite {
             }
         }
     }
-    
+
     /**
      * Gets the job identifier representing the currently running job for the
      * current thread.
@@ -375,16 +375,16 @@ public final class JobSuite {
     /**
      * Sets a job identifier as the currently running job for the
      * the current thread.  This method is called by the framework.
-     * Framework users may call this method when implementing their own 
+     * Framework users may call this method when implementing their own
      * threads to associated a job with the thread.  Framework code
-     * may rely on this to behave as expected.  Otherwise, it is best 
+     * may rely on this to behave as expected.  Otherwise, it is best
      * advised not to use this method.
      * @param jobId job identifier
      */
     public static void setCurrentJobId(String jobId) {
         CURRENT_JOB_ID.set(jobId);
     }
-    
+
     public String getId() {
         IJob job = getRootJob();
         if (job != null) {
@@ -392,7 +392,7 @@ public final class JobSuite {
         }
         return null;
     }
-    
+
 //    /**
 //     * Gets the latest index file created for a job suite (if one exists).
 //     * @param suiteWorkdir suite working directory
@@ -404,7 +404,7 @@ public final class JobSuite {
 //        return suiteWorkdir.resolve(
 //                FileUtil.toSafeFileName(suiteId) + ".index");
 //    }
-//    
+//
 //    public Path getSuiteIndexFile() {
 //        Path indexFile = getSuiteIndexFile(workdir, getId());
 //        if (!indexFile.toFile().exists()) {
@@ -420,15 +420,15 @@ public final class JobSuite {
 //        }
 //        return indexFile;
 //    }
-    
-    
+
+
 //    /*default*/ File getSuiteStopFile() {
-//        return new File(workdir + File.separator 
-//                + "latest" + File.separator 
+//        return new File(workdir + File.separator
+//                + "latest" + File.separator
 //                + FileUtil.toSafeFileName(getId()) + ".stop");
 //    }
 
-    
+
     //TODO document this is not a public method?
     //TODO Wrap this logic in a JobRunner class, passing it to job groups?
     public boolean runJob(final IJob job) {
@@ -438,11 +438,11 @@ public final class JobSuite {
         if (StringUtils.isBlank(job.getId())) {
             throw new IllegalArgumentException("Job id cannot be blank.");
         }
-        
+
         boolean success = false;
         Thread.currentThread().setName(job.getId());
         setCurrentJobId(job.getId());
-        
+
         JobStatus jobStatus = suiteStatus.getStatus(job);
         if (jobStatus.getState() == JobState.COMPLETED) {
             LOG.info("Job skipped: " + job.getId() + " (already completed)");
@@ -454,15 +454,15 @@ public final class JobSuite {
         try {
             if (!jobStatus.isResumed()) {
                 jobStatus.setStartTime(LocalDateTime.now());
-                LOG.info("Running {}: START ({})", 
+                LOG.info("Running {}: START ({})",
                         job.getId(), LocalDateTime.now());
                 fire(JefEvent.JOB_STARTED, jobStatus, job);
             } else {
-                LOG.info("Running {}: RESUME ({})", 
-                        job.getId(), jobStatus.getStartTime());  
+                LOG.info("Running {}: RESUME ({})",
+                        job.getId(), jobStatus.getStartTime());
                 fire(JefEvent.JOB_RESUMED, jobStatus, job);
                 jobStatus.setEndTime(null);
-                jobStatus.setNote("");  
+                jobStatus.setNote("");
             }
 
             heartbeatGenerator.register(jobStatus);
@@ -478,7 +478,7 @@ public final class JobSuite {
                 fire(JefEvent.JOB_PROGRESSED, js, job);
                 JobStatus parentStatus = suiteStatus.getParentStatus(js);
                 if (parentStatus != null) {
-                    IJobGroup jobGroup = 
+                    IJobGroup jobGroup =
                             (IJobGroup) jobs.get(parentStatus.getJobId());
                     if (jobGroup != null) {
                         jobGroup.groupProgressed(js);
@@ -506,9 +506,9 @@ public final class JobSuite {
             if (!success && !errorHandled) {
                 LOG.error("Fatal error occured in job: {}.", job.getId());
             }
-            LOG.info("Running " + job.getId()  
+            LOG.info("Running " + job.getId()
                     + ": END (" + jobStatus.getStartTime() + ")");
-            
+
             // If stopping or stopped, corresponding events will have been
             // fired already and we do not fire additional ones.
             if (jobStatus.getState() != JobState.STOPPING
@@ -522,7 +522,7 @@ public final class JobSuite {
         }
         return success;
     }
-    
+
     public void stop() throws ShutdownException {
         shutdownHook.shutdown(getStatusIndex());
 //        if (!getSuiteStopFile().createNewFile()) {
@@ -534,31 +534,31 @@ public final class JobSuite {
         //TODO if configurable, grab hook impl. from index file.
         new FileShutdownHook().shutdown(indexFile);
     }
-    
-    
+
+
 //    public static void stop(File indexFile) throws IOException {
 //        if (indexFile == null || !indexFile.exists() || !indexFile.isFile()) {
 //            throw new JefException("Invalid index file: " + indexFile);
 //        }
-//        String stopPath = 
+//        String stopPath =
 //                StringUtils.removeEnd(indexFile.getAbsolutePath(), "index");
 //        stopPath += ".stop";
 //        if (!new File(stopPath).createNewFile()) {
 //            throw new IOException(
 //                    "Could not create stop file: " + stopPath);
-//        }        
+//        }
 //    }
-    
 
 
-    
+
+
     //TODO is below still required once we handle resumes differently???
-    
-    
-    
+
+
+
 //    // This preparation is required otherwise, stopping of a resumed job
 //    // will fail, because of previous "stopRequested" flag being set.
-//    // "resumeAttempts" on the root must be incremented for resume to work, 
+//    // "resumeAttempts" on the root must be incremented for resume to work,
 //    // but technically the root attempts should always be incremented whenever
 //    // there is at least one child job that needs to be incremented.
 //    // This method fixes: https://github.com/Norconex/collector-http/issues/69
@@ -582,7 +582,7 @@ public final class JobSuite {
 //            }
 //        });
 //    }
-    
+
     private void ensureValidExecutionState(JobState state) {
         if (state == JobState.RUNNING) {
             throw new JefException("JOB SUITE ALREADY RUNNING. There is "
@@ -596,7 +596,7 @@ public final class JobSuite {
                     + "process.");
         }
     }
-    
+
     private void backupSuite(JobSuiteStatus suiteStatus) { // throws IOException {
         JobStatus jobStatus = suiteStatus.getRootStatus();
         LocalDateTime backupDate = jobStatus.getEndTime();
@@ -608,18 +608,18 @@ public final class JobSuite {
         }
         try {
             suiteStatusDAO.backup(getStatusBackupDir(backupDate));
-            
+
 //            // Backup status files
 //            jobSessionStore.backup(getId(), backupDate);
 //
 //            // Backup suite index
 //            Path indexFile = getSuiteIndexFile();
 //            Path backupFile = FileUtil.toDateFormattedDir(
-//                    workdir.resolve(FileUtil.toSafeFileName(getId())).toFile(), 
+//                    workdir.resolve(FileUtil.toSafeFileName(getId())).toFile(),
 //                    DateUtil.toDate(
 //                            backupDate), "yyyy/MM/dd/HH-mm-ss").toPath();
 //            Files.move(indexFile, backupFile);
-            
+
 //            String date = new SimpleDateFormat(
 //                    "yyyyMMddHHmmssSSSS").format(DateUtil.toDate(backupDate));
 //            Path indexFile = getSuiteIndexFile();
@@ -655,33 +655,33 @@ public final class JobSuite {
 //            throw new JefException("Could not backup suite index.", e);
 //        }
 //    }
-    
-    
+
+
 //    //TODO move these writeXX methods to JobSessionFacade??
-//    private void writeJobSuiteIndex() 
+//    private void writeJobSuiteIndex()
 //            throws IOException {
-//        
+//
 //        Path indexFile = getSuiteIndexFile();
-//        
+//
 //        StringWriter out = new StringWriter();
 //        out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
 //        out.write("<suite-index>");
-//            
+//
 //        //--- JobStatusSerializer ---
 //        out.flush();
 //        if (jobSessionStore instanceof IXMLConfigurable) {
 //            ((IXMLConfigurable) jobSessionStore).saveToXML(out);
 //        }
-//        
+//
 //        //--- Jobs ---
 //        writeJobSuiteIndexJob(out, rootJob);
-//        
+//
 //        out.write("</suite-index>");
 //        out.flush();
-//        
-//        // Using RandomAccessFile since evidence has shown it is better at 
+//
+//        // Using RandomAccessFile since evidence has shown it is better at
 //        // dealing with files/locks in a way that cause less/no errors.
-//        try (RandomAccessFile ras = 
+//        try (RandomAccessFile ras =
 //                new RandomAccessFile(indexFile.toFile(), "rwd");
 //                FileChannel channel = ras.getChannel();
 //                FileLock lock = channel.lock()) {
@@ -700,7 +700,7 @@ public final class JobSuite {
 //        }
 //        out.write("</job>");
 //    }
-    
+
     private Path resolveWorkdir(Path configWorkdir) {
         // Default to working directory??
         Path dir = configWorkdir;
@@ -716,7 +716,7 @@ public final class JobSuite {
             }
         } else if (!dir.toFile().isDirectory()) {
             throw new JefException("Invalid work directory: " + dir);
-            
+
         }
         LOG.info("JEF work directory is: {}", dir.toAbsolutePath());
         return dir;
@@ -730,11 +730,11 @@ public final class JobSuite {
 //        LOG.info("JEF job status store is {}", s.getClass().getSimpleName());
 //        return s;
 //    }
-    
+
     private void fire(String eventName, JobStatus status, Object source) {
         fire(eventName, status, source, null);
     }
-    private void fire(String eventName, JobStatus status, 
+    private void fire(String eventName, JobStatus status,
             Object source, Throwable exception) {
         fire(new JefEvent(eventName, status, source, exception));
     }
@@ -742,7 +742,7 @@ public final class JobSuite {
         if (event == null) {
             return;
         }
-        for (IJefEventListener l : eventListeners) {
+        for (DELETE_IJefEventListener l : eventListeners) {
             l.accept(event);
         }
     }

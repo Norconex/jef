@@ -16,7 +16,7 @@ package com.norconex.jef5.event;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.norconex.commons.lang.event.Event;
@@ -25,22 +25,25 @@ import com.norconex.jef5.status.JobStatus;
 /**
  * A crawler event.
  * @author Pascal Essiembre
- * @see IJefEventListener
+ * @see DELETE_IJefEventListener
  */
 public class JefEvent extends Event<Object> {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String SUITE_STARTED = "SUITE_STARTED";
     public static final String SUITE_STOPPING = "SUITE_STOPPING";
-    public static final String SUITE_STOPPED = "SUITE_STOPPED";
-    public static final String SUITE_ABORTED = "SUITE_ABORTED";
+    public static final String SUITE_STOPPED = "SUITE_STOPPED"; // <-- Realy an event? If stopped, it means nothing else is running, now even listeners?.
+    public static final String SUITE_ABORTED = "SUITE_ABORTED"; // <-- Realy an event? If abborted, no event can be sent.
     //TODO eliminate this one and rely on COMPLETED + status to find if failed/success?
     //TODO have a SUITE_FAILED instead (or in addition??)
+    //TODO make SUITE_INCOMPLETE ?
     public static final String SUITE_TERMINATED_PREMATURALY = "SUITE_TERMINATED_PREMATURALY";
     public static final String SUITE_COMPLETED = "SUITE_COMPLETED";
 
     //TODO have SUITE_RESUMED???
-    
-    
+
+
     // These ones replace IJobLifeCycleListener
     public static final String JOB_STARTED = "JOB_STARTED";
     public static final String JOB_RESUMED = "JOB_RESUMED";
@@ -57,7 +60,7 @@ public class JefEvent extends Event<Object> {
     // one can keep going, the other one stops???????
     // this one replaces IJobErrorListener
     public static final String JOB_ERROR = "JOB_ERROR";
-    
+
     private final JobStatus status;
 
     /**
@@ -70,7 +73,7 @@ public class JefEvent extends Event<Object> {
         this(name, status, source, null);
     }
 
-    
+
     /**
      * New crawler event.
      * @param name event name
@@ -78,12 +81,12 @@ public class JefEvent extends Event<Object> {
      * @param source object responsible for triggering the event
      * @param exception exception
      */
-    public JefEvent(String name, JobStatus status, 
+    public JefEvent(String name, JobStatus status,
             Object source, Throwable exception) {
         super(name, source, exception);
         this.status = status;
     }
-    
+
     /**
      * Gets the job status, if any.
      * @return the job status or <code>null</code>
@@ -91,31 +94,46 @@ public class JefEvent extends Event<Object> {
     public JobStatus getStatus() {
         return status;
     }
-    
+
     @Override
     public boolean equals(final Object other) {
-        if (!(other instanceof JefEvent))
-            return false;
-        JefEvent castOther = (JefEvent) other;
-        return new EqualsBuilder()
-                .appendSuper(super.equals(other))
-                .append(status, castOther.status)
-                .isEquals();
+        return EqualsBuilder.reflectionEquals(this, other);
     }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-                .appendSuper(super.hashCode())
-                .append(status)
-                .toHashCode();
+        return HashCodeBuilder.reflectionHashCode(this);
     }
-
     @Override
     public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .appendSuper(super.toString())
-                .append("status", status)
-                .toString();
+        return new ReflectionToStringBuilder(
+                this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
     }
+
+//    @Override
+//    public boolean equals(final Object other) {
+//        if (!(other instanceof JefEvent)) {
+//            return false;
+//        }
+//        JefEvent castOther = (JefEvent) other;
+//        return new EqualsBuilder()
+//                .appendSuper(super.equals(other))
+//                .append(status, castOther.status)
+//                .isEquals();
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return new HashCodeBuilder()
+//                .appendSuper(super.hashCode())
+//                .append(status)
+//                .toHashCode();
+//    }
+//
+//    @Override
+//    public String toString() {
+//        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+//                .appendSuper(super.toString())
+//                .append("status", status)
+//                .toString();
+//    }
 }

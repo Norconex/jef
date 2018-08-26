@@ -17,7 +17,7 @@ package com.norconex.jef5.status;
 public enum JobState {
 
     //TODO keep completion and 100% complete (termination) separate??
-    
+
     /**
      * The job was aborted (i.e. killed).  That is, if a job was started
      * and is no longer running, while it never was
@@ -33,10 +33,10 @@ public enum JobState {
      */
     COMPLETED,
     /**
-     * The job stopped running on its own, but has not reached
-     * 100% completion.
+     * The job stopped running without any reported problems, but
+     * its progress indicator has not reached 100% completion.
      */
-    PREMATURE_TERMINATION,
+    UNCOMPLETED,
     /**
      * The job is currently running.
      */
@@ -58,7 +58,7 @@ public enum JobState {
      * stopped.
      */
     STOPPED;
-    
+
     public boolean isOneOf(JobState... jobStates) {
         for (JobState jobState : jobStates) {
             if (jobState == this) {

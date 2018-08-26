@@ -24,7 +24,7 @@ import java.util.List;
 
 import com.norconex.commons.lang.collection.CollectionUtil;
 import com.norconex.commons.lang.config.IXMLConfigurable;
-import com.norconex.jef5.event.IJefEventListener;
+import com.norconex.jef5.event.DELETE_IJefEventListener;
 
 //TODO really have a config still??? given it contains so little, shall
 // we move these settings directly on JobSuite? Else, make IXMLConfigurable?
@@ -33,7 +33,7 @@ public class JobSuiteConfig implements IXMLConfigurable {
 
     private Path workdir;
     private boolean backupDisabled;
-    private final List<IJefEventListener> eventListeners = new ArrayList<>();
+    private final List<DELETE_IJefEventListener> eventListeners = new ArrayList<>();
 
     public JobSuiteConfig() {
         super();
@@ -53,19 +53,19 @@ public class JobSuiteConfig implements IXMLConfigurable {
         this.backupDisabled = backupDisabled;
     }
 
-    public List<IJefEventListener> getEventListeners() {
+    public List<DELETE_IJefEventListener> getEventListeners() {
         return eventListeners;
     }
-    public void setEventListeners(IJefEventListener... eventListeners) {
+    public void setEventListeners(DELETE_IJefEventListener... eventListeners) {
         CollectionUtil.setAll(this.eventListeners, eventListeners);
     }
-    public void addEventListeners(IJefEventListener... eventListeners) {
+    public void addEventListeners(DELETE_IJefEventListener... eventListeners) {
         this.eventListeners.addAll(Arrays.asList(eventListeners));
     }
     public void removeEventListeners() {
         this.eventListeners.clear();
     }
-    public void removeEventListeners(IJefEventListener... eventListeners) {
+    public void removeEventListeners(DELETE_IJefEventListener... eventListeners) {
         this.eventListeners.removeAll(Arrays.asList(eventListeners));
     }
 

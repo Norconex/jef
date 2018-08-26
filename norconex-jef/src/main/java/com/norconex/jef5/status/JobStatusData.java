@@ -90,7 +90,7 @@ public class JobStatusData
         if (isStopped())   { return JobState.STOPPED;   }
         if (isStopping())   { return JobState.STOPPING;   }
         if (isCompleted()) { return JobState.COMPLETED; }
-        if (isPrematurlyEnded())  { return JobState.PREMATURE_TERMINATION;  }
+        if (isPrematurlyEnded())  { return JobState.UNCOMPLETED;  }
         if (isRunning())   { return JobState.RUNNING;   }
         return JobState.UNKNOWN;
     }

@@ -14,7 +14,7 @@
  */
 package com.norconex.jef5.job;
 
-import com.norconex.jef5.event.IJefEventListener;
+import com.norconex.jef5.event.DELETE_IJefEventListener;
 import com.norconex.jef5.status.JobStatus;
 import com.norconex.jef5.status.JobStatusUpdater;
 import com.norconex.jef5.suite.JobSuite;
@@ -44,7 +44,7 @@ import com.norconex.jef5.suite.JobSuite;
  *
  * <p>
  * Jobs can be notified of JobSuite events if they implement 
- * {@link IJefEventListener}.
+ * {@link DELETE_IJefEventListener}.
  * </p>
  *
  * @author Pascal Essiembre

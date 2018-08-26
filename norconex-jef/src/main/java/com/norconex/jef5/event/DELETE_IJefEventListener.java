@@ -16,6 +16,6 @@ package com.norconex.jef5.event;
 
 import com.norconex.commons.lang.event.IEventListener;
 
-public interface IJefEventListener extends IEventListener<JefEvent> {
+public interface DELETE_IJefEventListener extends IEventListener<JefEvent> {
 
 }

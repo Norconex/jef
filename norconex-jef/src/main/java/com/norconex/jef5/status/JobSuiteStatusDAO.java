@@ -160,15 +160,15 @@ public class JobSuiteStatusDAO
         //The JobStatusData should not be written/read here??? so rename arg to JobStatus?
 
         Properties config = new Properties();
-        config.setString("jobId", js.getJobId());
-        config.setDouble("progress", js.getProgress());
-        config.setString("note", js.getNote());
-        config.setLocalDateTime("startTime", js.getStartTime());
-        config.setLocalDateTime("endTime", js.getEndTime());
+        config.set("jobId", js.getJobId());
+        config.set("progress", js.getProgress());
+        config.set("note", js.getNote());
+        config.set("startTime", js.getStartTime());
+        config.set("endTime", js.getEndTime());
 
         //TODO store different status for stopping and stopped?
         if (js.isStopping() || js.isStopped()) {
-            config.setBoolean("stopRequested", true);
+            config.set("stopRequested", true);
         }
         Properties props = js.getProperties();
         for (Entry<String, List<String>> entry : props.entrySet()) {
