@@ -237,7 +237,7 @@ public class JobSuiteStatusDAO
         jsd.setNote(config.getString("note", null));
         jsd.setStartTime(config.getLocalDateTime("startTime"));
         jsd.setEndTime(config.getLocalDateTime("endTime"));
-        jsd.setStopRequested(config.getBoolean("stopRequested"));
+        jsd.setStopRequested(config.getBoolean("stopRequested", false));
 
         Properties props = jsd.getProperties();
         for (String key : config.keySet()) {
