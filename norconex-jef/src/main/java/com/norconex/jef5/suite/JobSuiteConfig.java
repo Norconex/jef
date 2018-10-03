@@ -14,17 +14,17 @@
  */
 package com.norconex.jef5.suite;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.norconex.commons.lang.collection.CollectionUtil;
-import com.norconex.commons.lang.config.IXMLConfigurable;
-import com.norconex.jef5.event.DELETE_IJefEventListener;
+import com.norconex.commons.lang.event.Event;
+import com.norconex.commons.lang.event.IEventListener;
+import com.norconex.commons.lang.xml.IXMLConfigurable;
+import com.norconex.commons.lang.xml.XML;
 
 //TODO really have a config still??? given it contains so little, shall
 // we move these settings directly on JobSuite? Else, make IXMLConfigurable?
@@ -33,7 +33,8 @@ public class JobSuiteConfig implements IXMLConfigurable {
 
     private Path workdir;
     private boolean backupDisabled;
-    private final List<DELETE_IJefEventListener> eventListeners = new ArrayList<>();
+    private final List<IEventListener<Event<?>>> eventListeners =
+            new ArrayList<>();
 
     public JobSuiteConfig() {
         super();
@@ -53,29 +54,33 @@ public class JobSuiteConfig implements IXMLConfigurable {
         this.backupDisabled = backupDisabled;
     }
 
-    public List<DELETE_IJefEventListener> getEventListeners() {
-        return eventListeners;
+    public List<IEventListener<Event<?>>> getEventListeners() {
+        return Collections.unmodifiableList(eventListeners);
     }
-    public void setEventListeners(DELETE_IJefEventListener... eventListeners) {
+    @SuppressWarnings("unchecked")
+    public void setEventListeners(IEventListener<Event<?>>... eventListeners) {
         CollectionUtil.setAll(this.eventListeners, eventListeners);
     }
-    public void addEventListeners(DELETE_IJefEventListener... eventListeners) {
+    @SuppressWarnings("unchecked")
+    public void addEventListeners(IEventListener<Event<?>>... eventListeners) {
         this.eventListeners.addAll(Arrays.asList(eventListeners));
     }
     public void removeEventListeners() {
         this.eventListeners.clear();
     }
-    public void removeEventListeners(DELETE_IJefEventListener... eventListeners) {
+    @SuppressWarnings("unchecked")
+    public void removeEventListeners(
+            IEventListener<Event<?>>... eventListeners) {
         this.eventListeners.removeAll(Arrays.asList(eventListeners));
     }
 
     @Override
-    public void loadFromXML(Reader in) throws IOException {
+    public void loadFromXML(XML xml) {
         // TODO Auto-generated method stub
 
     }
     @Override
-    public void saveToXML(Writer out) throws IOException {
+    public void saveToXML(XML xml) {
         // TODO Auto-generated method stub
 
     }

@@ -19,9 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -30,10 +28,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.norconex.commons.lang.event.EventManager;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.commons.lang.time.DateUtil;
 import com.norconex.jef5.JefException;
-import com.norconex.jef5.event.DELETE_IJefEventListener;
 import com.norconex.jef5.event.JefEvent;
 import com.norconex.jef5.job.IJob;
 import com.norconex.jef5.job.IJobVisitor;
@@ -78,7 +76,8 @@ public final class JobSuite {
     private final Path workdir;
     private final boolean backupDisabled;
     //TODO rename JobEvent* to just Event*
-    private final List<DELETE_IJefEventListener> eventListeners = new ArrayList<>();
+
+    private final EventManager eventManager;
 
     private final JobHeartbeatGenerator heartbeatGenerator;
 
@@ -94,13 +93,20 @@ public final class JobSuite {
     IShutdownHook shutdownHook = new FileShutdownHook();
 
     public JobSuite(final IJob rootJob) {
-        this(rootJob, null);
+        this(rootJob, null, null);
     }
-
+    public JobSuite(final IJob rootJob, EventManager parentEventManager) {
+        this(rootJob, null, parentEventManager);
+    }
     public JobSuite(final IJob rootJob, JobSuiteConfig config) {
+        this(rootJob, config, null);
+    }
+    public JobSuite(final IJob rootJob, JobSuiteConfig config,
+            EventManager parentEventManager) {
         super();
         Objects.requireNonNull(rootJob, "rootJob");
         this.rootJob = rootJob;
+        this.eventManager = new EventManager(parentEventManager);
         JobSuiteConfig cfg =
                 ObjectUtils.defaultIfNull(config, new JobSuiteConfig());
 
@@ -119,14 +125,15 @@ public final class JobSuite {
 //        } catch (IOException e) {
 //            throw new JefException("Cannot create JEF suite session.", e);
 //        }
-        this.eventListeners.addAll(cfg.getEventListeners());
         this.heartbeatGenerator = new JobHeartbeatGenerator(this);
         this.backupDisabled = cfg.isBackupDisabled();
 
         accept((job, jobStatus) -> jobs.put(job.getId(), job));
 
         // register listening objects
-        registerListener(rootJob);
+        this.eventManager.addListeners(cfg.getEventListeners());
+        this.eventManager.addListenersFromScan(rootJob);
+//        registerListener(rootJob);
     }
 
 
@@ -195,6 +202,7 @@ public final class JobSuite {
         if (!success) {
             fire(JefEvent.SUITE_ABORTED, null, this);
         }
+        eventManager.clearListeners();
         return success;
     }
 
@@ -235,19 +243,19 @@ public final class JobSuite {
         return success;
     }
 
-    private void registerListener(Object obj) {
-        if (obj == null) {
-            return;
-        }
-        if (obj instanceof DELETE_IJefEventListener) {
-            eventListeners.add((DELETE_IJefEventListener) obj);
-            if (obj instanceof IJobGroup) {
-                for (IJob childJob : ((IJobGroup) obj).getJobs()) {
-                    registerListener(childJob);;
-                }
-            }
-        }
-    }
+//    private void registerListener(Object obj) {
+//        if (obj == null) {
+//            return;
+//        }
+//        if (obj instanceof DELETE_IJefEventListener) {
+//            eventListeners.add((DELETE_IJefEventListener) obj);
+//            if (obj instanceof IJobGroup) {
+//                for (IJob childJob : ((IJobGroup) obj).getJobs()) {
+//                    registerListener(childJob);;
+//                }
+//            }
+//        }
+//    }
 
     private JobSuiteStatus resolveSuiteStatus(boolean resumeIfIncomplete)
             throws IOException {
@@ -732,18 +740,17 @@ public final class JobSuite {
 //    }
 
     private void fire(String eventName, JobStatus status, Object source) {
-        fire(eventName, status, source, null);
+        eventManager.fire(JefEvent.create(eventName, status, source));
     }
     private void fire(String eventName, JobStatus status,
             Object source, Throwable exception) {
-        fire(new JefEvent(eventName, status, source, exception));
+        eventManager.fire(
+                JefEvent.create(eventName, status, source, exception));
     }
-    public void fire(JefEvent event) {
-        if (event == null) {
-            return;
-        }
-        for (DELETE_IJefEventListener l : eventListeners) {
-            l.accept(event);
-        }
+//    public void fire(JefEvent event) {
+//        eventManager.fire(event);
+//    }
+    public EventManager getEventManager() {
+        return eventManager;
     }
 }

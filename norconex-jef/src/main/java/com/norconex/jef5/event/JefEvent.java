@@ -25,7 +25,6 @@ import com.norconex.jef5.status.JobStatus;
 /**
  * A crawler event.
  * @author Pascal Essiembre
- * @see DELETE_IJefEventListener
  */
 public class JefEvent extends Event<Object> {
 
@@ -68,17 +67,6 @@ public class JefEvent extends Event<Object> {
      * @param name event name
      * @param status job status
      * @param source object responsible for triggering the event
-     */
-    public JefEvent(String name, JobStatus status, Object source) {
-        this(name, status, source, null);
-    }
-
-
-    /**
-     * New crawler event.
-     * @param name event name
-     * @param status job status
-     * @param source object responsible for triggering the event
      * @param exception exception
      */
     public JefEvent(String name, JobStatus status,
@@ -108,6 +96,16 @@ public class JefEvent extends Event<Object> {
         return new ReflectionToStringBuilder(
                 this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
     }
+
+    public static JefEvent create(
+            String name, JobStatus status, Object source) {
+        return create(name, status, source, null);
+    }
+    public static JefEvent create(String name, JobStatus status,
+            Object source, Throwable exception) {
+        return new JefEvent(name, status, source, exception);
+    }
+
 
 //    @Override
 //    public boolean equals(final Object other) {

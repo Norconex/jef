@@ -14,7 +14,7 @@
  */
 package com.norconex.jef5.job;
 
-import com.norconex.jef5.event.DELETE_IJefEventListener;
+import com.norconex.commons.lang.event.IEventListener;
 import com.norconex.jef5.status.JobStatus;
 import com.norconex.jef5.status.JobStatusUpdater;
 import com.norconex.jef5.suite.JobSuite;
@@ -43,8 +43,8 @@ import com.norconex.jef5.suite.JobSuite;
  * </ul>
  *
  * <p>
- * Jobs can be notified of JobSuite events if they implement 
- * {@link DELETE_IJefEventListener}.
+ * Jobs can be notified of JobSuite events if they implement
+ * {@link IEventListener}.
  * </p>
  *
  * @author Pascal Essiembre
@@ -55,9 +55,9 @@ public interface IJob {
     //TODO Have getStatus here, which would not hold an instance, but rather
     //construct dynamically (pulling from JobSuite maybe)??
     //TODO also have getStatusHistory ?? (lazy loaded from file?)
-    
+
     //TODO document about logging format to use for JEF Mon to read properly?
-    
+
     /**
      * Gets the job unique identifier. All characters are valid and regular
      * words can be used, as long as the returned string is unique.
@@ -68,7 +68,7 @@ public interface IJob {
 
     /**
      * Executes this job.  Implementors are responsible for updating
-     * execution progress on the given {@link JobStatusUpdater}.  
+     * execution progress on the given {@link JobStatusUpdater}.
      * @param statusUpdater status updater
      * @param suite job suite this job is part of
      */
@@ -76,15 +76,15 @@ public interface IJob {
 
     /**
      * Stops this job.  Implementors are responsible for terminating
-     * the execution of this job.  The progress and other contextual 
-     * information can be set, but the "status" should not 
+     * the execution of this job.  The progress and other contextual
+     * information can be set, but the "status" should not
      * be overwritten, as the framework will take care of assigning it.
      * @param status current job status
      * @param suite job suite this job is part of
      */
     void stop(final JobStatus status, final JobSuite suite);
-    
-    
+
+
     //TODO clean() ?
 
 }

@@ -36,22 +36,22 @@ import com.norconex.jef5.suite.JobSuite;
 
 /**
  * Listens for STOP requests using a stop file.  The stop file
- * file has the same path of the suite index file location, with ".stop" 
+ * file has the same path of the suite index file location, with ".stop"
  * extension instead.
  *
  * @author Pascal Essiembre
  */
 public class FileShutdownHook implements IShutdownHook {
 
-    private static final Logger LOG = 
+    private static final Logger LOG =
             LoggerFactory.getLogger(FileShutdownHook.class);
-    
+
     private static final int STOP_WAIT_DELAY = 3;
 
     private boolean monitoring = false;
     private JobSuite suite;
-    
-    
+
+
     @Override
     public void setup(final JobSuite suite) {
         this.suite = suite;
@@ -65,9 +65,9 @@ public class FileShutdownHook implements IShutdownHook {
                 }
                 Sleeper.sleepSeconds(1);
             }
-        }, "ShutdownHook Thread").start();                
+        }, "ShutdownHook Thread").start();
     }
-    
+
     @Override
     public void destroy() {
         monitoring = false;
@@ -76,13 +76,13 @@ public class FileShutdownHook implements IShutdownHook {
             try {
                 Files.delete(stopFile);
             } catch (IOException e) {
-                throw new JefException("Cannot delete stop file: " 
+                throw new JefException("Cannot delete stop file: "
                         + stopFile.toAbsolutePath(), e);
             }
         }
         suite = null;
     }
-    
+
     @Override
     public boolean shutdown(Path indexFile) throws ShutdownException {
         if (indexFile == null || !indexFile.toFile().isFile()) {
@@ -114,7 +114,7 @@ public class FileShutdownHook implements IShutdownHook {
         }
         return true;
     }
-    
+
     private synchronized void stopMonitoring(Path stopFile) {
         monitoring = false;
         try {
@@ -126,14 +126,16 @@ public class FileShutdownHook implements IShutdownHook {
     private void stopSuite() {
         monitoring = false;
         LOG.info("STOP request received.");
-        
+
         // Notify Suite Life Cycle listeners
-        suite.fire(new JefEvent(JefEvent.SUITE_STOPPING, null, suite));
-        
+        suite.getEventManager().fire(
+                JefEvent.create(JefEvent.SUITE_STOPPING, null, suite));
+
         // Notify Job Life Cycle listeners and stop them
         suite.accept((final IJob job, final JobStatus jobStatus) -> {
-            suite.fire(new JefEvent(JefEvent.JOB_STOPPING, jobStatus, suite));
-            new Thread(() -> stopJob(job, jobStatus), "Stop Thread").start();                
+            suite.getEventManager().fire(
+                    JefEvent.create(JefEvent.JOB_STOPPING, jobStatus, suite));
+            new Thread(() -> stopJob(job, jobStatus), "Stop Thread").start();
         });
     }
     private void stopJob(final IJob job, final JobStatus status) {
@@ -143,9 +145,11 @@ public class FileShutdownHook implements IShutdownHook {
             Sleeper.sleepSeconds(STOP_WAIT_DELAY);
         }
         if (status.getState() == JobState.STOPPED) {
-            suite.fire(new JefEvent(JefEvent.JOB_STOPPED, status, suite));
+            suite.getEventManager().fire(
+                    JefEvent.create(JefEvent.JOB_STOPPED, status, suite));
             if (job.getId().equals(suite.getRootJob().getId())) {
-                suite.fire(new JefEvent(JefEvent.SUITE_STOPPED, null, suite));
+                suite.getEventManager().fire(
+                        JefEvent.create(JefEvent.SUITE_STOPPED, null, suite));
             }
         }
     }
