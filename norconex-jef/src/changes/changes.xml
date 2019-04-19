@@ -7,6 +7,17 @@
   </properties>
   <body>
 
+    <release version="4.1.2-SNAPSHOT" date="2019-??-??" description="Maintenance release">
+      <action dev="essiembre" type="add">
+        New NoLogManager class to prevent JEF from adding its own file-based
+        logging.
+      </action>      
+      <action dev="essiembre" type="update">
+        ILogManager implementations can now return null appenders to disable
+        JEF-managed logging.
+      </action>
+    </release>
+
     <release version="4.1.1" date="2018-06-28" description="Bugfix release">
       <action dev="danizen" type="fix" issue="10">
         Fixed NPE in AbstractJobGroup#groupProgressed when accesing while

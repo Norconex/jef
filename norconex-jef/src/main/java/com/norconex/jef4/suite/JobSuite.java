@@ -1,4 +1,4 @@
-/* Copyright 2010-2018 Norconex Inc.
+/* Copyright 2010-2019 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,9 +59,6 @@ import com.norconex.jef4.status.JobState;
 import com.norconex.jef4.status.JobStatusUpdater;
 import com.norconex.jef4.status.JobSuiteStatusSnapshot;
 import com.norconex.jef4.status.MutableJobStatus;
-
-
-//TODO rename JobExecutor and move to root package?
 
 /**
  * A job suite is an amalgamation of jobs, represented as a single executable
@@ -278,13 +275,12 @@ public final class JobSuite {
 
         //--- Add Log Appender ---
         Appender appender = getLogManager().createAppender(getId());
-        appender.setLayout(new ThreadSafeLayout(appender.getLayout()));
-
-        Logger.getRootLogger().addAppender(appender);
+        if (appender != null) {
+            appender.setLayout(new ThreadSafeLayout(appender.getLayout()));
+            Logger.getRootLogger().addAppender(appender);
+        }
 
         heartbeatGenerator.start();
-
-        //TODO add listeners, etc
 
         StopRequestMonitor stopMonitor = new StopRequestMonitor(this);
         stopMonitor.start();
@@ -310,7 +306,9 @@ public final class JobSuite {
             }
 
             // Remove appender
-            appender.close();
+            if (appender != null) {
+                appender.close();
+            }
             Logger.getRootLogger().removeAppender(appender);
             heartbeatGenerator.terminate();
         }
