@@ -1,4 +1,4 @@
-/* Copyright 2010-2017 Norconex Inc.
+/* Copyright 2010-2019 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package com.norconex.jef4.suite;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,21 +33,41 @@ public class JobSuiteStatusIndexSerializerTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-    
+
     @Test
     public void testWriteJobSuiteIndex() throws IOException {
-        
+
         JobSuiteConfig config = JEFTestUtil.newConfigWithTempWorkdir(folder);
         IJob job = new SleepyJob(5, 1);
         JobSuite suite = new JobSuite(job, config);
         Assert.assertTrue("Execution returned false.", suite.execute());
 
-        JobSuiteStatusSnapshot tree = 
-                JobSuiteStatusSnapshot.newSnapshot(
-                        new File(config.getWorkdir(), "latest/"
-                      + FileUtil.toSafeFileName(job.getId()) + ".index"));
+        JobSuiteStatusSnapshot tree =
+                JobSuiteStatusSnapshot.newSnapshot(getIndexFile(suite));
         System.out.println("TREE: " + tree);
         Assert.assertEquals(1d, tree.getRoot().getProgress(), 0d);
     }
 
+
+    //Test for: https://github.com/Norconex/jef/issues/12
+    @Test
+    public void testStartOnEmptyIndexFile() throws IOException {
+
+        JobSuiteConfig config = JEFTestUtil.newConfigWithTempWorkdir(folder);
+
+        IJob job = new SleepyJob(2, 1);
+        JobSuite suite = new JobSuite(job, config);
+
+        FileUtils.touch(getIndexFile(suite)); // creates empty index file
+        Assert.assertTrue("Execution returned false.", suite.execute());
+
+        JobSuiteStatusSnapshot tree =
+                JobSuiteStatusSnapshot.newSnapshot(getIndexFile(suite));
+        Assert.assertEquals(1d, tree.getRoot().getProgress(), 0d);
+    }
+
+    private File getIndexFile(JobSuite suite) {
+        return new File(suite.getConfig().getWorkdir(), "latest/"
+                + FileUtil.toSafeFileName(suite.getId()) + ".index");
+    }
 }

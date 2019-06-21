@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2019 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import com.norconex.commons.lang.PercentFormatter;
 import com.norconex.commons.lang.config.XMLConfigurationUtil;
@@ -38,6 +40,9 @@ import com.norconex.jef4.log.ILogManager;
 
 public final class JobSuiteStatusSnapshot {
 
+    private static final Logger LOG =
+            LogManager.getLogger(JobSuiteStatusSnapshot.class);
+    
     private static final int TO_STRING_INDENT = 4;
     
     private final ILogManager logManager;
@@ -162,6 +167,10 @@ public final class JobSuiteStatusSnapshot {
         if (!suiteIndex.isFile()) {
             throw new IllegalArgumentException("Suite index is not a file: "
                     + suiteIndex.getAbsolutePath());
+        }
+        if (suiteIndex.length() == 0) {
+            LOG.error("Suite index file is empty.");
+            return null;
         }
 
         //--- Load XML file ---
