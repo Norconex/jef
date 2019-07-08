@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -145,11 +145,11 @@ public final class JobSuite {
                 FileUtil.toSafeFileName(suiteId), STATUS_SUBDIR));
     }
 
-    public Path getStatusBackupDir(LocalDateTime date) {
+    public Path getStatusBackupDir(Instant date) {
         return getStatusBackupDir(workdir, getId(), date);
     }
     public static Path getStatusBackupDir(
-            Path suiteWorkdir, String suiteId, LocalDateTime date) {
+            Path suiteWorkdir, String suiteId, Instant date) {
         return FileUtil.toDateFormattedDir(suiteWorkdir.resolve(Paths.get(
                 FileUtil.toSafeFileName(suiteId),
                         STATUS_BACKUP_SUBDIR)).toFile(),
@@ -221,7 +221,6 @@ public final class JobSuite {
 
         LOG.info("Starting execution.");
         fire(JefEvent.SUITE_STARTED, null, this);
-
         try {
             success = runJob(getRootJob());
         } finally {
@@ -452,6 +451,7 @@ public final class JobSuite {
         setCurrentJobId(job.getId());
 
         JobStatus jobStatus = suiteStatus.getStatus(job);
+
         if (jobStatus.getState() == JobState.COMPLETED) {
             LOG.info("Job skipped: " + job.getId() + " (already completed)");
             fire(JefEvent.JOB_SKIPPED, jobStatus, job);
@@ -461,9 +461,9 @@ public final class JobSuite {
         boolean errorHandled = false;
         try {
             if (!jobStatus.isResumed()) {
-                jobStatus.setStartTime(LocalDateTime.now());
+                jobStatus.setStartTime(Instant.now());
                 LOG.info("Running {}: START ({})",
-                        job.getId(), LocalDateTime.now());
+                        job.getId(), Instant.now());
                 fire(JefEvent.JOB_STARTED, jobStatus, job);
             } else {
                 LOG.info("Running {}: RESUME ({})",
@@ -505,7 +505,7 @@ public final class JobSuite {
             //System.exit(-1)
         } finally {
             heartbeatGenerator.unregister(jobStatus);
-            jobStatus.setEndTime(LocalDateTime.now());
+            jobStatus.setEndTime(Instant.now());
             try {
                 suiteStatusDAO.write(jobStatus);
             } catch (IOException e) {
@@ -607,12 +607,12 @@ public final class JobSuite {
 
     private void backupSuite(JobSuiteStatus suiteStatus) { // throws IOException {
         JobStatus jobStatus = suiteStatus.getRootStatus();
-        LocalDateTime backupDate = jobStatus.getEndTime();
+        Instant backupDate = jobStatus.getEndTime();
         if (backupDate == null) {
             backupDate = jobStatus.getLastActivity();
         }
         if (backupDate == null) {
-            backupDate = LocalDateTime.now();
+            backupDate = Instant.now();
         }
         try {
             suiteStatusDAO.backup(getStatusBackupDir(backupDate));

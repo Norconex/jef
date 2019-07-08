@@ -24,8 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -227,16 +225,17 @@ public class JobSuiteStatusDAO
             config.loadFromProperties(r);
         }
 
-        LocalDateTime lastModified = LocalDateTime.from(
-                Files.getLastModifiedTime(file).toInstant().atZone(ZoneId.of("UTC")));
+        Instant lastModified = Files.getLastModifiedTime(file).toInstant();
+//        LocalDateTime lastModified = LocalDateTime.from(
+//                Files.getLastModifiedTime(file).toInstant().atZone(ZoneId.of("UTC")));
 
         LOG.trace("{} last activity: {}", file.toAbsolutePath(), lastModified);
 
         jsd.setLastActivity(lastModified);
         jsd.setProgress(config.getDouble("progress", 0d));
         jsd.setNote(config.getString("note", null));
-        jsd.setStartTime(config.getLocalDateTime("startTime"));
-        jsd.setEndTime(config.getLocalDateTime("endTime"));
+        jsd.setStartTime(config.getInstant("startTime"));
+        jsd.setEndTime(config.getInstant("endTime"));
         jsd.setStopRequested(config.getBoolean("stopRequested", false));
 
         Properties props = jsd.getProperties();
@@ -263,7 +262,7 @@ public class JobSuiteStatusDAO
         }
     }
 
-    public LocalDateTime touch(String jobId) throws IOException {
+    public Instant touch(String jobId) throws IOException {
         Path file = resolveJobFile(jobId);
 
         if (!file.toFile().exists()) {
@@ -272,7 +271,7 @@ public class JobSuiteStatusDAO
         }
         Instant now = Instant.now();
         Files.setLastModifiedTime(file, FileTime.from(now));
-        return LocalDateTime.from(now.atZone(ZoneId.of("UTC")));
+        return now;
     }
 
 

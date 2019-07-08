@@ -16,7 +16,7 @@ package com.norconex.jef5.status;
 
 import java.io.Serializable;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -42,25 +42,25 @@ public class JobStatusData
     private double progress;
     private String note;
     private final Properties properties = new Properties();
-    private LocalDateTime lastActivity;
+    private Instant lastActivity;
     private boolean stopRequested;
 
-    private LocalDateTime startTime;
+    private Instant startTime;
     //TODO is endTime required/useful, since lastActivity does it?
-    private LocalDateTime endTime;
+    private Instant endTime;
 
     /**
      * Gets the end time.
      * @return end time or <code>null</code> if the job has not ended
      */
-    public final LocalDateTime getEndTime() {
+    public final Instant getEndTime() {
         return endTime;
     }
     /**
      * Sets the end time.
      * @param endTime end time
      */
-    public final void setEndTime(final LocalDateTime endTime) {
+    public final void setEndTime(final Instant endTime) {
         this.endTime = endTime;
     }
 
@@ -68,14 +68,14 @@ public class JobStatusData
      * Gets the start time.
      * @return start time or <code>null</code> if the job has not yet started
      */
-    public final LocalDateTime getStartTime() {
+    public final Instant getStartTime() {
         return startTime;
     }
     /**
      * Sets the start time.
      * @param startTime start time
      */
-    public final void setStartTime(final LocalDateTime startTime) {
+    public final void setStartTime(final Instant startTime) {
         this.startTime = startTime;
     }
 
@@ -159,12 +159,12 @@ public class JobStatusData
      */
 
     public boolean isRunning() {
-        LocalDateTime date = lastActivity;
+        Instant date = lastActivity;
         if (date == null) {
             return false;
         }
         return ChronoUnit.MILLIS.between(
-                date, LocalDateTime.now()) < ACTIVITY_TIMEOUT;
+                date, Instant.now()) < ACTIVITY_TIMEOUT;
     }
 
     /**
@@ -223,14 +223,14 @@ public class JobStatusData
      * Gets the last activity.
      * @return last activity
      */
-    public LocalDateTime getLastActivity() {
+    public Instant getLastActivity() {
         return lastActivity;
     }
     /**
      * Sets the last activity.
      * @param lastActivity last activity
      */
-    public void setLastActivity(final LocalDateTime lastActivity) {
+    public void setLastActivity(final Instant lastActivity) {
         this.lastActivity = lastActivity;
     }
 

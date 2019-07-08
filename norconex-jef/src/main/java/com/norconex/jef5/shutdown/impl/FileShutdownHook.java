@@ -63,7 +63,7 @@ public class FileShutdownHook implements IShutdownHook {
                     stopMonitoring(stopFile);
                     stopSuite();
                 }
-                Sleeper.sleepSeconds(1);
+                Sleeper.sleepNanos(500);
             }
         }, "ShutdownHook Thread").start();
     }
