@@ -16,6 +16,10 @@
         ILogManager implementations can now return null appenders to disable
         JEF-managed logging.
       </action>
+      <action dev="essiembre" type="fix">
+        Improved detection of already running instance to prevent
+        IllegalStateException on startup.
+      </action>
       <action dev="essiembre" type="fix" issue="12">
         Now logs an error instead of throwing an exception when 
         a suite index file is empty. 

@@ -22,6 +22,7 @@ import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -451,35 +452,71 @@ public final class JobSuite {
         }
     }
 
-    private void initialize(boolean resumeIfIncomplete)
+    private synchronized void initialize(boolean resumeIfIncomplete)
             throws IOException {
-        JobSuiteStatusSnapshot statusTree =
-                JobSuiteStatusSnapshot.newSnapshot(getSuiteIndexFile());
 
-        if (statusTree != null) {
-            LOG.info("Previous execution detected.");
-            MutableJobStatus status = (MutableJobStatus) statusTree.getRoot();
-            JobState state = status.getState();
-            ensureValidExecutionState(state);
-            if (resumeIfIncomplete && !state.isOneOf(
-                    JobState.COMPLETED, JobState.PREMATURE_TERMINATION)) {
-                LOG.info("Resuming from previous execution.");
-                prepareStatusTreeForResume(statusTree);
+        // Use a a lock file while initializing to fix
+        // https://github.com/Norconex/collector-http/issues/634
+
+        File indexFile = getSuiteIndexFile();
+        File lockFile = new File(indexFile.getAbsolutePath() + ".lck");
+        // If file is not older than 5 seconds, we assume it is already running.
+        if (lockFile.exists()) {
+            if (FileUtils.isFileNewer(lockFile, System.currentTimeMillis()
+                    - JobHeartbeatGenerator.HEARTBEAT_INTERVAL)) {
+                throw new JEFException("JOB SUITE ALREADY RUNNING. Wait for "
+                        + "previous execution to complete, or stop it.");
             } else {
-                // Back-up so we can start clean
-                LOG.info("Backing up previous execution status and log files.");
-                backupSuite(statusTree);
-                statusTree = null;
+                // Delete old lock file
+                lockFile.delete();
             }
-        } else {
-            LOG.info("No previous execution detected.");
         }
-        if (statusTree == null) {
-            statusTree = JobSuiteStatusSnapshot.create(
-                    getRootJob(), getLogManager());
-            writeJobSuiteIndex(statusTree);
+
+        try (RandomAccessFile raf = new RandomAccessFile(lockFile, "rws");
+                FileChannel channel = raf.getChannel()) {
+
+            FileLock lock = channel.tryLock();
+            if (lock == null) {
+                throw new JEFException("JOB SUITE ALREADY STARTED. Wait for "
+                        + "previous execution to complete, or stop it.");
+            }
+
+            JobSuiteStatusSnapshot statusTree =
+                    JobSuiteStatusSnapshot.newSnapshot(indexFile);
+
+            if (statusTree != null) {
+                LOG.info("Previous execution detected.");
+                MutableJobStatus status =
+                        (MutableJobStatus) statusTree.getRoot();
+                JobState state = status.getState();
+                ensureValidExecutionState(state);
+                if (resumeIfIncomplete && !state.isOneOf(
+                        JobState.COMPLETED, JobState.PREMATURE_TERMINATION)) {
+                    LOG.info("Resuming from previous execution.");
+                    prepareStatusTreeForResume(statusTree);
+                } else {
+                    // Back-up so we can start clean
+                    LOG.info("Backing up previous execution status "
+                            + "and log files.");
+                    backupSuite(statusTree);
+                    statusTree = null;
+                }
+            } else {
+                LOG.info("No previous execution detected.");
+            }
+            if (statusTree == null) {
+                statusTree = JobSuiteStatusSnapshot.create(
+                        getRootJob(), getLogManager());
+                writeJobSuiteIndex(statusTree);
+            }
+            this.jobSuiteStatusSnapshot = statusTree;
+
+            lock.release();
+        } catch (OverlappingFileLockException e) {
+            throw new JEFException(
+                    "JOB SUITE ALREADY STARTED by another process.");
         }
-        this.jobSuiteStatusSnapshot = statusTree;
+        lockFile.deleteOnExit();
     }
 
     // This preparation is required otherwise, stopping of a resumed job

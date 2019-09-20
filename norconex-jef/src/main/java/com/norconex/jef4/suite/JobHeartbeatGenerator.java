@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2019 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@ import com.norconex.jef4.status.MutableJobStatus;
 
 public class JobHeartbeatGenerator extends Thread {
 
-    private static final long HEARTBEAT_INTERVAL = 5000;
-    
-    private final Queue<MutableJobStatus> statuses = 
+    public static final long HEARTBEAT_INTERVAL = 5000;
+
+    private final Queue<MutableJobStatus> statuses =
             new ConcurrentLinkedQueue<>();
     private final JobSuite suite;
-    
+
     private boolean terminate = false;
-    
+
     public JobHeartbeatGenerator(JobSuite suite) {
         super();
         this.suite = suite;
@@ -60,13 +60,13 @@ public class JobHeartbeatGenerator extends Thread {
     public void unregister(MutableJobStatus status) {
         statuses.remove(status);
     }
-    
+
     @Override
     public synchronized void start() {
         terminate = false;
         super.start();
     }
-    
+
     public void terminate() {
         terminate = true;
     }
