@@ -1,4 +1,13 @@
 
+LAST MERGE FROM MASTER
+======================
+
+2019-09-20
+
+
+TODO:
+==============
+
 = A unit tests for resumed jobs (with cummulated durations).
 
 - For JEF Job Groups, provide fluid-style way of adding child jobs. 

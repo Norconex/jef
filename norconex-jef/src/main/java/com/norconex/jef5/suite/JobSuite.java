@@ -14,7 +14,12 @@
  */
 package com.norconex.jef5.suite;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -259,41 +265,73 @@ public final class JobSuite {
     private JobSuiteStatus resolveSuiteStatus(boolean resumeIfIncomplete)
             throws IOException {
 
-        JobSuiteStatus status =
-                JobSuiteStatus.getInstance(getStatusIndex());
-//        JobSessionFacade facade = JobSessionFacade.get(getSuiteIndexFile());
+        // Use a a lock file while initializing to fix
+        // https://github.com/Norconex/collector-http/issues/634
 
-        if (status != null) {
-            LOG.info("Previous execution detected.");
-            JobStatus rootStatus = status.getRootStatus();
-            JobState state = rootStatus.getState();
-            ensureValidExecutionState(state);
-            if (resumeIfIncomplete && !state.isOneOf(
-                    JobState.COMPLETED, JobState.UNCOMPLETED)) {
-                LOG.info("Resuming from previous execution.");
-//TODO fix this:                prepareStatusTreeForResume(statusTree);
+        File indexFile = getStatusIndex().toFile();
+        File lockFile = new File(indexFile.getAbsolutePath() + ".lck");
+        // If file is not older than 5 seconds, we assume it is already running.
+        if (lockFile.exists()) {
+            if (FileUtils.isFileNewer(lockFile, System.currentTimeMillis()
+                    - JobHeartbeatGenerator.HEARTBEAT_INTERVAL)) {
+                throw new JefException("JOB SUITE ALREADY RUNNING. Wait for "
+                        + "previous execution to complete, or stop it.");
             } else {
-                // Back-up so we can start clean
-                //TODO only backup if backup dir set...
-                if (backupDisabled) {
-                    LOG.info("Deleting previous execution status.");
-                    suiteStatusDAO.delete();
-                    //deleteSuite(facade);
-                } else {
-                    LOG.info("Backing up previous execution status.");
-                    backupSuite(status);
-                }
-                status = null;
+                // Delete old lock file
+                lockFile.delete();
             }
-        } else {
-            LOG.info("No previous execution detected.");
         }
-        if (status == null) {
-            status = JobSuiteStatus.getInstance(this);
-            status.toXML(getStatusIndex());
-//            writeJobSuiteIndex();
-//            facade = JobSessionFacade.get(getSuiteIndexFile());
+
+        JobSuiteStatus status = null;
+        try (RandomAccessFile raf = new RandomAccessFile(lockFile, "rws");
+                FileChannel channel = raf.getChannel()) {
+
+            FileLock lock = channel.tryLock();
+            if (lock == null) {
+                throw new JefException("JOB SUITE ALREADY STARTED. Wait for "
+                        + "previous execution to complete, or stop it.");
+            }
+
+            status = JobSuiteStatus.getInstance(getStatusIndex());
+    //        JobSessionFacade facade = JobSessionFacade.get(getSuiteIndexFile());
+
+            if (status != null) {
+                LOG.info("Previous execution detected.");
+                JobStatus rootStatus = status.getRootStatus();
+                JobState state = rootStatus.getState();
+                ensureValidExecutionState(state);
+                if (resumeIfIncomplete && !state.isOneOf(
+                        JobState.COMPLETED, JobState.UNCOMPLETED)) {
+                    LOG.info("Resuming from previous execution.");
+    //TODO fix this:                prepareStatusTreeForResume(statusTree);
+                } else {
+                    // Back-up so we can start clean
+                    //TODO only backup if backup dir set...
+                    if (backupDisabled) {
+                        LOG.info("Deleting previous execution status.");
+                        suiteStatusDAO.delete();
+                        //deleteSuite(facade);
+                    } else {
+                        LOG.info("Backing up previous execution status.");
+                        backupSuite(status);
+                    }
+                    status = null;
+                }
+            } else {
+                LOG.info("No previous execution detected.");
+            }
+            if (status == null) {
+                status = JobSuiteStatus.getInstance(this);
+                status.toXML(getStatusIndex());
+    //            writeJobSuiteIndex();
+    //            facade = JobSessionFacade.get(getSuiteIndexFile());
+            }
+            lock.release();
+        } catch (OverlappingFileLockException e) {
+            throw new JefException(
+                    "JOB SUITE ALREADY STARTED by another process.");
         }
+        lockFile.deleteOnExit();
         return status;
     }
 
