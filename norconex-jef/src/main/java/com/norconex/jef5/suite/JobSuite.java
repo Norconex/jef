@@ -16,10 +16,6 @@ package com.norconex.jef5.suite;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -283,14 +279,15 @@ public final class JobSuite {
         }
 
         JobSuiteStatus status = null;
-        try (RandomAccessFile raf = new RandomAccessFile(lockFile, "rws");
-                FileChannel channel = raf.getChannel()) {
-
-            FileLock lock = channel.tryLock();
-            if (lock == null) {
-                throw new JefException("JOB SUITE ALREADY STARTED. Wait for "
-                        + "previous execution to complete, or stop it.");
-            }
+//        FileUtils.touch(lockFile);
+//        try (RandomAccessFile raf = new RandomAccessFile(lockFile, "rws");
+//                FileChannel channel = raf.getChannel()) {
+//
+//            FileLock lock = channel.tryLock();
+//            if (lock == null) {
+//                throw new JefException("JOB SUITE ALREADY STARTED. Wait for "
+//                        + "previous execution to complete, or stop it.");
+//            }
 
             status = JobSuiteStatus.getInstance(getStatusIndex());
     //        JobSessionFacade facade = JobSessionFacade.get(getSuiteIndexFile());
@@ -326,12 +323,12 @@ public final class JobSuite {
     //            writeJobSuiteIndex();
     //            facade = JobSessionFacade.get(getSuiteIndexFile());
             }
-            lock.release();
-        } catch (OverlappingFileLockException e) {
-            throw new JefException(
-                    "JOB SUITE ALREADY STARTED by another process.");
-        }
-        lockFile.deleteOnExit();
+//            lock.release();
+//        } catch (OverlappingFileLockException e) {
+//            throw new JefException(
+//                    "JOB SUITE ALREADY STARTED by another process.");
+//        }
+//        lockFile.deleteOnExit();
         return status;
     }
 
