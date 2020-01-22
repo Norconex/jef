@@ -7,6 +7,13 @@
   </properties>
   <body>
 
+    <release version="4.1.3-SNAPSHOT" date="2020-??-??" description="Bugfix release">
+      <action dev="essiembre" type="fix" issue="13">
+        Added conditional checks before log4j-specific method calls not covered
+        by "log4j-over-slf4j".
+      </action>
+    </release>
+
     <release version="4.1.2" date="2019-12-22" description="Maintenance release">
       <action dev="essiembre" type="add">
         New NoLogManager class to prevent JEF from adding its own file-based

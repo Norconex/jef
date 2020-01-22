@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2020 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package com.norconex.jef4.log;
 import org.apache.log4j.Layout;
 import org.apache.log4j.spi.LoggingEvent;
 
+import com.norconex.commons.lang.log.Log4jCheck;
 import com.norconex.jef4.suite.JobSuite;
 
 /**
@@ -31,7 +32,7 @@ public class ThreadSafeLayout extends Layout {
 
     /** Log4j log layout. */
     private final Layout layout;
-    
+
     /**
      * Constructor.
      * @param layout decorated layout
@@ -43,25 +44,31 @@ public class ThreadSafeLayout extends Layout {
 
     @Override
     public void activateOptions() {
-        layout.activateOptions();
+        if (Log4jCheck.present()) {
+            layout.activateOptions();
+        }
     }
 
     /**
      * Calls the decorated instance, prefixing with job identifier.
      * @see org.apache.log4j.Layout#format(org.apache.log4j.spi.LoggingEvent)
      */
-    @SuppressWarnings("nls")
     @Override
     public String format(LoggingEvent evt) {
         String jobId = JobSuite.getCurrentJobId();
-        if (jobId == null) {
-            return "[non-job]: " + layout.format(evt);
+        if (Log4jCheck.present()) {
+            if (jobId == null) {
+                return "[non-job]: " + layout.format(evt);
+            }
+            return jobId + ": " + layout.format(evt);
         }
-        return jobId + ": " + layout.format(evt);
+        return jobId + ": " + evt;
     }
-
     @Override
     public boolean ignoresThrowable() {
-        return layout.ignoresThrowable();
+        if (Log4jCheck.present()) {
+            return layout.ignoresThrowable();
+        }
+        return true;
     }
 }

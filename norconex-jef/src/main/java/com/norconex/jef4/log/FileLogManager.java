@@ -1,4 +1,4 @@
-/* Copyright 2010-2017 Norconex Inc.
+/* Copyright 2010-2020 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,16 +44,17 @@ import com.norconex.commons.lang.config.XMLConfigurationUtil;
 import com.norconex.commons.lang.file.FileUtil;
 import com.norconex.commons.lang.io.FilteredInputStream;
 import com.norconex.commons.lang.io.IInputStreamFilter;
+import com.norconex.commons.lang.log.Log4jCheck;
 import com.norconex.jef4.JEFException;
 import com.norconex.jef4.JEFUtil;
 
 /**
  * <p>
  * Log manager using the file system to store its logs.
- * When no log directory is explicitly set, it defaults to: 
+ * When no log directory is explicitly set, it defaults to:
  * <code>&lt;user.home&gt;/Norconex/jef/workdir</code>
  * </p>
- * 
+ *
  * <h3>XML configuration usage:</h3>
  * <pre>
  *  &lt;logManager class="com.norconex.jef4.log.FileLogManager"&gt;
@@ -70,28 +71,28 @@ import com.norconex.jef4.JEFUtil;
  *      &lt;logDir&gt;/tmp/jeflogs&lt;/logDir&gt;
  *  &lt;/logManager&gt;
  * </pre>
- * 
+ *
  * @author Pascal Essiembre
  */
 public class FileLogManager implements ILogManager {
 
     private static final Logger LOG =
             LogManager.getLogger(FileLogManager.class);
-    
-    private static final String LAYOUT_PATTERN = 
+
+    private static final String LAYOUT_PATTERN =
             "%d{yyyy-MM-dd HH:mm:ss} %p - %m\n";
-    
+
     /** Directory where to store the file. */
     private String logdirLatest;
     /** Directory where to backup the file. */
     private String logdirBackupBase;
     /** Base parent log directory. */
     private String logdir;
-    
+
     private static final String LOG_SUFFIX = ".log";
-    
+
     private boolean needToResolveDirs= true;
-    
+
     /**
      * Constructor using default log directory location.
      */
@@ -117,7 +118,7 @@ public class FileLogManager implements ILogManager {
         this.logdir = logdir;
         this.needToResolveDirs = true;
     }
-    
+
     private synchronized void resolveDirsIfNeeded() {
         // Leave now if we do not need to update dirs.
         if (!needToResolveDirs) {
@@ -131,9 +132,9 @@ public class FileLogManager implements ILogManager {
         } else {
             path = new File(path).getAbsolutePath();
         }
-        
-        LOG.debug("Log directory: " + path); 
-        logdirLatest = path + File.separatorChar 
+
+        LOG.debug("Log directory: " + path);
+        logdirLatest = path + File.separatorChar
                 + "latest" + File.separatorChar + "logs";
         logdirBackupBase = path + "/backup";
         File dir = new File(logdirLatest);
@@ -145,20 +146,23 @@ public class FileLogManager implements ILogManager {
                     throw new JEFException("Cannot create log directory: "
                             + logdirLatest, e);
                 }
-            }  
+            }
         }
         this.needToResolveDirs = false;
     }
-    
+
     @Override
     public final Appender createAppender(final String suiteId)
             throws IOException {
         resolveDirsIfNeeded();
-        return new FileAppender(new PatternLayout(LAYOUT_PATTERN),
-                logdirLatest + "/" + 
-                        FileUtil.toSafeFileName(suiteId) + LOG_SUFFIX);
+        if (Log4jCheck.present()) {
+            return new FileAppender(new PatternLayout(LAYOUT_PATTERN),
+                    logdirLatest + "/" +
+                            FileUtil.toSafeFileName(suiteId) + LOG_SUFFIX);
+        }
+        return null;
     }
-    
+
     @Override
     public final void backup(final String suiteId, final Date backupDate)
             throws IOException {
@@ -166,7 +170,7 @@ public class FileLogManager implements ILogManager {
         String date = new SimpleDateFormat(
                 "yyyyMMddHHmmssSSSS").format(backupDate);
         File progressFile = getLogFile(suiteId);
-        
+
 
         File backupDir = FileUtil.createDateDirs(
                 new File(logdirBackupBase), backupDate);
@@ -178,9 +182,9 @@ public class FileLogManager implements ILogManager {
                 throw new JEFException("Cannot create backup directory: "
                         + backupDir, e);
             }
-        }        
+        }
         File backupFile = new File(
-                backupDir + "/" + date + "__" 
+                backupDir + "/" + date + "__"
                         + FileUtil.toSafeFileName(suiteId) + LOG_SUFFIX);
         if (progressFile.exists()) {
             FileUtil.moveFile(progressFile, backupFile);
@@ -218,10 +222,10 @@ public class FileLogManager implements ILogManager {
             return null;
         }
         resolveDirsIfNeeded();
-        return new File(logdirLatest + "/" 
+        return new File(logdirLatest + "/"
                 + FileUtil.toSafeFileName(suiteId) + LOG_SUFFIX);
     }
-    
+
     @Override
     public void loadFromXML(Reader in) throws IOException {
         XMLConfiguration xml = XMLConfigurationUtil.newXMLConfiguration(in);
@@ -243,7 +247,7 @@ public class FileLogManager implements ILogManager {
             writer.close();
         } catch (XMLStreamException e) {
             throw new IOException("Cannot save as XML.", e);
-        }       
+        }
     }
 
     private static class StartWithFilter implements IInputStreamFilter {

@@ -1,4 +1,4 @@
-/* Copyright 2010-2019 Norconex Inc.
+/* Copyright 2010-2020 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.norconex.commons.lang.file.FileUtil;
+import com.norconex.commons.lang.log.Log4jCheck;
 import com.norconex.jef4.JEFException;
 import com.norconex.jef4.JEFUtil;
 import com.norconex.jef4.job.IJob;
@@ -309,8 +310,10 @@ public final class JobSuite {
             // Remove appender
             if (appender != null) {
                 appender.close();
+                if (Log4jCheck.present()) {
+                    Logger.getRootLogger().removeAppender(appender);
+                }
             }
-            Logger.getRootLogger().removeAppender(appender);
             heartbeatGenerator.terminate();
         }
 
