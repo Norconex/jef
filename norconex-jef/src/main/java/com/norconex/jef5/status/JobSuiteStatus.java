@@ -192,9 +192,8 @@ public class JobSuiteStatus implements Serializable {
             }
             dao = new JobSuiteStatusDAO(tree.jobId, suiteIndex.getParent());
             return new JobSuiteStatus(tree, dao);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public static JobSuiteStatus getInstance(

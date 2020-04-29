@@ -272,10 +272,9 @@ public final class JobSuite {
                     - JobHeartbeatGenerator.HEARTBEAT_INTERVAL)) {
                 throw new JefException("JOB SUITE ALREADY RUNNING. Wait for "
                         + "previous execution to complete, or stop it.");
-            } else {
-                // Delete old lock file
-                lockFile.delete();
             }
+            // Delete old lock file
+            lockFile.delete();
         }
 
         JobSuiteStatus status = null;
