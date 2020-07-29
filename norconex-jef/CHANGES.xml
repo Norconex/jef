@@ -7,7 +7,7 @@
   </properties>
   <body>
 
-    <release version="5.0.0" date="2018-??-??" description="Major release">
+    <release version="5.0.0" date="2020-??-??" description="Major release">
       <action dev="essiembre" type="add">
         Major refactor: 
           - Now requires Java 8 minimum.

@@ -1,12 +1,12 @@
 Norconex JEF
-Copyright 2010-2014 Norconex Inc.
+Copyright 2010-2020 Norconex Inc.
 
 
 For any inquiries about Norconex JEF, 
 please contact Norconex Inc. at info@norconex.com.
 
 This product website and documentation is located at:
-http://www.norconex.com/product/jef/
+https://opensource.norconex.com/jef/api
 
 Norconex licenses:
 ==================

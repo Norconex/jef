@@ -128,10 +128,10 @@
   <distributionManagement>
     <site>
       <id>norconex-site-deployment</id>
-      <url>${site.baseurl}/jef/api/latest</url>
+      <url>${site.baseurl}/jef/api/v5</url>
     </site>
   </distributionManagement>
-  
+  <!-- 
   <reporting>
     <plugins>
       <plugin>
@@ -154,7 +154,7 @@
           <header><![CDATA[
             <style>div.aboutLanguage .siteLink {font-size: 2em;}</style>
             <span class="siteLink">
-              <a href="http://www.norconex.com/jef/api">Norconex JEF API</a>
+              <a href="https://opensource.norconex.com/jef/api">Norconex JEF API</a>
             </span>
             ]]>
           </header>
@@ -172,7 +172,7 @@
             </script>
             <a style="font-size: 1.4em;" href="https://github.com/norconex/jef/issues">Submit an Issue</a>
             &nbsp;&nbsp;|&nbsp;&nbsp; 
-            <a style="font-size: 1.4em;" href="http://www.norconex.com">www.norconex.com</a>
+            <a style="font-size: 1.4em;" href="https://norconex.com">norconex.com</a>
             ]]>
           </footer>
           <show>protected</show>
@@ -192,8 +192,9 @@
       </plugin>
     </plugins>
   </reporting>  
+   -->
 
-  <url>http://www.norconex.com/jef/api</url>
+  <url>https://opensource.norconex.com/jef/api</url>
   <description>JEF is a Java API library meant to facilitate the lives of developers and integrators who have to build any kind of maintenance tasks on a server.</description>
   <issueManagement>
     <system>GitHub</system>

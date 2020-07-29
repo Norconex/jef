@@ -1,5 +1,5 @@
 <!-- 
-   Copyright 2013-2014 Norconex Inc.
+   Copyright 2013-2020 Norconex Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -28,11 +28,19 @@
         <exclude>dist.xml</exclude>
       </excludes>
       <includes>
+        <include>README.txt</include>
         <include>scripts/**</include>
         <include>third-party/**</include>
-        <include>*.txt</include>
       </includes>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>./</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}</directory>
+      <includes>
+        <include>LICENSE</include>
+        <include>CHANGES.xml</include>
+      </includes>
+      <outputDirectory>./</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>${project.build.directory}/site/apidocs</directory>
@@ -44,7 +52,7 @@
         <exclude>scripts/decrypt*</exclude>
         <exclude>scripts/encrypt*</exclude>
       </excludes>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>./</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>${project.build.directory}/generated-resources</directory>
@@ -55,16 +63,18 @@
       <includes>
         <include>THIRD-PARTY.txt</include>
       </includes>
-      <outputDirectory>third-party</outputDirectory>
+      <outputDirectory>./third-party</outputDirectory>
     </fileSet>    
   </fileSets>
   <dependencySets>
     <dependencySet>
+<!--
       <excludes>
         <exclude>junit*</exclude>
         <exclude>hamcrest-core*</exclude>
       </excludes>
-      <outputDirectory>lib</outputDirectory>
+ -->
+       <outputDirectory>./lib</outputDirectory>
       <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}.${artifact.extension}</outputFileNameMapping>      
     </dependencySet>
   </dependencySets>
