@@ -24,11 +24,11 @@ import com.norconex.jef5.suite.JobSuiteConfig;
 public final class JEFTestUtil {
 
     public static final String TEMP_DIR_ROOT = "jef-junit";
-    
+
     private JEFTestUtil() {
         super();
     }
-    
+
     public static JobSuiteConfig newConfig(
             TemporaryFolder folder) throws IOException {
         JobSuiteConfig config = new JobSuiteConfig();

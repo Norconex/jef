@@ -1,4 +1,4 @@
-/* Copyright 2010-2018 Norconex Inc.
+/* Copyright 2010-2020 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public class JobSuiteConfig implements IXMLConfigurable {
 
     private Path workdir;
     private boolean backupDisabled;
-    private final List<IEventListener<Event<?>>> eventListeners =
+    private final List<IEventListener<Event>> eventListeners =
             new ArrayList<>();
 
     public JobSuiteConfig() {
@@ -54,23 +54,22 @@ public class JobSuiteConfig implements IXMLConfigurable {
         this.backupDisabled = backupDisabled;
     }
 
-    public List<IEventListener<Event<?>>> getEventListeners() {
+    public List<IEventListener<Event>> getEventListeners() {
         return Collections.unmodifiableList(eventListeners);
     }
     @SuppressWarnings("unchecked")
-    public void setEventListeners(IEventListener<Event<?>>... eventListeners) {
+    public void setEventListeners(IEventListener<Event>... eventListeners) {
         CollectionUtil.setAll(this.eventListeners, eventListeners);
     }
     @SuppressWarnings("unchecked")
-    public void addEventListeners(IEventListener<Event<?>>... eventListeners) {
+    public void addEventListeners(IEventListener<Event>... eventListeners) {
         this.eventListeners.addAll(Arrays.asList(eventListeners));
     }
     public void removeEventListeners() {
         this.eventListeners.clear();
     }
     @SuppressWarnings("unchecked")
-    public void removeEventListeners(
-            IEventListener<Event<?>>... eventListeners) {
+    public void removeEventListeners(IEventListener<Event>... eventListeners) {
         this.eventListeners.removeAll(Arrays.asList(eventListeners));
     }
 

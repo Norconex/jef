@@ -1,4 +1,4 @@
-/* Copyright 2010-2018 Norconex Inc.
+/* Copyright 2010-2020 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -532,9 +532,7 @@ public final class JobSuite {
             success = false;
             LOG.error("Execution failed for job: " + job.getId(), e);
             fire(JefEvent.JOB_ERROR, jobStatus, job, e);
-            if (jobStatus != null) {
-                jobStatus.setNote("Error occured: " + e.getLocalizedMessage());
-            }
+            jobStatus.setNote("Error occured: " + e.getLocalizedMessage());
             errorHandled = true;
             //System.exit(-1)
         } finally {
@@ -774,12 +772,16 @@ public final class JobSuite {
 //    }
 
     private void fire(String eventName, JobStatus status, Object source) {
-        eventManager.fire(JefEvent.create(eventName, status, source));
+        eventManager.fire(new JefEvent.Builder(eventName, source)
+                .status(status)
+                .build());
     }
     private void fire(String eventName, JobStatus status,
             Object source, Throwable exception) {
-        eventManager.fire(
-                JefEvent.create(eventName, status, source, exception));
+        eventManager.fire(new JefEvent.Builder(eventName, source)
+                .status(status)
+                .exception(exception)
+                .build());
     }
 //    public void fire(JefEvent event) {
 //        eventManager.fire(event);

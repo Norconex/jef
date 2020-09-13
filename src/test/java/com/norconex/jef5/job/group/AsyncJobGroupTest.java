@@ -49,11 +49,11 @@ public class AsyncJobGroupTest {
         IJob job3 = new SleepyJob(3 * sleepMultiplier, 1);
         IJob rootJob = new AsyncJobGroup(
                 "async sleepy jobs", 2, job1, job2, job3);
-        
+
         JobSuite suite = new JobSuite(
                 rootJob, JEFTestUtil.newConfig(folder, tempFolder));
         Assert.assertTrue("Suite failed.", suite.execute());
-        
+
         assertStatus(suite.getJobStatus(job1));
         assertStatus(suite.getJobStatus(job2));
         assertStatus(suite.getJobStatus(job3));
@@ -66,7 +66,7 @@ public class AsyncJobGroupTest {
         assertTrue(status.getProgress() == 1d);
 //        assertTrue(status.getState() == JobState.COMPLETED);
     }
-    
+
     public static void main(String[] args) throws IOException {
         if (args.length < 1) {
             System.out.println("Usage: <app> workdir [sleepScale]");
@@ -80,7 +80,7 @@ public class AsyncJobGroupTest {
         if (args.length == 2) {
             scale = Integer.parseInt(args[1]);
         }
-        
+
         AsyncJobGroupTest test = new AsyncJobGroupTest();
         test.folder = dir;
         test.sleepMultiplier = scale;

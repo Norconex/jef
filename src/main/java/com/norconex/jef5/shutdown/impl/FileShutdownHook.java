@@ -1,4 +1,4 @@
-/* Copyright 2018 Norconex Inc.
+/* Copyright 2018-2020 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,12 +129,14 @@ public class FileShutdownHook implements IShutdownHook {
 
         // Notify Suite Life Cycle listeners
         suite.getEventManager().fire(
-                JefEvent.create(JefEvent.SUITE_STOPPING, null, suite));
+                new JefEvent.Builder(JefEvent.SUITE_STOPPING, suite).build());
 
         // Notify Job Life Cycle listeners and stop them
         suite.accept((final IJob job, final JobStatus jobStatus) -> {
             suite.getEventManager().fire(
-                    JefEvent.create(JefEvent.JOB_STOPPING, jobStatus, suite));
+                    new JefEvent.Builder(JefEvent.JOB_STOPPING, suite)
+                        .status(jobStatus)
+                        .build());
             new Thread(() -> stopJob(job, jobStatus), "Stop Thread").start();
         });
     }
@@ -146,10 +148,12 @@ public class FileShutdownHook implements IShutdownHook {
         }
         if (status.getState() == JobState.STOPPED) {
             suite.getEventManager().fire(
-                    JefEvent.create(JefEvent.JOB_STOPPED, status, suite));
+                    new JefEvent.Builder(JefEvent.JOB_STOPPED, suite)
+                        .status(status)
+                        .build());
             if (job.getId().equals(suite.getRootJob().getId())) {
-                suite.getEventManager().fire(
-                        JefEvent.create(JefEvent.SUITE_STOPPED, null, suite));
+                suite.getEventManager().fire(new JefEvent.Builder(
+                        JefEvent.SUITE_STOPPED, suite).build());
             }
         }
     }

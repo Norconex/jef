@@ -1,4 +1,4 @@
-/* Copyright 2010-2018 Norconex Inc.
+/* Copyright 2010-2020 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,9 @@
  */
 package com.norconex.jef5.status;
 
-import com.norconex.jef5.status.JobStatus;
-
 /**
- * Allows one to "visit" job statuses and walk the status hierarchy with 
- * minimal effort (matching job hierarchy).  
+ * Allows one to "visit" job statuses and walk the status hierarchy with
+ * minimal effort (matching job hierarchy).
  * @author Pascal Essiembre
  */
 public interface IJobStatusVisitor {

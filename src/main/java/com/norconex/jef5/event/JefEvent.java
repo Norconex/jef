@@ -1,4 +1,4 @@
-/* Copyright 2018 Norconex Inc.
+/* Copyright 2018-2020 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,13 @@
  */
 package com.norconex.jef5.event;
 
+import java.math.RoundingMode;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.norconex.commons.lang.event.Event;
 import com.norconex.jef5.status.JobStatus;
@@ -26,7 +29,7 @@ import com.norconex.jef5.status.JobStatus;
  * A crawler event.
  * @author Pascal Essiembre
  */
-public class JefEvent extends Event<Object> {
+public class JefEvent extends Event {
 
     private static final long serialVersionUID = 1L;
 
@@ -62,17 +65,32 @@ public class JefEvent extends Event<Object> {
 
     private final JobStatus status;
 
+    public static class Builder extends Event.Builder<Builder> {
+
+        private JobStatus status;
+
+        public Builder(String name, Object source) {
+            super(name, source);
+        }
+
+        public Builder status(JobStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        @Override
+        public JefEvent build() {
+            return new JefEvent(this);
+        }
+    }
+
     /**
-     * New crawler event.
-     * @param name event name
-     * @param status job status
-     * @param source object responsible for triggering the event
-     * @param exception exception
+     * New event.
+     * @param b builder
      */
-    public JefEvent(String name, JobStatus status,
-            Object source, Throwable exception) {
-        super(name, source, exception);
-        this.status = status;
+    protected JefEvent(Builder b) {
+        super(b);
+        this.status = b.status;
     }
 
     /**
@@ -93,45 +111,14 @@ public class JefEvent extends Event<Object> {
     }
     @Override
     public String toString() {
-        return new ReflectionToStringBuilder(
-                this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+        ToStringBuilder b = new ToStringBuilder(
+                this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .appendSuper(super.toString());
+        if (status != null) {
+            b.append("progress", NumberUtils.toScaledBigDecimal(
+                    status.getProgress(), 2, RoundingMode.FLOOR));
+            b.append("note", status.getNote());
+        }
+        return b.toString();
     }
-
-    public static JefEvent create(
-            String name, JobStatus status, Object source) {
-        return create(name, status, source, null);
-    }
-    public static JefEvent create(String name, JobStatus status,
-            Object source, Throwable exception) {
-        return new JefEvent(name, status, source, exception);
-    }
-
-
-//    @Override
-//    public boolean equals(final Object other) {
-//        if (!(other instanceof JefEvent)) {
-//            return false;
-//        }
-//        JefEvent castOther = (JefEvent) other;
-//        return new EqualsBuilder()
-//                .appendSuper(super.equals(other))
-//                .append(status, castOther.status)
-//                .isEquals();
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return new HashCodeBuilder()
-//                .appendSuper(super.hashCode())
-//                .append(status)
-//                .toHashCode();
-//    }
-//
-//    @Override
-//    public String toString() {
-//        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-//                .appendSuper(super.toString())
-//                .append("status", status)
-//                .toString();
-//    }
 }
