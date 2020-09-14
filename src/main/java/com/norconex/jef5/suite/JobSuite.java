@@ -747,6 +747,7 @@ public final class JobSuite {
         if (configWorkdir == null) {
             dir = Paths.get(".");
         }
+        dir = dir.normalize();
         if (!dir.toFile().exists()) {
             try {
                 Files.createDirectories(dir);
@@ -758,7 +759,7 @@ public final class JobSuite {
             throw new JefException("Invalid work directory: " + dir);
 
         }
-        LOG.info("JEF work directory is: {}", dir.toAbsolutePath());
+        LOG.info("Work directory is: {}", dir.toAbsolutePath());
         return dir;
     }
 
