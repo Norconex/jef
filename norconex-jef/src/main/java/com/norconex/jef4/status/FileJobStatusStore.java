@@ -244,7 +244,7 @@ public class FileJobStatusStore implements IJobStatusStore {
         for (String key : config.keySet()) {
             if (key.startsWith("prop.")) {
                 props.put(StringUtils.removeStart(
-                        "prop.", key), props.get(key));
+                        key, "prop."), config.get(key));
             }
         }
         return jobStatus;
