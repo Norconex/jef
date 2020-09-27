@@ -237,11 +237,10 @@ public class JobSuiteStatusDAO
         jsd.setStartTime(config.getInstant("startTime"));
         jsd.setEndTime(config.getInstant("endTime"));
         jsd.setStopRequested(config.getBoolean("stopRequested", false));
-
         Properties props = jsd.getProperties();
         for (String key : config.keySet()) {
             if (key.startsWith(".")) {
-                props.put(StringUtils.removeStart(".", key), props.get(key));
+                props.put(StringUtils.removeStart(key, "."), config.get(key));
             }
         }
     }

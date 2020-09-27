@@ -14,6 +14,8 @@
  */
 package com.norconex.jef5.status;
 
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
@@ -21,10 +23,13 @@ import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.EqualsExclude;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.HashCodeExclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringExclude;
 
+import com.norconex.commons.lang.EqualsUtil;
 import com.norconex.commons.lang.map.Properties;
 
 
@@ -42,6 +47,9 @@ public class JobStatusData
     private double progress;
     private String note;
     private final Properties properties = new Properties();
+    @ToStringExclude
+    @HashCodeExclude
+    @EqualsExclude
     private Instant lastActivity;
     private boolean stopRequested;
 
@@ -250,44 +258,19 @@ public class JobStatusData
 
     @Override
     public boolean equals(final Object other) {
-        if (!(other instanceof JobStatusData)) {
-            return false;
+        Properties otherProps = null;
+        if (other != null) {
+            otherProps = ((JobStatusData) other).properties;
         }
-        JobStatusData castOther = (JobStatusData) other;
-        return new EqualsBuilder()
-                .append(progress, castOther.progress)
-                .append(note, castOther.note)
-                .append(properties, castOther.properties)
-                .append(lastActivity, castOther.lastActivity)
-                .append(stopRequested, castOther.stopRequested)
-                .append(startTime, castOther.startTime)
-                .append(endTime, castOther.endTime)
-                .isEquals();
+        return EqualsBuilder.reflectionEquals(this, other, "properties")
+                 &&  EqualsUtil.equalsMap(properties, otherProps);
     }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-                .append(progress)
-                .append(note)
-                .append(properties)
-                .append(lastActivity)
-                .append(stopRequested)
-                .append(startTime)
-                .append(endTime)
-                .toHashCode();
+        return HashCodeBuilder.reflectionHashCode(this);
     }
-
     @Override
     public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("progress", progress)
-                .append("note", note)
-                .append("properties", properties)
-                .append("lastActivity", lastActivity)
-                .append("stopRequested", stopRequested)
-                .append("startTime", startTime)
-                .append("endTime", endTime)
-                .toString();
+        return ToStringBuilder.reflectionToString(this, SHORT_PREFIX_STYLE);
     }
 }

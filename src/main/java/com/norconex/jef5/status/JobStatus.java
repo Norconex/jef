@@ -14,6 +14,8 @@
  */
 package com.norconex.jef5.status;
 
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
@@ -21,9 +23,11 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.EqualsExclude;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.HashCodeExclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringExclude;
 
 
 
@@ -35,6 +39,11 @@ public class JobStatus extends JobStatusData {
 
     //TODO have status Comparable by JobDuration (startDate)
     private final String jobId;
+
+    //TODO remove the keeping of resumed attempts.
+    @ToStringExclude
+    @HashCodeExclude
+    @EqualsExclude
     private final Set<JobStatusData> resumedAttempts = new TreeSet<>();
 
     public JobStatus(String jobId, Set<JobStatusData> resumedAttempts) {
@@ -101,32 +110,14 @@ public class JobStatus extends JobStatusData {
 
     @Override
     public boolean equals(final Object other) {
-        if (!(other instanceof JobStatus)) {
-            return false;
-        }
-        JobStatus castOther = (JobStatus) other;
-        return new EqualsBuilder()
-                .appendSuper(super.equals(castOther))
-                .append(jobId, castOther.jobId)
-                .append(resumedAttempts, castOther.resumedAttempts)
-                .isEquals();
+        return EqualsBuilder.reflectionEquals(this, other);
     }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-                .append(super.hashCode())
-                .append(jobId)
-                .append(resumedAttempts)
-                .toHashCode();
+        return HashCodeBuilder.reflectionHashCode(this);
     }
-
     @Override
     public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .appendSuper(super.toString())
-                .append("name", jobId)
-                .append("resumedAttempts", resumedAttempts)
-                .toString();
+        return ToStringBuilder.reflectionToString(this, SHORT_PREFIX_STYLE);
     }
 }
