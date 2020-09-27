@@ -12,6 +12,9 @@
         Added conditional checks before log4j-specific method calls not covered
         by "log4j-over-slf4j".
       </action>
+      <action dev="kemcon" type="fix" issue="15">
+        Fixed FileJobStatusStore not storing status properties properly.
+      </action>
     </release>
 
     <release version="4.1.2" date="2019-12-22" description="Maintenance release">

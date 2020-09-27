@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Norconex Inc.
+/* Copyright 2010-2020 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,35 @@
  */
 package com.norconex.jef4.status;
 
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+
 import java.util.Date;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.EqualsExclude;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.HashCodeExclude;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringExclude;
 
+import com.norconex.commons.lang.EqualsUtil;
 import com.norconex.commons.lang.map.Properties;
 
 public class MutableJobStatus implements IJobStatus {
 
     /** Activity timeout. */
     private static final long ACTIVITY_TIMEOUT = 10 * 1000;
-    
+
     private final String jobId;
     private double progress;
     private String note;
     private int resumeAttempts;
     private JobDuration duration = new JobDuration();
     private Properties properties = new Properties();
+    @ToStringExclude
+    @HashCodeExclude
+    @EqualsExclude
     private Date lastActivity;
     private boolean stopRequested;
 
@@ -61,12 +73,12 @@ public class MutableJobStatus implements IJobStatus {
         return JobState.UNKNOWN;
     }
 
-    
+
     @Override
     public boolean isStopped() {
         return stopRequested && !isRunning();
     }
-    
+
     @Override
     public boolean isStopping() {
         return stopRequested && isRunning();
@@ -80,7 +92,7 @@ public class MutableJobStatus implements IJobStatus {
     }
 
     /**
-     * Whether this status resumed from a previously 
+     * Whether this status resumed from a previously
      * failed or stopped job.
      * @return <code>true</code> if the current job was resumed
      * @since 1.1.1
@@ -89,7 +101,7 @@ public class MutableJobStatus implements IJobStatus {
     public boolean isResumed() {
         return resumeAttempts > 0;
     }
-    
+
     /**
      * Checks whether the job was started or not.  This is not an indication
      * that a job is currently running.
@@ -130,11 +142,11 @@ public class MutableJobStatus implements IJobStatus {
      */
     @Override
     public boolean isAborted() {
-        return isStarted() && !isRunning() 
-                && duration.getEndTime() == null 
+        return isStarted() && !isRunning()
+                && duration.getEndTime() == null
                 && !isCompleted();
     }
-    
+
     /**
      * Checks whether the job execution represented by this progress is still
      * running.
@@ -149,7 +161,7 @@ public class MutableJobStatus implements IJobStatus {
         return (System.currentTimeMillis() - date.getTime())
                 < ACTIVITY_TIMEOUT;
     }
-    
+
     /**
      * Checks whether the current progress status matches any of the supplied
      * statuses.
@@ -167,7 +179,7 @@ public class MutableJobStatus implements IJobStatus {
         }
         return false;
     }
-    
+
     @Override
     public double getProgress() {
         return progress;
@@ -191,11 +203,11 @@ public class MutableJobStatus implements IJobStatus {
     public void setProgress(double progress) {
         this.progress = progress;
     }
-    
+
     public void setNote(String note) {
         this.note = note;
     }
-    
+
     public void setDuration(JobDuration duration) {
         this.duration = duration;
     }
@@ -204,6 +216,7 @@ public class MutableJobStatus implements IJobStatus {
      * Gets the last activity.
      * @return last activity
      */
+    @Override
     public Date getLastActivity() {
         return ObjectUtils.clone(lastActivity);
     }
@@ -214,7 +227,7 @@ public class MutableJobStatus implements IJobStatus {
     public void setLastActivity(final Date lastActivity) {
         this.lastActivity = ObjectUtils.clone(lastActivity);
     }
-    
+
     @Override
     public int getResumeAttempts() {
         return resumeAttempts;
@@ -222,8 +235,26 @@ public class MutableJobStatus implements IJobStatus {
     public void setResumeAttempts(int resumeAttempts) {
         this.resumeAttempts = resumeAttempts;
     }
-    
+
     public void incrementResumeAttempts() {
-        resumeAttempts++;        
+        resumeAttempts++;
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        Properties otherProps = null;
+        if (other != null) {
+            otherProps = ((MutableJobStatus) other).properties;
+        }
+        return EqualsBuilder.reflectionEquals(this, other, "properties")
+                 &&  EqualsUtil.equalsMap(properties, otherProps);
+    }
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, SHORT_PREFIX_STYLE);
     }
 }

@@ -1,4 +1,4 @@
-/* Copyright 2010-2017 Norconex Inc.
+/* Copyright 2010-2020 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,11 +50,11 @@ import com.norconex.jef4.job.JobException;
 /**
  * <p>
  * File-based status store. The created
- * file name matches the job id, plus the ".job" extension. If no 
- * status directory is explicitly set, it defaults to: 
+ * file name matches the job id, plus the ".job" extension. If no
+ * status directory is explicitly set, it defaults to:
  * <code>&lt;user.home&gt;/Norconex/jef/workdir</code>
  * </p>
- * 
+ *
  * <h3>XML configuration usage:</h3>
  * <pre>
  *  &lt;statusStore class="com.norconex.jef4.status.FileJobStatusStore"&gt;
@@ -63,7 +63,7 @@ import com.norconex.jef4.job.JobException;
  * </pre>
  * <h4>Usage example:</h4>
  * <p>
- * The following example indicates status files should be stored in this 
+ * The following example indicates status files should be stored in this
  * directory:
  * <code>/tmp/jefstatuses</code>
  * </p>
@@ -72,7 +72,7 @@ import com.norconex.jef4.job.JobException;
  *      &lt;statusDir&gt;/tmp/jefstatuses&lt;/statusDir&gt;
  *  &lt;/statusStore&gt;
  * </pre>
- * 
+ *
  * @author Pascal Essiembre
  */
 public class FileJobStatusStore implements IJobStatusStore {
@@ -85,7 +85,7 @@ public class FileJobStatusStore implements IJobStatusStore {
     private String statusDir;
 
     private boolean needToResolveDirs= true;
-    
+
     public FileJobStatusStore() {
         super();
         this.needToResolveDirs = true;
@@ -99,7 +99,7 @@ public class FileJobStatusStore implements IJobStatusStore {
         this.statusDir = statusDir;
         this.needToResolveDirs = true;
     }
-    
+
     public String getStatusDirectory() {
         return statusDir;
     }
@@ -122,8 +122,8 @@ public class FileJobStatusStore implements IJobStatusStore {
         } else {
             path = new File(path).getAbsolutePath();
         }
-        LOG.debug("Status serialization directory: " + path); 
-        jobdirLatest = path + File.separatorChar 
+        LOG.debug("Status serialization directory: " + path);
+        jobdirLatest = path + File.separatorChar
                 + "latest" + File.separatorChar + "status";
         jobdirBackupBase = path + "/backup";
         File dir = new File(jobdirLatest);
@@ -152,7 +152,7 @@ public class FileJobStatusStore implements IJobStatusStore {
         if (jobStatus.getResumeAttempts() > 0) {
             config.setInt("resumeAttempts", jobStatus.getResumeAttempts());
             config.setDate("resumedStartTime", duration.getResumedStartTime());
-            config.setDate("resumedLastActivity", 
+            config.setDate("resumedLastActivity",
                     duration.getResumedLastActivity());
         }
         if (duration.getStartTime() != null) {
@@ -173,9 +173,9 @@ public class FileJobStatusStore implements IJobStatusStore {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Writing status file: " + file);
         }
-        
+
         synchronized(jobStatus) {
-            // Using RandomAccessFile since evidence has shown it is better at 
+            // Using RandomAccessFile since evidence has shown it is better at
             // dealing with files/locks in a way that cause less/no errors.
             // "d" ensures content is all written before a read.
             try (RandomAccessFile ras = new RandomAccessFile(file, "rwd");
@@ -191,11 +191,11 @@ public class FileJobStatusStore implements IJobStatusStore {
     @Override
     public final IJobStatus read(String suiteName, final String jobId)
             throws IOException {
-        
+
         resolveDirsIfNeeded();
         MutableJobStatus jobStatus = new MutableJobStatus(jobId);
         File file = getStatusFile(suiteName, jobId);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Reading status file: " + file);
         }
@@ -208,8 +208,8 @@ public class FileJobStatusStore implements IJobStatusStore {
         }
 
         Properties config = new Properties();
-        
-        // Using RandomAccessFile since evidence has shown it is better at 
+
+        // Using RandomAccessFile since evidence has shown it is better at
         // dealing with files/locks in a way that cause less/no errors.
         try (RandomAccessFile ras = new RandomAccessFile(file, "r")) {
             StringReader sr = new StringReader(ras.readUTF());
@@ -218,17 +218,17 @@ public class FileJobStatusStore implements IJobStatusStore {
             LOG.error("Cannot read file: " + file.getAbsolutePath());
             throw e;
         }
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(jobId + " last active time: "
                     + new Date(file.lastModified()));
         }
         jobStatus.setLastActivity(new Date(file.lastModified()));
-        
+
         jobStatus.setProgress(config.getDouble("progress", 0d));
         jobStatus.setNote(config.getString("note", null));
         jobStatus.setResumeAttempts(config.getInt("resumeAttempts", 0));
-        
+
         JobDuration duration = new JobDuration();
         duration.setResumedStartTime(
                 config.getDate("resumedStartTime", null));
@@ -239,7 +239,7 @@ public class FileJobStatusStore implements IJobStatusStore {
         jobStatus.setDuration(duration);
 
         jobStatus.setStopRequested(config.getBoolean("stopped", false));
-        
+
         Properties props = jobStatus.getProperties();
         for (String key : config.keySet()) {
             if (key.startsWith("prop.")) {
@@ -274,7 +274,7 @@ public class FileJobStatusStore implements IJobStatusStore {
         FileUtils.touch(file);
         return file.lastModified();
     }
-    
+
     /**
      * Gets the file used to store the job progress.
      * @param suiteName name space given to the job progress
@@ -283,7 +283,7 @@ public class FileJobStatusStore implements IJobStatusStore {
      */
     private File getStatusFile(final String suiteName, final String jobId) {
         resolveDirsIfNeeded();
-        return new File(jobdirLatest 
+        return new File(jobdirLatest
                 + "/" + FileUtil.toSafeFileName(suiteName)
                 + "__" + FileUtil.toSafeFileName(jobId) + ".job");
     }
@@ -294,7 +294,7 @@ public class FileJobStatusStore implements IJobStatusStore {
      * @param backupDate date used to timestamp to backup
      * @return file used to store the job process
      */
-    private File getBackupFile(final String suiteName, final String jobId, 
+    private File getBackupFile(final String suiteName, final String jobId,
             final Date backupDate) {
         resolveDirsIfNeeded();
         String date = new SimpleDateFormat(
@@ -316,7 +316,7 @@ public class FileJobStatusStore implements IJobStatusStore {
                         + backupDir, e);
             }
         }
-        return new File(backupDir + "/" + date + "__" 
+        return new File(backupDir + "/" + date + "__"
                 + FileUtil.toSafeFileName(suiteName)
                 + "__" + FileUtil.toSafeFileName(jobId) + ".job");
     }
@@ -342,7 +342,7 @@ public class FileJobStatusStore implements IJobStatusStore {
             writer.close();
         } catch (XMLStreamException e) {
             throw new IOException("Cannot save as XML.", e);
-        }       
+        }
     }
 
     @Override

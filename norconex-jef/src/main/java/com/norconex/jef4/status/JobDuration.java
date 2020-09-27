@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 Norconex Inc.
+/* Copyright 2010-2020 Norconex Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,14 @@
  */
 package com.norconex.jef4.status;
 
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+
 import java.util.Date;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Holds time-related information about a job execution.
@@ -26,17 +31,17 @@ public class JobDuration {
 
     private Date resumedStartTime;
     private Date resumedLastActivity;
-    
+
     private Date startTime;
     private Date endTime;
-    
+
     /**
      * Creates a job elapsed time.
      */
     public JobDuration() {
         super();
     }
-    
+
     /**
      * Gets the end time.
      * @return end time
@@ -78,11 +83,11 @@ public class JobDuration {
         }
         return 0;
     }
-    
+
     /**
-     * Gets the elapsed time in milliseconds between the start date of the 
+     * Gets the elapsed time in milliseconds between the start date of the
      * first elapsed time and the end of the last elapsed time.  If there
-     * are no previous elapsed time, this method has the same effect 
+     * are no previous elapsed time, this method has the same effect
      * as calling {@link #getDuration()}.
      * @return the total elapsed time
      */
@@ -111,5 +116,17 @@ public class JobDuration {
             return resumedLastActivity.getTime() - resumedStartTime.getTime();
         }
         return 0;
+    }
+    @Override
+    public boolean equals(final Object other) {
+        return EqualsBuilder.reflectionEquals(this, other);
+    }
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, SHORT_PREFIX_STYLE);
     }
 }
