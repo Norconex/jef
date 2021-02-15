@@ -14,6 +14,8 @@
  */
 package com.norconex.jef5.suite;
 
+import static com.norconex.commons.lang.file.FileUtil.toSafeFileName;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -152,10 +154,15 @@ public final class JobSuite {
     }
     public static Path getStatusBackupDir(
             Path suiteWorkdir, String suiteId, Instant date) {
-        return FileUtil.toDateFormattedDir(suiteWorkdir.resolve(Paths.get(
-                FileUtil.toSafeFileName(suiteId),
-                        STATUS_BACKUP_SUBDIR)).toFile(),
-                DateUtil.toDate(date), "yyyy/MM/dd/HH-mm-ss").toPath();
+        Path dir = FileUtil.toDateFormattedDir(suiteWorkdir.resolve(
+            Paths.get(toSafeFileName(suiteId), STATUS_BACKUP_SUBDIR)).toFile(),
+            DateUtil.toDate(date), "yyyy/MM/dd/HH-mm-ss").toPath();
+        int cnt = 1;
+        while (Files.exists(dir)) {
+            cnt++;
+            dir = dir.resolveSibling(dir.getFileName() + "_" + cnt);
+        }
+        return dir;
     }
 
     public Path getStatusIndex() {
