@@ -421,7 +421,7 @@ public class JobSuiteStatus implements Serializable {
         }
     }
 
-    private static class TreeNode implements Serializable {
+    protected static class TreeNode implements Serializable {
         private static final long serialVersionUID = 1L;
 
         private String jobId;
