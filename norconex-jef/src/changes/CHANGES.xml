@@ -7,7 +7,7 @@
   </properties>
   <body>
 
-    <release version="4.1.3-SNAPSHOT" date="2020-??-??" description="Bugfix release">
+    <release version="4.1.3" date="2021-10-18" description="Bugfix release">
       <action dev="essiembre" type="fix" issue="13">
         Added conditional checks before log4j-specific method calls not covered
         by "log4j-over-slf4j".
